@@ -1,6 +1,8 @@
 <script>
-	//import { tooltip } from 'svooltip';
-	//import 'svooltip/styles.css'
+	import { goto } from "$app/navigation";
+	import { json } from "@sveltejs/kit";
+	// import Testplot, {handleMessage} from "./test_plot.svelte";
+	// import { plot_result } from "./test_plot.svelte";
 	import Simulate from "./simulate.svelte";
 	import ConvertSchematic from "./convertSchematic.svelte";
 	import Experiment, { set_trace_names } from "./experiment.svelte";
@@ -198,9 +200,7 @@
 			settings.title[current_plot] = val;
 			settings.measfile[current_plot] = file
 				.replace(/^"/, "")
-				.replace(/"$/, "")
-				.replace('%HOMEPATH%', data.props.home)
-				.replace('$HOME', data.props.home);
+				.replace(/"$/, "");
 			settings.selection[current_plot] = sel;
 			settings.invert_x[current_plot] = inv_x == "true" ? true : false;
 			settings.invert_y[current_plot] = inv_y == "true" ? true : false;
@@ -314,8 +314,7 @@
 <hr />
 <div>
 	<button on:click={load_measurement_group_file} class="button-2"
-		use:tooltip={{content: 'load measurement group file'}}
-	>Load measurement group file</button
+		>Load measurement group file</button
 	>
 	<!-- ConvertSchematic / -->
 	{#if settings.meas_group != undefined}

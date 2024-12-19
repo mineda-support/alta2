@@ -1,5 +1,5 @@
 <script context="module">
-  import { goto } from "$app/navigation";
+  //import { goto } from "$app/navigation";
   export function get_control(props) {
     if (Array.isArray(props)) {
       return props[0].control;
@@ -11,8 +11,8 @@
 
 <script>
   // import { end_hydrating } from "svelte/internal";
-  import { createEventDispatcher } from "svelte";
-  import InputWideValue from "./Utils/input_wide_value.svelte";
+  // import { createEventDispatcher } from "svelte";
+  import * as InputWideValue from "./Utils/input_wide_value.svelte";
 
   export let data;
   export let probes;
@@ -97,6 +97,7 @@
   if (data.props != undefined && data.props.ckt != undefined) {
     scoops = data.props.ckt;
   }
+  /*
   import {
     ckt_name,
     dir_name,
@@ -104,6 +105,7 @@
     elements_store,
     models_store,
   } from "./stores.js";
+  */
   import { element } from "svelte/internal";
   import { log } from "plotly.js-dist";
   let ckt;
@@ -372,20 +374,20 @@
               </td>
               {#each Object.entries(variations) as [elm, vals]}
                 <td
-                  ><InputWideValue
+                  ><!-- InputWideValue
                     lab={elm + "#" + String(i + 1)}
                     bind:val={vals[i]}
-                  />
+                  / -->
                 </td>
               {/each}
             </tr>
           {/each}
         {/if}
         <tr>
-          <td><button on:click={add_variation} class="td-button">+</button></td>
-          <button on:click={remove_variation(remove_index)} class="td-button"
+          <td><!-- button on:click={add_variation} class="td-button">+</button></td -->
+          <!-- button on:click={remove_variation(remove_index)} class="td-button"
             >-</button
-          >
+          -->
           remove_index: <input bind:value={remove_index} />
         </tr>
       </tbody>

@@ -382,10 +382,10 @@
             >
         </div>
     {/if}
-    <button
+    <!-- button
         on:click={plot_result_clicked}
         class="button-1">Plot with probes:</button
-    >
+    -->
     <input bind:value={probes} style="border:darkgray solid 1px;" />
     {#if probes == undefined || !probes.startsWith("frequency")}
         <label>
@@ -480,11 +480,11 @@
             >
             {#if Array.isArray(calculated_value)}
                 <table>
-                    <tr>
+                    <thead>
                         {#each performances as perf}
                             <th>{perf}</th>
                         {/each}
-                    </tr>
+                    </thead>
                     {#each calculated_value as vals}
                         <tr>
                             {#each vals as val}
