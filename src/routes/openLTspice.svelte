@@ -12,7 +12,7 @@
 <script>
   // import { end_hydrating } from "svelte/internal";
   // import { createEventDispatcher } from "svelte";
-  import * as InputWideValue from "./Utils/input_wide_value.svelte";
+  import InputWideValue from "./Utils/input_wide_value.svelte";
 
   export let data;
   export let probes;
