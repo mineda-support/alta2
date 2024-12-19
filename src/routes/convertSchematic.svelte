@@ -1,25 +1,34 @@
-<script>
+<script lang="ts">
+   import { run } from 'svelte/legacy';
+
     import { enhance, applyAction } from "$app/forms";
     import { goto } from "$app/navigation";
     //import { dir_name } from "./stores.js";
     //let dir;
     // dir_name.subscribe((value) => {
     //    dir = value;
-    //});
-    export let dir;
+    
+   interface Props {
+      //});
+      dir: any;
+   }
+
+   let { dir }: Props = $props();
 
     // function convertSchematic(selected) {
     //    alert("conversion to " + selected);
     // }
-    let selected;
-    let program;
-    $: if (selected == "Xschem") {
-        program = `
-create_cdraw()
-dir = Dir.pwd
-cdraw2target 'xschem', File.join(dir,'cdraw'), File.join(dir,'./Xschem')
-`;
-    }
+    let selected = $state();
+    let program = $state();
+    run(() => {
+      if (selected == "Xschem") {
+           program = `
+   create_cdraw()
+   dir = Dir.pwd
+   cdraw2target 'xschem', File.join(dir,'cdraw'), File.join(dir,'./Xschem')
+   `;
+       }
+   });
     /*
     function convert_from_ltspice(program) {
         const encoded_params = `dir=${encodeURIComponent(dir)}`;

@@ -1,4 +1,6 @@
-<script>
+<script lang="ts">
+	import { run } from 'svelte/legacy';
+
 	import { goto } from "$app/navigation";
 	import { json } from "@sveltejs/kit";
 	// import Testplot, {handleMessage} from "./test_plot.svelte";
@@ -25,10 +27,10 @@
 	} from "./stores.js";
 	//import { stringify } from "postcss";
 	//import { A } from "plotly.js-dist";
-	let file;
-	let dir;
-	let ckt;
-	let elements;
+	let file = $state();
+	let dir = $state();
+	let ckt = $state();
+	let elements = $state();
 	//let models;
 
 	ckt_name.subscribe((value) => {
@@ -48,15 +50,15 @@
 	//	models = value;
 	//});
 	//models_store.set({});
-	let settings;
+	let settings = $state();
 	settings_store.subscribe((value) => {
 		settings = value;
 	});
 	ckt_store.set(undefined);
 
-	export let data;
+	let { data } = $props();
 
-	let results_data = [];
+	let results_data = $state([]);
 	results_data[0] = [];
 
 	export function handleMessage(event) {
@@ -67,8 +69,10 @@
 
 	let calculated_value;
 	// $: calculated_value = calculated_value;
-	$: results_data = results_data;
-	let current_plot; //  = 0;
+	run(() => {
+		results_data = results_data;
+	});
+	let current_plot = $state(); //  = 0;
 	function plot_results() {
 		if (variations == {}) {
 			return;
@@ -138,17 +142,17 @@
 		sweep_title: [],
 		result_title: [],
 	};
-	let ckt_data = {
+	let ckt_data = $state({
 		measdata: [],
 		plotdata: [],
 		db_data: [],
 		ph_data: [],
 		calculated_value: [],
-	};
+	});
 	settings.plot_showhide = [true];
 	settings.probes = [""];
 	ckt_data.measdata = [[]];
-	let variations = {};
+	let variations = $state({});
 
 	async function load_measurement_group_file() {
 		if (ckt == undefined || ckt.elements == undefined) {
@@ -289,7 +293,7 @@
 		}
 		settings = settings;
 	}
-	let nvar = 0;
+	let nvar = $state(0);
 </script>
 
 <ConvertSchematic {dir} />
@@ -313,19 +317,19 @@
 </div>
 <hr />
 <div>
-	<button on:click={load_measurement_group_file} class="button-2"
+	<button onclick={load_measurement_group_file} class="button-2"
 		>Load measurement group file</button
 	>
 	<!-- ConvertSchematic / -->
 	{#if settings.meas_group != undefined}
-		<button on:click={setup_measurement_group} class="button-1"
+		<button onclick={setup_measurement_group} class="button-1"
 			>Setup</button
 		>
 		<button
-			on:click={plot_measurement_group}
+			onclick={plot_measurement_group}
 			class="button-2">Plot measurement group</button
 		>
-		<button on:click={clear_measurement_group} class="button-1"
+		<button onclick={clear_measurement_group} class="button-1"
 			>Clear</button
 		>
 		{#each settings.meas_group as line}
@@ -367,8 +371,8 @@
 	></PlotResults>
 {/each}
 
-<button on:click={add_plot} class="button-2">Add plot</button>
-<button on:click={delete_plot} class="button-2">Delete plot</button>
+<button onclick={add_plot} class="button-2">Add plot</button>
+<button onclick={delete_plot} class="button-2">Delete plot</button>
 
 {#if settings.equation[current_plot] != undefined}
 	<Experiment

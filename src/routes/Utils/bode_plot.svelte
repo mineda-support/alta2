@@ -1,12 +1,14 @@
-<script>
+<script lang="ts">
     import Plot from "svelte-plotly.js";
 
-    export let db_data;
-    export let ph_data;
-    export let title;
-    export let title_x;
-    export let title_y1;
-    export let title_y2;
+    let {
+        db_data,
+        ph_data,
+        title,
+        title_x,
+        title_y1,
+        title_y2
+    } = $props();
 </script>
 
 <Plot

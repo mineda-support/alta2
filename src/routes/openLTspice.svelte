@@ -1,4 +1,4 @@
-<script context="module">
+<script module>
   //import { goto } from "$app/navigation";
   export function get_control(props) {
     if (Array.isArray(props)) {
@@ -9,16 +9,13 @@
   }
 </script>
 
-<script>
+<script lang="ts">
+  import { run } from 'svelte/legacy';
+
   // import { end_hydrating } from "svelte/internal";
   // import { createEventDispatcher } from "svelte";
   import InputWideValue from "./Utils/input_wide_value.svelte";
 
-  export let data;
-  export let probes;
-  export let variations = {};
-  export let nvar;
-  export let current_plot;
 
   const dispatch = createEventDispatcher();
 
@@ -93,7 +90,7 @@
   function fakeOpen(file) {
     alert(`you have chosen ${file}`);
   }
-  let scoops;
+  let scoops = $state();
   if (data.props != undefined && data.props.ckt != undefined) {
     scoops = data.props.ckt;
   }
@@ -106,27 +103,34 @@
     models_store,
   } from "./stores.js";
   */
-  import { element } from "svelte/internal";
+  // import { element } from "svelte/internal";
   import { log } from "plotly.js-dist";
-  let ckt;
+  let {
+    data = $bindable(),
+    probes = $bindable(),
+    variations = $bindable({}),
+    nvar = $bindable(),
+    current_plot = $bindable()
+  } = $props();
+  let ckt = $state();
   ckt_store.subscribe((value) => {
     ckt = value;
   });
-  let dir;
+  let dir = $state();
   dir_name.subscribe((value) => {
     dir = value;
   });
-  let elements = {};
+  let elements = $state({});
   elements_store.subscribe((value) => {
     elements = value;
   });
-  let models = {};
+  let models = $state({});
   models_store.subscribe((value) => {
     models = value;
   });
 
   let traces = "";
-  let showup = false;
+  let showup = $state(false);
   if (scoops != undefined) {
     openLTspice(data.props.wdir, scoops, showup);
   }
@@ -143,17 +147,17 @@
     //wdir = handle.name; # does not return path
     goto("/development/test3?wdir=" + wdir);
   }
-  let alter_src;
-  let alter = [{}];
-  let c, e;
-  $: {
+  let alter_src = $state();
+  let alter = $state([{}]);
+  let c = $state(), e = $state();
+  run(() => {
     if (alter_src != undefined) {
       [c, e] = alter_src.split(":");
       if (alter[0][alter_src] == undefined) {
         alter[0][alter_src] = elements[c][e];
       }
     }
-  }
+  });
 
   function add_alter() {}
 
@@ -222,15 +226,17 @@
     //console.log("After: ", variations, 'nvar=', nvar);
     variations = variations;
   }
-  $: variations = variations;
-  let src;
+  run(() => {
+    variations = variations;
+  });
+  let src = $state();
   // let nvar = 0;
-  let remove_index = 0;
-  $: {
+  let remove_index = $state(0);
+  run(() => {
     dir = data.props.wdir;
     dir_name.set(dir);
     console.log("*** dir=", dir);
-  }
+  });
 </script>
 
 <h2>
@@ -241,7 +247,7 @@
       style="border:darkgray solid 1px;width: 50%;"
     />
   {/if}
-  <button on:click={switch_wdir(data.props.wdir)} class="button-1"
+  <button onclick={switch_wdir(data.props.wdir)} class="button-1"
     >Switch Wdir</button
   >
 </h2>
@@ -257,7 +263,7 @@
 </div>
 <div>
   <button
-    on:click={openLTspice(data.props.wdir, scoops, showup)}
+    onclick={openLTspice(data.props.wdir, scoops, showup)}
     class="button-1"
   >
     Click here to read-in</button
@@ -332,8 +338,8 @@
       style="border:darkgray solid 1px;"
       bind:value={alter[0][alter_src]}
     /><br />
-    <button on:click={add_alter} class="button-item">New Tab</button>
-    <button on:click={check_alter} class="button-item">Check Alter</button>
+    <button onclick={add_alter} class="button-item">New Tab</button>
+    <button onclick={check_alter} class="button-item">Check Alter</button>
   </div>
   <input id="TAB-04" type="radio" name="TAB" class="tab-switch" />
   <label class="tab-label" for="TAB-04">Variation</label>
@@ -349,8 +355,8 @@
           {/each}
         {/each}
       </select>
-      <button on:click={add_variation_item(src)} class="td-button">+</button>
-      <button on:click={remove_variation_item(src)} class="td-button">-</button>
+      <button onclick={add_variation_item(src)} class="td-button">+</button>
+      <button onclick={remove_variation_item(src)} class="td-button">-</button>
       (nvar={nvar})
     </div>
     <table>
@@ -397,7 +403,7 @@
 {#if ckt != undefined}
   <div class="sample">
     {#each ckt.info as node}
-      <button on:click={push_button(node)} class="button-item">{node}</button>
+      <button onclick={push_button(node)} class="button-item">{node}</button>
     {/each}
   </div>
 {/if}

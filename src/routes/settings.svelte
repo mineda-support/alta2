@@ -1,13 +1,5 @@
-<script>
-  /*
-  import { settings_store } from "./stores.js";
-  let settings;
-
-  settings_store.subscribe((value) => {
-    settings = value;
-  });
-  */
-  export let settings;
+<script lang="ts">
+  
 
   async function save_settings(data, settings_name, ckt, variations) {
     const props = data.props;
@@ -50,13 +42,33 @@
     variations = props.variations;
   }
   console.log("settings=", settings);
-  let settings_name = "default";
-  export let data, ckt, variations;
+  let settings_name = $state("default");
+  interface Props {
+    /*
+  import { settings_store } from "./stores.js";
+  let settings;
+
+  settings_store.subscribe((value) => {
+    settings = value;
+  });
+  */
+    settings: any;
+    data: any;
+    ckt: any;
+    variations: any;
+  }
+
+  let {
+    settings = $bindable(),
+    data,
+    ckt,
+    variations = $bindable()
+  }: Props = $props();
 </script>
 
 <div>
   <button
-    on:click={save_settings(data, settings_name, ckt, variations)}
+    onclick={save_settings(data, settings_name, ckt, variations)}
     class="button-1"
   >
     Save settings in:</button
@@ -65,7 +77,7 @@
     <input
       type="text"
       autocomplete="off"
-      on:keydown={async (e) => {
+      onkeydown={async (e) => {
         if (e.key == "Enter") {
           save_settings(data, settings_name, ckt);
         }
@@ -75,14 +87,14 @@
     />
   </label>
   <button
-    on:click={() => load_settings(settings_name, data.props.wdir)}
+    onclick={() => load_settings(settings_name, data.props.wdir)}
     class="button-1"
     >Load settings from:
   </button>
   <select
     bind:value={settings_name}
     style="border:darkgray solid 1px;"
-    on:change={() => load_settings(settings_name, data.props.wdir)}
+    onchange={() => load_settings(settings_name, data.props.wdir)}
   >
     {#if data.props != undefined}
       {#each data.props.setting_names as setting}

@@ -1,4 +1,4 @@
-<script context="module">
+<script module>
 	export function set_trace_names(res2, probes, elements, step_precision) {
 		const plotdata = res2.traces;
 		const db_data = res2.db;
@@ -57,7 +57,9 @@
 	}
 </script>
 
-<script>
+<script lang="ts">
+	import { run } from 'svelte/legacy';
+
 	import Plot from "svelte-plotly.js";
 	import { update_elements, update_models } from "./simulate.svelte";
 	import SweepSource from "./utils/sweep_source.svelte";
@@ -70,15 +72,9 @@
 	} from "./stores.js";
 	import { bindAll, dot$1, number, R, update } from "plotly.js-dist";
 	let ckt;
-	let file, dir;
+	let file, dir = $state();
 	let models;
 
-	export let settings;
-	export let results_data;
-	export let elements;
-	export let probes;
-	export let equation; 
-	export let performance_names;
 
 	ckt_name.subscribe((value) => {
 		file = value;
@@ -130,19 +126,31 @@
 		plot_data = await res.json();
 		console.log(plot_data);
 	}
-	let plot_data;
-	let sweep_name;
-	$: settings.sweep_name = sweep_name;
+	let plot_data = $state();
+	let sweep_name = $state();
+	run(() => {
+		settings.sweep_name = sweep_name;
+	});
 	let src1;
-	$: settings.src1 = src1;
+	run(() => {
+		settings.src1 = src1;
+	});
 
 	import { createEventDispatcher } from "svelte";
+	let {
+		settings = $bindable(),
+		results_data = $bindable(),
+		elements = $bindable(),
+		probes,
+		equation,
+		performance_names
+	} = $props();
 	const dispatch = createEventDispatcher();
 
 	function postprocess(settings) {
 		eval(settings.postprocess);
 	}
-	let plot_data2;
+	let plot_data2 = $state();
 	settings.result_number = 0;
 	results_data[settings.result_number] = {};
 	function add_experiment() {
@@ -277,15 +285,15 @@
 	// console.log("updates=", updates, `on ${dir}${target}.asc`);
 	// await update_elms(dir, target+'.asc', updates);
 
-	let performances;
-	$: {
+	let performances = $state();
+	run(() => {
 		let performance_names = settings.performance_names[settings.plot_number];
 		if (performance_names != undefined) {
 			console.log(`performance_names[${settings.plot_number}]=`, performance_names);
 			performances = performance_names.split(",").map((a) => a.trim());
 			console.log('performances=', performances);
 		}
-	}
+	});
 
 	async function go_experiments(dir, settings, elements) {
 		if (ckt == undefined) {
@@ -703,10 +711,10 @@
 	></SweepSource>
 {/each}
 <label>
-	<button on:click={add_experiment} class="button-2">Add experiment</button>
+	<button onclick={add_experiment} class="button-2">Add experiment</button>
 </label>
 <label>
-	<button on:click={clear_experiment} class="button-1"
+	<button onclick={clear_experiment} class="button-1"
 		>Clear experiment</button
 	>
 </label>
@@ -714,24 +722,24 @@
 <div>
 	<label>
 		<button
-			on:click={preview_experiments(dir, settings, elements)}
+			onclick={preview_experiments(dir, settings, elements)}
 			class="button-1">Dry run</button
 		>
 	</label>
 	<label>
 		<button
-			on:click={go_experiments(dir, settings, elements)}
+			onclick={go_experiments(dir, settings, elements)}
 			class="button-1">Go</button
 		>
 	</label>
 	<label>
-		<button on:click={clear_experiments} class="button-1">clear</button>
+		<button onclick={clear_experiments} class="button-1">clear</button>
 	</label>
 	<label>
-		<button on:click={save_experiments} class="button-1">Save</button>
+		<button onclick={save_experiments} class="button-1">Save</button>
 	</label>
 	<label>
-		<button on:click={load_experiments} class="button-1">Load</button>
+		<button onclick={load_experiments} class="button-1">Load</button>
 	</label>
 </div>
 

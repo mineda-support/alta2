@@ -1,6 +1,5 @@
-<script>
-    export let lab;
-    export let val;
+<script lang="ts">
+    let { lab, val = $bindable() } = $props();
 </script>
 
 <label>{lab}

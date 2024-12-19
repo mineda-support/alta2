@@ -1,8 +1,11 @@
-<script>
+<script lang="ts">
     import Plot from "svelte-plotly.js";
-    export let plot_data;
-    export let title, performance;
-    export let sweep_name;
+    let {
+        plot_data,
+        title,
+        performance,
+        sweep_name
+    } = $props();
 </script>
 
 <Plot

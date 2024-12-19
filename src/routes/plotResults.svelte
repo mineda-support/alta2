@@ -1,4 +1,4 @@
-<script context="module">
+<script module>
     function get_sweep_values(plotdata) {
         let values = [];
         let sweep, value;
@@ -101,7 +101,9 @@
 
 </script>
 
-<script>
+<script lang="ts">
+    import { run } from 'svelte/legacy';
+
     import BodePlot from "./utils/bode_plot.svelte";
     import SinglePlot from "./utils/single_plot.svelte";
     import { set_trace_names } from "./experiment.svelte";
@@ -111,23 +113,45 @@
     ckt_store.subscribe((value) => {
       ckt = value;
     });
-    export let current_plot;
-    export let dir, file, measfile, plot_showhide, plot_number;
-    export let selection, reverse, invert_x, invert_y, tracemode;
-    export let title, title_x, title_y, title_y1, title_y2;
-    export let equation, probes, performance_names;
-    export let xaxis_is_log, yaxis_is_log;
-    export let step_precision, calculated_value;
-    export let plotdata, db_data, ph_data, measdata;
-    export let results_data, elements;
+    let {
+        current_plot = $bindable(),
+        dir,
+        file,
+        measfile = $bindable(),
+        plot_showhide = $bindable(),
+        plot_number,
+        selection = $bindable(),
+        reverse = $bindable(),
+        invert_x = $bindable(),
+        invert_y = $bindable(),
+        tracemode = $bindable(),
+        title = $bindable(),
+        title_x = $bindable(),
+        title_y = $bindable(),
+        title_y1 = $bindable(),
+        title_y2 = $bindable(),
+        equation = $bindable(),
+        probes = $bindable(),
+        performance_names = $bindable(),
+        xaxis_is_log = $bindable(),
+        yaxis_is_log = $bindable(),
+        step_precision = $bindable(),
+        calculated_value = $bindable(),
+        plotdata = $bindable(),
+        db_data = $bindable(),
+        ph_data = $bindable(),
+        measdata = $bindable(),
+        results_data = $bindable(),
+        elements
+    } = $props();
 
     let sweep_name;
-    let performances;
-    $: {
+    let performances = $state();
+    run(() => {
         if (performance_names != undefined) {
             performances = performance_names.split(",").map((a) => a.trim());
         }
-    }
+    });
 
     const options = {
         types: [
@@ -321,17 +345,17 @@
     equation = "x.where(y, 2.5){|x, y| x > 1e-6}";
 </script>
 
-<button on:click={() => (plot_showhide = !plot_showhide)} class="button-2"
+<button onclick={() => (plot_showhide = !plot_showhide)} class="button-2"
     >Show/hide</button
 >
 {plot_number}
 {#if plot_showhide}
-    <button on:click={() => (current_plot = plot_number)} class="button-2"
+    <button onclick={() => (current_plot = plot_number)} class="button-2"
         >Make current</button
     >
     <div>
         <button
-            on:click={get_measurement_results(
+            onclick={get_measurement_results(
                 measfile.trim().replace(/^"/, "").replace(/"$/, ""),
                 selection,
                 reverse,
@@ -375,10 +399,10 @@
                     />
                 </label>
             {/each}
-            <button on:click={checkall_measdata} class="button-1"
+            <button onclick={checkall_measdata} class="button-1"
                 >check all</button
             >
-            <button on:click={clear_measdata} class="button-1">clear all</button
+            <button onclick={clear_measdata} class="button-1">clear all</button
             >
         </div>
     {/if}
@@ -402,7 +426,7 @@
         <input bind:value={step_precision} />
     </label>
     <label>
-        <button on:click={clear_plot} class="button-1">clear</button>
+        <button onclick={clear_plot} class="button-1">clear</button>
     </label>
     <!-- label>
         <button on:click={redraw} class="button-1">redraw</button>
@@ -473,7 +497,7 @@
             >Equation(s)
             <input bind:value={equation} style="border:darkgray solid 1px;" />
             <button
-                on:click={calculate_equation(results_data[0])}
+                onclick={calculate_equation(results_data[0])}
                 class="button-1"
             >
                 Calculate</button

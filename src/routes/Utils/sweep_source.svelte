@@ -1,23 +1,46 @@
-<script>
+<script lang="ts">
     import InputValue from "./input_value.svelte";
-    export let src;
-    export let par_name;
-    export let src_values;
-    export let src_plus;
-    export let sweep_type='Linear';
-    export let start_lin_val;
-    export let stop_lin_val;
-    export let lin_incr;
-    export let src_value;
-    export let start_dec_val;
-    export let stop_dec_val;
-    export let dec_points;
-    export let start_oct_val;
-    export let stop_oct_val;
-    export let oct_points;
-    export let elements;
-    export let source_title;
-    export let src_precision=3;
+    interface Props {
+        src: any;
+        par_name: any;
+        src_values: any;
+        src_plus: any;
+        sweep_type?: string;
+        start_lin_val: any;
+        stop_lin_val: any;
+        lin_incr: any;
+        src_value: any;
+        start_dec_val: any;
+        stop_dec_val: any;
+        dec_points: any;
+        start_oct_val: any;
+        stop_oct_val: any;
+        oct_points: any;
+        elements: any;
+        source_title: any;
+        src_precision?: number;
+    }
+
+    let {
+        src = $bindable(),
+        par_name = $bindable(),
+        src_values = $bindable(),
+        src_plus = $bindable(),
+        sweep_type = $bindable('Linear'),
+        start_lin_val = $bindable(),
+        stop_lin_val = $bindable(),
+        lin_incr = $bindable(),
+        src_value,
+        start_dec_val = $bindable(),
+        stop_dec_val = $bindable(),
+        dec_points = $bindable(),
+        start_oct_val = $bindable(),
+        stop_oct_val = $bindable(),
+        oct_points = $bindable(),
+        elements,
+        source_title,
+        src_precision = 3
+    }: Props = $props();
 
     function set_src_values() {
         console.log("sweep type:", sweep_type);
@@ -67,7 +90,7 @@
         src_plus.pop();
         console.log("src_plus=", src_plus);
     }
-    let value_list=[];
+    let value_list=$state([]);
 </script>
 
 <div>
@@ -89,12 +112,12 @@
             </select>
         {/if}
         <label>
-            <button on:click={add_additional_source} class="button-1">
+            <button onclick={add_additional_source} class="button-1">
                 add
             </button> {src_plus ? src_plus.join('&') : ''}
         </label>
         <label>
-            <button on:click={clear_additional_source} class="button-1">
+            <button onclick={clear_additional_source} class="button-1">
                 clear
             </button>
         </label>
@@ -134,7 +157,7 @@
                     /></label
                 >
             {/if}
-            <button on:click={set_src_values} class="button-1"
+            <button onclick={set_src_values} class="button-1"
                 >Set source values</button
             >
             <label>precision:

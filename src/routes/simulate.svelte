@@ -1,4 +1,4 @@
-<script context="module">
+<script module>
     export async function update_elements(dir, ckt, elements) {
         for (const [ckt_name, elms] of Object.entries(ckt.elements)) {
             if (ckt_name[0] == ".") {
@@ -76,7 +76,7 @@
     }
 </script>
 
-<script>
+<script lang="ts">
     import { get_control } from "./openLTspice.svelte";
     import {
         ckt_name,
@@ -155,11 +155,10 @@
         // plotdata = get_results();
         return res2;
     }
-    export let variations;
-    export let probes;
+    let { variations, probes } = $props();
 </script>
 
-<button on:click={goLTspice} class="button-1">
+<button onclick={goLTspice} class="button-1">
     Click here to Start LTspice simulation</button
 >
 

@@ -1,13 +1,15 @@
-<script>
+<script lang="ts">
     import Plot from "svelte-plotly.js";
 
-    export let plotdata;
-    export let measdata;
-    export let title;
-    export let title_x;
-    export let title_y;
-    export let xaxis_is_log;
-    export let yaxis_is_log;    
+    let {
+        plotdata,
+        measdata,
+        title,
+        title_x,
+        title_y,
+        xaxis_is_log,
+        yaxis_is_log
+    } = $props();
 </script>
 
 <Plot
