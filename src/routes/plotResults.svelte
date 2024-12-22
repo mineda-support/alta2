@@ -115,8 +115,8 @@
     });
     let {
         current_plot = $bindable(),
-        dir,
-        file,
+        dir = $bindable(),
+        file = $bindable(),
         measfile = $bindable(),
         plot_showhide = $bindable(),
         plot_number,
@@ -142,7 +142,7 @@
         ph_data = $bindable(),
         measdata = $bindable(),
         results_data = $bindable(),
-        elements
+        elements = $bindable()
     } = $props();
 
     let sweep_name;

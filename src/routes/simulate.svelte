@@ -156,7 +156,7 @@
         // plotdata = get_results();
         return res2;
     }
-    let { variations, probes, on_sim_start, on_sim_end } = $props();
+    let { variations = $bindable(), probes = $bindable() , on_sim_start, on_sim_end } = $props();
 </script>
 
 <button onclick={goLTspice} class="button-1">

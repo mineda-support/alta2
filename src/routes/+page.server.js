@@ -1,5 +1,5 @@
 import fs from 'fs';
-//import glob from 'glob';
+import { globSync } from 'node:fs'
 import path from 'path';
 
 /*
@@ -25,11 +25,11 @@ export function load({ url }) {
             });
         });
 
-        const files = glob.sync(wdir + '*.asc').concat(glob.sync(wdir + '*.sch'));
+        const files = globSync(wdir + '*.asc').concat(globSync(wdir + '*.sch'));
         files.forEach(file => {
             // console.log(file);
         });
-        const setting_files = glob.sync(wdir + '*_settings.json');
+        const setting_files = globSync(wdir + '*_settings.json');
         console.log(setting_files);
         return {
             props: {

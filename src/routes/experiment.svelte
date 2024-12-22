@@ -141,9 +141,9 @@
 		settings = $bindable(),
 		results_data = $bindable(),
 		elements = $bindable(),
-		probes,
-		equation,
-		performance_names,
+		probes = $bindable(),
+		equation = $bindable(),
+		performance_names = $bindable(),
 		on_sim_start, on_sim_end
 	} = $props();
 	const dispatch = createEventDispatcher();

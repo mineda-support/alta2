@@ -40,9 +40,9 @@
         console.log(`dir=${encodeURIComponent(dir)}`);
         return `dir=${encodeURIComponent(dir)}`;
     }
-    function handleSubmit() {
+    /* function handleSubmit() {
         goto("/development/test3/");
-    }
+    } */
 </script>
 
 <!-- form method="POST" on:submit={handleSubmit} class='button-2'></form -->

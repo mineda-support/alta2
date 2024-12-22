@@ -146,7 +146,7 @@
   function switch_wdir(wdir) {
     //const handle = await window.showDirectoryPicker();
     //wdir = handle.name; # does not return path
-    goto("/development/test3?wdir=" + wdir);
+    goto("?wdir=" + wdir);
   }
   let alter_src = $state();
   let alter = $state([{}]);
@@ -227,17 +227,15 @@
     //console.log("After: ", variations, 'nvar=', nvar);
     variations = variations;
   }
-  run(() => {
-    variations = variations;
-  });
+
   let src = $state();
   // let nvar = 0;
   let remove_index = $state(0);
-  run(() => {
+  if (data != undefined && data.props != undefined) {
     dir = data.props.wdir;
     dir_name.set(dir);
     console.log("*** dir=", dir);
-  });
+  }
 </script>
 
 <h2>
@@ -264,7 +262,7 @@
 </div>
 <div>
   <button
-    onclick={openLTspice(data.props.wdir, scoops, showup)}
+    onclick={() => openLTspice(data.props.wdir, scoops, showup)}
     class="button-1"
   >
     Click here to read-in</button

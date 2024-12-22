@@ -12,7 +12,7 @@
       props.settings[item] = value;
     }
     console.log("props=", props);
-    const response = await fetch("/development/test3/settings", {
+    const response = await fetch("settings", {
       method: "POST",
       body: JSON.stringify(props),
       headers: {
@@ -29,7 +29,7 @@
 
   async function load_settings(settings_name, dir) {
     const response = await fetch(
-      `/development/test3/settings?dir=${encodeURIComponent(
+      `settings?dir=${encodeURIComponent(
         dir,
       )}&settings_name=${settings_name}`,
     );
@@ -41,7 +41,7 @@
     settings = props.settings;
     variations = props.variations;
   }
-  console.log("settings=", settings);
+  //console.log("settings=", settings);
   let settings_name = $state("default");
   interface Props {
     /*
