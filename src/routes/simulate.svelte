@@ -108,8 +108,8 @@
         models = value;
     });
 
-    import { createEventDispatcher } from "svelte";
-    const dispatch = createEventDispatcher();
+    // import { createEventDispatcher } from "svelte";
+    // const dispatch = createEventDispatcher();
 
     export async function goLTspice() {
         if (ckt == undefined) {
@@ -134,7 +134,8 @@
                 encoded_params +
                 `&models_update=${encodeURIComponent(JSON.stringify(models_update))}`;
         }
-        dispatch("sim_start", { text: "LTspice simulation started!" });
+        // dispatch("sim_start", { text: "LTspice simulation started!" });
+        on_sim_start("LTspice simulation started!");
         let response = await fetch(
             `http://localhost:9292/api/ltspctl/simulate?${encoded_params}`,
             {},
@@ -155,7 +156,7 @@
         // plotdata = get_results();
         return res2;
     }
-    let { variations, probes } = $props();
+    let { variations, probes, on_sim_start, on_sim_end } = $props();
 </script>
 
 <button onclick={goLTspice} class="button-1">

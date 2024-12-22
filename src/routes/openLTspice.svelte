@@ -17,7 +17,7 @@
   import InputWideValue from "./Utils/input_wide_value.svelte";
 
 
-  const dispatch = createEventDispatcher();
+  // const dispatch = createEventDispatcher();
 
   async function openLTspice(dir, file, showup) {
     if (file == undefined) {
@@ -90,11 +90,7 @@
   function fakeOpen(file) {
     alert(`you have chosen ${file}`);
   }
-  let scoops = $state();
-  if (data.props != undefined && data.props.ckt != undefined) {
-    scoops = data.props.ckt;
-  }
-  /*
+  
   import {
     ckt_name,
     dir_name,
@@ -102,7 +98,7 @@
     elements_store,
     models_store,
   } from "./stores.js";
-  */
+  
   // import { element } from "svelte/internal";
   import { log } from "plotly.js-dist";
   let {
@@ -129,6 +125,11 @@
     models = value;
   });
 
+  let scoops = $state();
+  if (data != undefined && data.props != undefined && data.props.ckt != undefined) {
+    scoops = data.props.ckt;
+  }
+  
   let traces = "";
   let showup = $state(false);
   if (scoops != undefined) {
@@ -241,7 +242,7 @@
 
 <h2>
   Work directory:
-  {#if data.props != undefined}
+  {#if data != undefined && data.props != undefined && data.props.wdir != undefined}
     <input
       bind:value={data.props.wdir}
       style="border:darkgray solid 1px;width: 50%;"

@@ -143,7 +143,8 @@
 		elements = $bindable(),
 		probes,
 		equation,
-		performance_names
+		performance_names,
+		on_sim_start, on_sim_end
 	} = $props();
 	const dispatch = createEventDispatcher();
 
@@ -321,7 +322,8 @@
 			//console.log("updates=", updates, `on ${dir}${target}.asc`);
 			await update_elms(dir, target + ".asc", updates);
 
-			dispatch("sim_start", { text: "LTspice simulation started!" });
+			// dispatch("sim_start", { text: "LTspice simulation started!" });
+			on_sim_start("LTspice simulation started!");
 			let calculated_value, plotdata, db_data, ph_data;
 			[calculated_value, plotdata, db_data, ph_data, sweep_name] =
 				await goLTspice2(ckt);
@@ -490,7 +492,8 @@
 				console.log("updates=", updates, `on ${dir}${target}.asc`);
 				await update_elms(dir, target + ".asc", updates);
 
-				dispatch("sim_start", { text: "LTspice simulation started!" });
+				//dispatch("sim_start", { text: "LTspice simulation started!" });
+				sim_start("LTspice simulation started!");
 				let calculated_value = await goLTspice2(ckt);
 				if (Array.isArray(calculated_value[0])) {
 					gb.push(calculated_value[0][0]);
