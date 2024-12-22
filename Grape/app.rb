@@ -1,6 +1,6 @@
 require 'grape'
 #$:.unshift File.join(ENV['HOME'].gsub(/\\/, '/'), '/work/alb2/lib')
-$:.unshift File.join('..', 'j_pack')
+$:.unshift File.join('..', '..', 'j_pack')
 $:.unshift '.'
 puts "hello world from ruby"
 # puts $:

@@ -35,6 +35,35 @@
 			}
 		}
 	}
+	function eng2f(str) {
+		const s = str.toLowerCase();
+		let i;
+		let e;
+		if ((i = s.indexOf("t")) != -1) {
+			e = 1.0e12;
+		} else if ((i = s.indexOf("g")) != -1) {
+			e = 1.0e9;
+		} else if ((i = s.indexOf("meg")) != -1) {
+			e = 1.0e6;
+		} else if ((i = s.indexOf("k")) != -1) {
+			e = 1.0e3;
+		} else if ((i = s.indexOf("f")) != -1) {
+			e = 1.0e-15;
+		} else if ((i = s.indexOf("p")) != -1) {
+			e = 1.0e-12;
+		} else if ((i = s.indexOf("n")) != -1) {
+			e = 1.0e-9;
+		} else if ((i = s.indexOf("u")) != -1) {
+			e = 1.0e-6;
+		} else if ((i = s.indexOf("m")) != -1) {
+			e = 1.0e-3;
+		} else {
+			return Number(s);
+		}
+		//console.log("i=", i, "e=", e);
+		//console.log(s.substring(0, i), Number(s.substring(0, i)));
+		return Number(s.substring(0, i)) * e;
+	}
 
 	function parse_step_command(props, precision) {
 		// like '.step param ccap 0.2p 2p 0.5p'
@@ -128,14 +157,10 @@
 	}
 	let plot_data = $state();
 	let sweep_name = $state();
-	run(() => {
-		settings.sweep_name = sweep_name;
-	});
-	let src1;
-	run(() => {
-		settings.src1 = src1;
-	});
 
+	let src1;
+	//settings.src1 = src1;
+	
 	import { createEventDispatcher } from "svelte";
 	let {
 		settings = $bindable(),
@@ -164,36 +189,6 @@
 	}
 	function execute_script(script, dir, settings, elements) {
 		eval(script);
-	}
-
-	function eng2f(str) {
-		const s = str.toLowerCase();
-		let i;
-		let e;
-		if ((i = s.indexOf("t")) != -1) {
-			e = 1.0e12;
-		} else if ((i = s.indexOf("g")) != -1) {
-			e = 1.0e9;
-		} else if ((i = s.indexOf("meg")) != -1) {
-			e = 1.0e6;
-		} else if ((i = s.indexOf("k")) != -1) {
-			e = 1.0e3;
-		} else if ((i = s.indexOf("f")) != -1) {
-			e = 1.0e-15;
-		} else if ((i = s.indexOf("p")) != -1) {
-			e = 1.0e-12;
-		} else if ((i = s.indexOf("n")) != -1) {
-			e = 1.0e-9;
-		} else if ((i = s.indexOf("u")) != -1) {
-			e = 1.0e-6;
-		} else if ((i = s.indexOf("m")) != -1) {
-			e = 1.0e-3;
-		} else {
-			return Number(s);
-		}
-		//console.log("i=", i, "e=", e);
-		//console.log(s.substring(0, i), Number(s.substring(0, i)));
-		return Number(s.substring(0, i)) * e;
 	}
 
 	async function goLTspice2(ckt) {

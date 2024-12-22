@@ -406,10 +406,10 @@
             >
         </div>
     {/if}
-    <!-- button
-        on:click={plot_result_clicked}
+    <button
+        onclick={plot_result_clicked}
         class="button-1">Plot with probes:</button
-    -->
+    >
     <input bind:value={probes} style="border:darkgray solid 1px;" />
     {#if probes == undefined || !probes.startsWith("frequency")}
         <label>

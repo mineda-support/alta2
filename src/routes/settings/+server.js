@@ -1,5 +1,5 @@
 import fs from 'fs';
-import glob from 'glob';
+import { globSync } from 'node:fs'
 import path from 'path';
 import { json } from '@sveltejs/kit';
 
@@ -20,6 +20,6 @@ export async function POST({ request, cookies }) {
     console.log(wdir);
     fs.writeFileSync(wdir+`${settings_name}_settings.json`, JSON.stringify(props));
     console.log(props);
-    const setting_files = glob.sync(wdir + '*_settings.json');
+    const setting_files = globSync(wdir + '*_settings.json');
 	return json(setting_files.map(a => path.basename(a).replace('_settings.json', '')), { status: 201 });
 }

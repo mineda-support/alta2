@@ -51,11 +51,11 @@
       // dispatch("open_end", { text: "fake simulation ended!" });
     }
     ckt = res2;
-    console.log("ckt=", ckt);
+    //console.log("ckt=", $inspect(ckt));
     if (ckt != undefined) {
       elements = {};
       for (const [ckt_name, elms] of Object.entries(ckt.elements)) {
-        console.log(ckt_name, "=", elms);
+        //console.log(ckt_name, "=", elms);
         if (ckt_name[0] == ".") {
           console.log("skip:", ckt_name);
           continue;
@@ -66,16 +66,16 @@
           elements[ckt_name][elm] = get_control(props);
         }
       }
-      console.log("elements=", elements);
+      //console.log("elements=", $inspect(elements));
       models = {};
       for (const [model_name, model_params] of Object.entries(ckt.models)) {
-        console.log(model_name, "=", model_params[1]);
+        // console.log($inspect(model_name), "=", $inspect(model_params[1]));
         models[model_name] = {};
         for (const [par, value] of Object.entries(model_params[1])) {
           models[model_name][par] = value;
         }
       }
-      console.log("models=", models);
+      //console.log("models=", $inspect(models));
     }
     ckt_store.set(ckt);
     elements_store.set(elements);
@@ -242,7 +242,7 @@
   Work directory:
   {#if data != undefined && data.props != undefined && data.props.wdir != undefined}
     <input
-      bind:value={data.props.wdir}
+      value={data.props.wdir}
       style="border:darkgray solid 1px;width: 50%;"
     />
   {/if}

@@ -39,7 +39,7 @@
         oct_points = $bindable(),
         elements,
         source_title,
-        src_precision = 3
+        src_precision = $bindable(3)
     }: Props = $props();
 
     function set_src_values() {
