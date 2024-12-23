@@ -152,7 +152,8 @@
         // console.log(ckt.info);
         ckt_store.set(ckt);
         //}
-        dispatch("sim_end", { text: "LTspice simulation ended!" });
+        // dispatch("sim_end", { text: "LTspice simulation ended!" });
+        
         // plotdata = get_results();
         return res2;
     }

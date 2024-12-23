@@ -204,7 +204,9 @@
 			settings.title[current_plot] = val;
 			settings.measfile[current_plot] = file
 				.replace(/^"/, "")
-				.replace(/"$/, "");
+				.replace(/"$/, "")
+				.replace('%HOMEPATH%', data.props.home)
+				.replace('$HOME', data.props.home);				
 			settings.selection[current_plot] = sel;
 			settings.invert_x[current_plot] = inv_x == "true" ? true : false;
 			settings.invert_y[current_plot] = inv_y == "true" ? true : false;
@@ -310,8 +312,8 @@
 	<Simulate
 		bind:probes={settings.probes[current_plot]}
 		bind:variations
-		on:sim_end={plot_results}
-		on:sim_start={clear_all_plots}
+		on_sim_end={plot_results}
+		on_sim_start={clear_all_plots}
 	/>
 	<!-- Testplot / -->
 </div>
