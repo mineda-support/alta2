@@ -363,7 +363,7 @@
     >
     <div>
         <button
-            onclick={get_measurement_results(
+            onclick={() => get_measurement_results(
                 port,
                 measfile.trim().replace(/^"/, "").replace(/"$/, ""),
                 selection,
@@ -506,7 +506,7 @@
             >Equation(s)
             <input bind:value={equation} style="border:darkgray solid 1px;" />
             <button
-                onclick={calculate_equation(results_data[0])}
+                onclick={() => culate_equation(results_data[0])}
                 class="button-1"
             >
                 Calculate</button

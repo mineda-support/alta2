@@ -253,7 +253,7 @@
       style="border:darkgray solid 1px;width: 50%;"
     />
   {/if}
-  <button onclick={switch_wdir(data.props.wdir)} class="button-1"
+  <button onclick={() => switch_wdir(data.props.wdir)} class="button-1"
     >Switch Wdir</button
   >
   <Tooltip>switch working directory</Tooltip>
@@ -362,8 +362,8 @@
           {/each}
         {/each}
       </select>
-      <button onclick={add_variation_item(src)} class="td-button">+</button>
-      <button onclick={remove_variation_item(src)} class="td-button">-</button>
+      <button onclick={() => add_variation_item(src)} class="td-button">+</button>
+      <button onclick={() => emove_variation_item(src)} class="td-button">-</button>
       (nvar={nvar})
     </div>
     <table>
@@ -399,7 +399,7 @@
         <tr>
           <td><button onclick={add_variation} class="td-button">+</button></td>
 
-          <td><button onclick={remove_variation(remove_index)} class="td-button"
+          <td><button onclick={() => remove_variation(remove_index)} class="td-button"
             >-</button
           ></td>
           <td>remove_index:</td> <td><input bind:value={remove_index} /></td>
@@ -411,7 +411,7 @@
 {#if ckt != undefined}
   <div class="sample">
     {#each ckt.info as node}
-      <button onclick={push_button(node)} class="button-item">{node}</button>
+      <button onclick={() => push_button(node)} class="button-item">{node}</button>
     {/each}
   </div>
 {/if}

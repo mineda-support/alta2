@@ -44,11 +44,16 @@ export async function load({ url }) {
     }
 }
 
+const current_dir;
+
 async function startGrape() {
+    if (current_dir == undefined) {
+        current_dir = process.cwd();
+    }
     const port = await getPort();
     console.log('port=', port);
     const command = `rackup -p ${port}`
-    process.chdir('Grape');
+    process.chdir(current_dir + '/Grape');
     console.log('command:', command, 'dir=', process.cwd());
     exec(command,  (error, stdout, stderr) => {
         if (error) {

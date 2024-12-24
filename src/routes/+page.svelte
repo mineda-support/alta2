@@ -222,7 +222,7 @@
 	}
 
 	async function plot_measurement_group() { // ckt_data, settings
-		console.log("settings.measfile", $inspect(settings.measfile));
+		console.log("settings.measfile", settings.measfile);
 		//settings.measfile.forEach(async function (measfile, i) {
         //Note: await does not work inside forEach
 		let sweep_name;
@@ -263,7 +263,7 @@
 			//	new Promise((resolve) => setTimeout(resolve, ms));
 			//await my_sleep(3000); 
 		};
-        console.log('ckt_data=', $inspect(ckt_data));
+        console.log('ckt_data=', ckt_data);
 		console.log('sweep_name', sweep_name);
 		settings = settings;
 		ckt_data = ckt_data;

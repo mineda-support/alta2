@@ -68,7 +68,7 @@
 
 <div>
   <button
-    onclick={save_settings(data, settings_name, ckt, variations)}
+    onclick={() => save_settings(data, settings_name, ckt, variations)}
     class="button-1"
   >
     Save settings in:</button

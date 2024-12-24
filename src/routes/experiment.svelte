@@ -728,7 +728,7 @@
 	</label>
 	<label>
 		<button
-			onclick={go_experiments(dir, settings, elements)}
+			onclick={() => go_experiments(dir, settings, elements)}
 			class="button-1">Go</button
 		>
 	</label>
