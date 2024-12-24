@@ -9,7 +9,6 @@
         start_lin_val: any;
         stop_lin_val: any;
         lin_incr: any;
-        src_value: any;
         start_dec_val: any;
         stop_dec_val: any;
         dec_points: any;
@@ -30,7 +29,6 @@
         start_lin_val = $bindable(),
         stop_lin_val = $bindable(),
         lin_incr = $bindable(),
-        src_value,
         start_dec_val = $bindable(),
         stop_dec_val = $bindable(),
         dec_points = $bindable(),

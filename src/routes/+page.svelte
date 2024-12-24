@@ -18,6 +18,7 @@
 	} from "./plotResults.svelte";
 
 	import {
+		port_number,
 		ckt_name,
 		dir_name,
 		ckt_store,
@@ -27,12 +28,15 @@
 	} from "./stores.js";
 	//import { stringify } from "postcss";
 	//import { A } from "plotly.js-dist";
+	let port;
 	let file = $state();
 	let dir = $state();
 	let ckt = $state();
 	let elements = $state();
 	//let models;
-
+	port_number.subscribe((value) => {
+		port = value;
+	});
 	ckt_name.subscribe((value) => {
 		file = value;
 	});
@@ -58,7 +62,7 @@
 
 	let { data } = $props();
 
-	let results_data = $state([]);
+	let results_data = [] // $state([]);
 	results_data[0] = [];
 
 	export function handleMessage(event) {
@@ -218,13 +222,14 @@
 	}
 
 	async function plot_measurement_group() { // ckt_data, settings
-		console.log("settings.measfile", settings.measfile);
+		console.log("settings.measfile", $inspect(settings.measfile));
 		//settings.measfile.forEach(async function (measfile, i) {
         //Note: await does not work inside forEach
 		let sweep_name;
 		for (let i = 0; i < settings.measfile.length; i++) {
 			let measfile = settings.measfile[i];
 			ckt_data.measdata[i] = await measurement_results(
+				port,
 				measfile,
 				settings.selection[i],
 				settings.reverse[i],
@@ -234,6 +239,7 @@
 			);
 			//ckt_data.measdata[i] = ckt_data.measdata[i];
 			let result = plot_result(
+				port,
 				dir,
 				file,
 				settings.probes[i],
@@ -257,7 +263,7 @@
 			//	new Promise((resolve) => setTimeout(resolve, ms));
 			//await my_sleep(3000); 
 		};
-        console.log('ckt_data=', ckt_data);
+        console.log('ckt_data=', $inspect(ckt_data));
 		console.log('sweep_name', sweep_name);
 		settings = settings;
 		ckt_data = ckt_data;
@@ -298,7 +304,7 @@
 	let nvar = $state(0);
 </script>
 
-<ConvertSchematic {dir} />
+<ConvertSchematic {port} {dir} />
 <OpenLTspice
 	{data}
 	bind:probes={settings.probes[current_plot]}

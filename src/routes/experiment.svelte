@@ -94,6 +94,7 @@
 	import SweepSource from "./utils/sweep_source.svelte";
 	import ResultsPlot from "./utils/results_plot.svelte";
 	import {
+		port_number,
 		ckt_name,
 		dir_name,
 		ckt_store,
@@ -101,10 +102,12 @@
 	} from "./stores.js";
 	import { bindAll, dot$1, number, R, update } from "plotly.js-dist";
 	let ckt;
-	let file, dir = $state();
+	let port, file, dir = $state();
 	let models;
 
-
+	port_number.subscribe((value) => {
+		port = value;
+	});
 	ckt_name.subscribe((value) => {
 		file = value;
 	});
@@ -143,7 +146,7 @@
 		)}&file=${encodeURIComponent(file)}`;
 		// console.log(`program to send: ${program}`);
 		const res = await fetch(
-			`http://localhost:9292/api/ltspctl/execute?${encoded_params}`,
+			`http://localhost:${port}/api/ltspctl/execute?${encoded_params}`,
 			{
 				method: "POST",
 				headers: {
@@ -212,7 +215,7 @@
         }
 		// dispatch("sim_start", { text: "LTspice simulation started!" });
 		let response = await fetch(
-			`http://localhost:9292/api/ltspctl/simulate?${encoded_params}`,
+			`http://localhost:${port}/api/ltspctl/simulate?${encoded_params}`,
 			{},
 		);
 		let res2 = await response.json();
@@ -609,11 +612,11 @@
 		let encoded_params = `dir=${encodeURIComponent(
 			dir,
 		)}&file=${encodeURIComponent(target)}`;
-		const command = `http://localhost:9292/api/ltspctl/update?${encoded_params}&updates=${update_elms}`;
+		const command = `http://localhost:${port}/api/ltspctl/update?${encoded_params}&updates=${update_elms}`;
 		console.log(command);
 		let response = await fetch(command, {});
 		let ckt = await response.json(); // ckt = {elements}
-		console.log("ckt=", ckt);
+		console.log("ckt=", ckt);		
 	}
 
 	function clear() {
@@ -698,7 +701,6 @@
 		bind:start_lin_val={settings.start_lin_val[i]}
 		bind:stop_lin_val={settings.stop_lin_val[i]}
 		bind:lin_incr={settings.lin_incr[i]}
-		bind:src_value={settings.source_value[i]}
 		bind:start_dec_val={settings.start_dec_val[i]}
 		bind:stop_dec_val={settings.stop_dec_val[i]}
 		bind:dec_points={settings.dec_points[i]}

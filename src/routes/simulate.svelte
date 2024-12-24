@@ -31,7 +31,7 @@
                     probes,
                     )}`;
 
-                const command = `http://localhost:9292/api/ltspctl/update?${encoded_params}&updates=${update_elms}`;
+                const command = `http://localhost:${port}/api/ltspctl/update?${encoded_params}&updates=${update_elms}`;
                 console.log(command);
                 let response = await fetch(command, {});
                 let ckt = await response.json(); // ckt = {elements}
@@ -79,19 +79,19 @@
 <script lang="ts">
     import { get_control } from "./openLTspice.svelte";
     import {
+        port_number,
         ckt_name,
         dir_name,
         ckt_store,
         elements_store,
         models_store,
     } from "./stores.js";
-    let file;
-    let dir;
-    let ckt;
-    let elements;
-    let models;
+    let port, file, dir, ckt, elements, models;
     //let models;
     //    let elements;
+    port_number.subscribe((value) => {
+        port = value;
+    });
     ckt_name.subscribe((value) => {
         file = value;
     });
@@ -137,14 +137,14 @@
         // dispatch("sim_start", { text: "LTspice simulation started!" });
         on_sim_start("LTspice simulation started!");
         let response = await fetch(
-            `http://localhost:9292/api/ltspctl/simulate?${encoded_params}`,
+            `http://localhost:${port}/api/ltspctl/simulate?${encoded_params}`,
             {},
         );
         let res2 = await response.json();
         console.log(res2);
         //if (ckt.info == null) {
         response = await fetch(
-            `http://localhost:9292/api/ltspctl/info?${encoded_params}`,
+            `http://localhost:${port}/api/ltspctl/info?${encoded_params}`,
             {},
         );
         res2 = await response.json();

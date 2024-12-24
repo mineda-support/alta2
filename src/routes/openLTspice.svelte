@@ -11,6 +11,7 @@
 
 <script lang="ts">
   import { run } from 'svelte/legacy';
+  import { Tooltip } from 'flowbite-svelte'
 
   // import { end_hydrating } from "svelte/internal";
   // import { createEventDispatcher } from "svelte";
@@ -19,14 +20,15 @@
 
   // const dispatch = createEventDispatcher();
 
-  async function openLTspice(dir, file, showup) {
+  async function openLTspice(port, dir, file, showup) {
     if (file == undefined) {
       alert("Please choose the circuit to open");
       return;
     }
+    port_number.set(port);
     ckt_name.set(file);
     dir_name.set(dir);
-    console.log(`openLTspice dir='${dir}' file='${file}'`);
+    console.log(`openLTspice port=${port} dir='${dir}' file='${file}'`);
     let encoded_params;
     if (showup) {
       encoded_params = `dir=${encodeURIComponent(
@@ -39,7 +41,7 @@
     }
     console.log(encoded_params);
     let response = await fetch(
-      `http://localhost:9292/api/ltspctl/open?${encoded_params}`,
+      `http://localhost:${port}/api/ltspctl/open?${encoded_params}`,
       {},
     );
     let res2 = await response.json();
@@ -92,6 +94,7 @@
   }
   
   import {
+    port_number,
     ckt_name,
     dir_name,
     ckt_store,
@@ -108,6 +111,10 @@
     nvar = $bindable(),
     current_plot = $bindable()
   } = $props();
+  let port;
+  port_number.subscribe((value) => {
+    port = value;
+  });
   let ckt = $state();
   ckt_store.subscribe((value) => {
     ckt = value;
@@ -125,7 +132,7 @@
     models = value;
   });
 
-  let scoops = $state();
+  let scoops; // = $state();
   if (data != undefined && data.props != undefined && data.props.ckt != undefined) {
     scoops = data.props.ckt;
   }
@@ -133,7 +140,7 @@
   let traces = "";
   let showup = $state(false);
   if (scoops != undefined) {
-    openLTspice(data.props.wdir, scoops, showup);
+    openLTspice(data.props.port, data.props.wdir, scoops, showup);
   }
   function push_button(node) {
     console.log(`${probes}, ${node}`);
@@ -249,6 +256,7 @@
   <button onclick={switch_wdir(data.props.wdir)} class="button-1"
     >Switch Wdir</button
   >
+  <Tooltip>switch working directory</Tooltip>
 </h2>
 <div class="sample">
   {#if data.props != undefined}
@@ -262,7 +270,7 @@
 </div>
 <div>
   <button
-    onclick={() => openLTspice(data.props.wdir, scoops, showup)}
+    onclick={() => openLTspice(data.props.port, data.props.wdir, scoops, showup)}
     class="button-1"
   >
     Click here to read-in</button
@@ -379,21 +387,22 @@
               </td>
               {#each Object.entries(variations) as [elm, vals]}
                 <td
-                  ><!-- InputWideValue
+                  ><InputWideValue
                     lab={elm + "#" + String(i + 1)}
                     bind:val={vals[i]}
-                  / -->
+                  />
                 </td>
               {/each}
             </tr>
           {/each}
         {/if}
         <tr>
-          <td><!-- button on:click={add_variation} class="td-button">+</button></td -->
-          <!-- button on:click={remove_variation(remove_index)} class="td-button"
+          <td><button onclick={add_variation} class="td-button">+</button></td>
+
+          <td><button onclick={remove_variation(remove_index)} class="td-button"
             >-</button
-          -->
-          remove_index: <input bind:value={remove_index} />
+          ></td>
+          <td>remove_index:</td> <td><input bind:value={remove_index} /></td>
         </tr>
       </tbody>
     </table>

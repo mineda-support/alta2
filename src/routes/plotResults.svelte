@@ -19,6 +19,7 @@
     }
 
     export async function measurement_results(
+        port,
         measfile,
         selection,
         reverse,
@@ -41,7 +42,7 @@
             encoded_params = encoded_params + `&invert_y=${invert_y}`;
         }
         let response = await fetch(
-            `http://localhost:9292/api/misc/measured_data?${encoded_params}`,
+            `http://localhost:${port}/api/misc/measured_data?${encoded_params}`,
             {},
         );
         let res2 = await response.json();
@@ -56,6 +57,7 @@
     }
 
     export async function plot_result(
+        port,
         dir,
         file,
         probes,
@@ -85,7 +87,7 @@
             probes,
         )}&equation=${encodeURIComponent(equation)}`;
         let response = await fetch(
-            `http://localhost:9292/api/ltspctl/results?${encoded_params}`,
+            `http://localhost:${port}/api/ltspctl/results?${encoded_params}`,
             {},
         );
         let res2 = await response.json();
@@ -108,7 +110,11 @@
     import SinglePlot from "./utils/single_plot.svelte";
     import { set_trace_names } from "./experiment.svelte";
     import Settings from "./settings.svelte";
-    import { ckt_store } from "./stores";
+    import { ckt_store, port_number} from "./stores";
+    let port;
+    port_number.subscribe((value) => {
+      port = value;
+    });
     let ckt;
     ckt_store.subscribe((value) => {
       ckt = value;
@@ -165,6 +171,7 @@
     };
 
     async function get_measurement_results(
+        port,
         measfile,
         selection,
         reverse,
@@ -176,6 +183,7 @@
             const [handle] = await window.showOpenFilePicker(options);
         }
         measdata = await measurement_results(
+            port,
             measfile,
             selection,
             reverse,
@@ -204,6 +212,7 @@
     async function plot_result_clicked () {
         if (!check_probes_valid()) return;
         let result = await plot_result(
+            port,
             dir,
             file,
             probes,
@@ -310,7 +319,7 @@
             ph_data,
         );
         const res = await fetch(
-            `http://localhost:9292/api/ltspctl/measure?${encoded_params}`,
+            `http://localhost:${port}/api/ltspctl/measure?${encoded_params}`,
             {
                 method: "POST",
                 headers: {
@@ -347,8 +356,7 @@
 
 <button onclick={() => (plot_showhide = !plot_showhide)} class="button-2"
     >Show/hide</button
->
-{plot_number}
+>plot#{plot_number}
 {#if plot_showhide}
     <button onclick={() => (current_plot = plot_number)} class="button-2"
         >Make current</button
@@ -356,6 +364,7 @@
     <div>
         <button
             onclick={get_measurement_results(
+                port,
                 measfile.trim().replace(/^"/, "").replace(/"$/, ""),
                 selection,
                 reverse,
@@ -505,10 +514,13 @@
             {#if Array.isArray(calculated_value)}
                 <table>
                     <thead>
+                        <tr>
                         {#each performances as perf}
                             <th>{perf}</th>
                         {/each}
+                        </tr>  
                     </thead>
+                    <tbody>
                     {#each calculated_value as vals}
                         <tr>
                             {#each vals as val}
@@ -516,6 +528,7 @@
                             {/each}
                         </tr>
                     {/each}
+                    </tbody>
                 </table>
             {/if}
         </label>

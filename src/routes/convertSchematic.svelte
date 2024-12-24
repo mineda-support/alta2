@@ -13,7 +13,7 @@
       dir: any;
    }
 
-   let { dir }: Props = $props();
+   let { dir, port }: Props = $props();
 
     // function convertSchematic(selected) {
     //    alert("conversion to " + selected);
@@ -64,7 +64,7 @@
         };
     }}
     class="button-2"
-    action={`http://localhost:9292/api/ltspctl/convert_from_LTspice?${encoded_params(
+    action={`http://localhost:${port}/api/ltspctl/convert_from_LTspice?${encoded_params(
         dir,
     )}`}
 >
