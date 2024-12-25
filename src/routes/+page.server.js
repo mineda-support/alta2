@@ -44,7 +44,7 @@ export async function load({ url }) {
     }
 }
 
-const current_dir;
+let current_dir = undefined;
 
 async function startGrape() {
     if (current_dir == undefined) {

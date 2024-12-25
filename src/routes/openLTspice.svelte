@@ -1,5 +1,5 @@
 <script module>
-  //import { goto } from "$app/navigation";
+  import { goto } from "$app/navigation";
   export function get_control(props) {
     if (Array.isArray(props)) {
       return props[0].control;
@@ -153,7 +153,7 @@
   function switch_wdir(wdir) {
     //const handle = await window.showDirectoryPicker();
     //wdir = handle.name; # does not return path
-    goto("?wdir=" + wdir);
+    goto("?wdir=" + wdir.replace(/^"/, "").replace(/"$/, ""));
   }
   let alter_src = $state();
   let alter = $state([{}]);
@@ -249,7 +249,7 @@
   Work directory:
   {#if data != undefined && data.props != undefined && data.props.wdir != undefined}
     <input
-      value={data.props.wdir}
+      bind:value={data.props.wdir}
       style="border:darkgray solid 1px;width: 50%;"
     />
   {/if}
