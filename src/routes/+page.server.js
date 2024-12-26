@@ -50,7 +50,13 @@ async function startGrape() {
     if (current_dir == undefined) {
         current_dir = process.cwd();
     }
-    const port = await getPort();
+    let port = process.env.GRAPE;
+    console.log('process.env.GRAPE', port);
+
+    if (port != undefined) {
+        return(port);
+    }
+    port = await getPort();
     console.log('port=', port);
     const command = `rackup -p ${port}`
     process.chdir(current_dir + '/Grape');

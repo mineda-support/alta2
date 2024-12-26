@@ -504,9 +504,9 @@
     <div>
         <label
             >Equation(s)
-            <input bind:value={equation} style="border:darkgray solid 1px;" />
+            <input bind:value={equation} style="border:darkgray solid 1px; width: 50%" />
             <button
-                onclick={() => culate_equation(results_data[0])}
+                onclick={() => calculate_equation(results_data[0])}
                 class="button-1"
             >
                 Calculate</button
@@ -535,6 +535,9 @@
     </div>
     <hr />
 {/if}
-
 <style>
+	label {
+	    font-family: Arial, "Helvetica Neue", "BIZ UDPGothic", Meiryo, "Hiragino Kaku Gothic Pro", sans-serif;
+    	font-size: 10pt;
+	}
 </style>

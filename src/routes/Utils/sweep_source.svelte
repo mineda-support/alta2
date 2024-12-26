@@ -35,8 +35,8 @@
         start_oct_val = $bindable(),
         stop_oct_val = $bindable(),
         oct_points = $bindable(),
-        elements,
-        source_title,
+        elements = $bindable(),
+        source_title = $bindable(),
         src_precision = $bindable(3)
     }: Props = $props();
 

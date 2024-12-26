@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { run } from 'svelte/legacy';
+	import { run } from "svelte/legacy";
 
 	import { goto } from "$app/navigation";
 	import { json } from "@sveltejs/kit";
@@ -62,7 +62,7 @@
 
 	let { data } = $props();
 
-	let results_data = [] // $state([]);
+	let results_data = []; // $state([]);
 	results_data[0] = [];
 
 	export function handleMessage(event) {
@@ -77,6 +77,7 @@
 		results_data = results_data;
 	});
 	let current_plot = $state(); //  = 0;
+
 	function plot_results() {
 		if (variations == {}) {
 			return;
@@ -209,8 +210,8 @@
 			settings.measfile[current_plot] = file
 				.replace(/^"/, "")
 				.replace(/"$/, "")
-				.replace('%HOMEPATH%', data.props.home)
-				.replace('$HOME', data.props.home);				
+				.replace("%HOMEPATH%", data.props.home)
+				.replace("$HOME", data.props.home);
 			settings.selection[current_plot] = sel;
 			settings.invert_x[current_plot] = inv_x == "true" ? true : false;
 			settings.invert_y[current_plot] = inv_y == "true" ? true : false;
@@ -218,25 +219,28 @@
 		});
 		settings = settings;
 		current_plot = 0;
-		console.log("variations=", variations, "nvar=", nvar);
+		console.log("variations=", $state.snapshot(variations), "nvar=", nvar);
 	}
 
-	async function plot_measurement_group() { // ckt_data, settings
-		console.log("settings.measfile", settings.measfile);
+	async function plot_measurement_group() {
+		// ckt_data, settings
+		console.log("settings.measfile", $state.snapshot(settings.measfile));
 		//settings.measfile.forEach(async function (measfile, i) {
-        //Note: await does not work inside forEach
+		//Note: await does not work inside forEach
 		let sweep_name;
-		for (let i = 0; i < settings.measfile.length; i++) {
+		for (let i = 0; i < settings.plot_showhide.length; i++) {
 			let measfile = settings.measfile[i];
-			ckt_data.measdata[i] = await measurement_results(
-				port,
-				measfile,
-				settings.selection[i],
-				settings.reverse[i],
-				settings.invert_x[i],
-				settings.invert_y[i],
-				settings.tracemode[i]
-			);
+			if (measfile != undefined && measfile != "") {
+				ckt_data.measdata[i] = await measurement_results(
+					port,
+					measfile,
+					settings.selection[i],
+					settings.reverse[i],
+					settings.invert_x[i],
+					settings.invert_y[i],
+					settings.tracemode[i],
+				);
+			}
 			//ckt_data.measdata[i] = ckt_data.measdata[i];
 			let result = plot_result(
 				port,
@@ -261,17 +265,17 @@
 			// ckt_data.plotdata[i] = ckt_data.plotdata[i];
 			// *const my_sleep = (ms) =>  ### sleep is useless
 			//	new Promise((resolve) => setTimeout(resolve, ms));
-			//await my_sleep(3000); 
-		};
-        console.log('ckt_data=', ckt_data);
-		console.log('sweep_name', sweep_name);
+			//await my_sleep(3000);
+		}
+		console.log("ckt_data=", $state.snapshot(ckt_data));
+		console.log("sweep_name", sweep_name);
 		settings = settings;
 		ckt_data = ckt_data;
 	}
 
 	function clear_measurement_group() {
 		settings.meas_group = undefined;
-		settings.meas_file = [];
+		settings.measfile = [];
 		settings.selection = [];
 		settings.title = [];
 		current_plot = 0;
@@ -302,93 +306,104 @@
 		settings = settings;
 	}
 	let nvar = $state(0);
+	let show_meas_group = $state(true);
 </script>
 
-<ConvertSchematic {port} {dir} />
-<OpenLTspice
-	{data}
-	bind:probes={settings.probes[current_plot]}
-	bind:variations
-	bind:nvar
-	bind:current_plot
-/>
-<!--	plot_on:open_end={plot_results} -->
-<Settings {data} {ckt} bind:variations bind:settings />
-<div>
-	<Simulate
+<main>
+	<ConvertSchematic {port} {dir} />
+	<OpenLTspice
+		{data}
 		bind:probes={settings.probes[current_plot]}
 		bind:variations
-		on_sim_end={plot_results}
-		on_sim_start={clear_all_plots}
-	/>
-	<!-- Testplot / -->
-</div>
-<hr />
-<div>
-	<button onclick={load_measurement_group_file} class="button-2"
-		>Load measurement group file</button
-	>
-	<!-- ConvertSchematic / -->
-	{#if settings.meas_group != undefined}
-		<button onclick={setup_measurement_group} class="button-1"
-			>Setup</button
-		>
-		<button
-			onclick={plot_measurement_group}
-			class="button-2">Plot measurement group</button
-		>
-		<button onclick={clear_measurement_group} class="button-1"
-			>Clear</button
-		>
-		{#each settings.meas_group as line}
-			<div>{line}</div>
-		{/each}
-	{/if}
-</div>
-{#each settings.plot_showhide as _, i}
-	<PlotResults
+		bind:nvar
 		bind:current_plot
-		plot_number={i}
-		bind:plot_showhide={settings.plot_showhide[i]}
-		bind:results_data
-		bind:dir
-		bind:file
-		bind:elements
-		bind:measfile={settings.measfile[i]}
-		bind:step_precision={settings.step_precision[i]}
-		bind:title={settings.title[i]}
-		bind:title_x={settings.title_x[i]}
-		bind:title_y={settings.title_y[i]}
-		bind:title_y1={settings.title_y1[i]}
-		bind:title_y2={settings.title_y2[i]}
-		bind:yaxis_is_log={settings.yaxis_is_log}
-		bind:xaxis_is_log={settings.xaxis_is_log}
-		bind:equation={settings.equation[i]}
-		bind:performance_names={settings.performance_names[i]}
-		bind:probes={settings.probes[i]}
-		bind:plotdata={ckt_data.plotdata[i]}
-		bind:db_data={ckt_data.db_data[i]}
-		bind:ph_data={ckt_data.ph_data[i]}
-		bind:measdata={ckt_data.measdata[i]}
-		bind:calculated_value={ckt_data.calculated_value[i]}
-		bind:selection={settings.selection[i]}
-		bind:reverse={settings.reverse[i]}
-		bind:invert_x={settings.invert_x[i]}
-		bind:invert_y={settings.invert_y[i]}
-		bind:tracemode={settings.tracemode[i]}
-	></PlotResults>
-{/each}
-
-<button onclick={add_plot} class="button-2">Add plot</button>
-<button onclick={delete_plot} class="button-2">Delete plot</button>
-
-{#if settings.equation[current_plot] != undefined}
-	<Experiment
-		bind:settings
-		bind:results_data
-		{elements}
-		bind:probes={settings.probes[current_plot]}
-		bind:equation={settings.equation[current_plot]}
-		bind:performance_names={settings.performance_names[current_plot]}
 	/>
-{/if}
+	<!--	plot_on:open_end={plot_results} -->
+	<Settings {data} {ckt} bind:variations bind:settings />
+	<div>
+		<Simulate
+			bind:probes={settings.probes[current_plot]}
+			bind:variations
+			on_sim_end={plot_measurement_group}
+			on_sim_start={clear_all_plots}
+		/>
+		<!-- Testplot / -->
+	</div>
+	<hr />
+	<div>
+		<button onclick={load_measurement_group_file} class="button-2"
+			>Load measurement group file</button
+		>
+		<!-- ConvertSchematic / -->
+		{#if settings.meas_group != undefined}
+			<button onclick={setup_measurement_group} class="button-1"
+				>Setup</button
+			>
+			<button onclick={plot_measurement_group} class="button-2"
+				>Plot measurement group</button
+			>
+			<button onclick={clear_measurement_group} class="button-1"
+				>Clear</button
+			>
+			<button onclick={show_meas_group = !show_meas_group}>show/hide</button>
+			{#if show_meas_group}
+				{#each settings.meas_group as line}
+					<div>{line}</div>
+				{/each}
+			{/if}
+		{/if}
+	</div>
+	{#each settings.plot_showhide as _, i}
+		<PlotResults
+			bind:current_plot
+			plot_number={i}
+			bind:plot_showhide={settings.plot_showhide[i]}
+			bind:results_data
+			bind:dir
+			bind:file
+			bind:elements
+			bind:measfile={settings.measfile[i]}
+			bind:step_precision={settings.step_precision[i]}
+			bind:title={settings.title[i]}
+			bind:title_x={settings.title_x[i]}
+			bind:title_y={settings.title_y[i]}
+			bind:title_y1={settings.title_y1[i]}
+			bind:title_y2={settings.title_y2[i]}
+			bind:yaxis_is_log={settings.yaxis_is_log}
+			bind:xaxis_is_log={settings.xaxis_is_log}
+			bind:equation={settings.equation[i]}
+			bind:performance_names={settings.performance_names[i]}
+			bind:probes={settings.probes[i]}
+			bind:plotdata={ckt_data.plotdata[i]}
+			bind:db_data={ckt_data.db_data[i]}
+			bind:ph_data={ckt_data.ph_data[i]}
+			bind:measdata={ckt_data.measdata[i]}
+			bind:calculated_value={ckt_data.calculated_value[i]}
+			bind:selection={settings.selection[i]}
+			bind:reverse={settings.reverse[i]}
+			bind:invert_x={settings.invert_x[i]}
+			bind:invert_y={settings.invert_y[i]}
+			bind:tracemode={settings.tracemode[i]}
+		></PlotResults>
+	{/each}
+
+	<button onclick={add_plot} class="button-2">Add plot</button>
+	<button onclick={delete_plot} class="button-2">Delete plot</button>
+
+	{#if settings.equation[current_plot] != undefined}
+		<Experiment
+			bind:settings
+			bind:results_data
+			{elements}
+			bind:probes={settings.probes[current_plot]}
+			bind:equation={settings.equation[current_plot]}
+			bind:performance_names={settings.performance_names[current_plot]}
+		/>
+	{/if}
+</main>
+<!-- style>
+	main {
+	    font-family: Arial, "Helvetica Neue", "BIZ UDPGothic", Meiryo, "Hiragino Kaku Gothic Pro", sans-serif;
+    	font-size: 10pt;
+	}
+</style -->

@@ -245,7 +245,7 @@
   }
 </script>
 
-<h2>
+<p>
   Work directory:
   {#if data != undefined && data.props != undefined && data.props.wdir != undefined}
     <input
@@ -257,7 +257,7 @@
     >Switch Wdir</button
   >
   <Tooltip>switch working directory</Tooltip>
-</h2>
+</p>
 <div class="sample">
   {#if data.props != undefined}
     {#each data.props.files as file}
