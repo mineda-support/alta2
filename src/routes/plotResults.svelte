@@ -2,7 +2,7 @@
     function get_sweep_values(plotdata) {
         let values = [];
         let sweep, value;
-        console.log("plotdata in get_sweep_values=", plotdata);
+        console.log("plotdata in get_sweep_values=", $state.snapshot(plotdata));
         plotdata.forEach((trace) => {
             [sweep, value] = trace.name.split("=");
             values.push(Number(value));
@@ -95,7 +95,7 @@
         [plotdata, db_data, ph_data, sweep_name] = set_trace_names(
             res2,
             probes,
-            elements,
+            proj.elements,
             step_precision,
         );
         return [plotdata, db_data, ph_data, sweep_name];
@@ -104,60 +104,47 @@
 </script>
 
 <script lang="ts">
-    import { run } from 'svelte/legacy';
-
     import BodePlot from "./utils/bode_plot.svelte";
     import SinglePlot from "./utils/single_plot.svelte";
     import { set_trace_names } from "./experiment.svelte";
     import Settings from "./settings.svelte";
-    import { ckt_store, port_number} from "./stores";
-    let port;
-    port_number.subscribe((value) => {
-      port = value;
-    });
-    let ckt;
-    ckt_store.subscribe((value) => {
-      ckt = value;
-    });
+    import { proj, ckt } from "./shared.svelte.js";
     let {
+        plot_number = $bindable(),
         current_plot = $bindable(),
-        dir = $bindable(),
-        file = $bindable(),
-        measfile = $bindable(),
         plot_showhide = $bindable(),
-        plot_number,
-        selection = $bindable(),
-        reverse = $bindable(),
-        invert_x = $bindable(),
-        invert_y = $bindable(),
-        tracemode = $bindable(),
+        results_data = $bindable(),
+        measfile = $bindable(),
+        step_precision = $bindable(),
         title = $bindable(),
         title_x = $bindable(),
         title_y = $bindable(),
         title_y1 = $bindable(),
         title_y2 = $bindable(),
-        equation = $bindable(),
-        probes = $bindable(),
-        performance_names = $bindable(),
         xaxis_is_log = $bindable(),
         yaxis_is_log = $bindable(),
-        step_precision = $bindable(),
-        calculated_value = $bindable(),
+        equation = $bindable(),
+        performance_names = $bindable(),
+        probes = $bindable(),
         plotdata = $bindable(),
         db_data = $bindable(),
         ph_data = $bindable(),
         measdata = $bindable(),
-        results_data = $bindable(),
-        elements = $bindable()
+        calculated_value = $bindable(),
+        selection = $bindable(),
+        reverse = $bindable(),
+        invert_x = $bindable(),
+        invert_y = $bindable(),
+        tracemode = $bindable(),
     } = $props();
 
     let sweep_name;
     let performances = $state();
-    run(() => {
+    // run(() => {
         if (performance_names != undefined) {
             performances = performance_names.split(",").map((a) => a.trim());
         }
-    });
+    // });
 
     const options = {
         types: [
@@ -212,15 +199,15 @@
     async function plot_result_clicked () {
         if (!check_probes_valid()) return;
         let result = await plot_result(
-            port,
-            dir,
-            file,
+            proj.port,
+            proj.dir,
+            proj.file,
             probes,
             equation,
             plotdata,
             db_data,
             ph_data,
-            elements,
+            proj.elements,
             step_precision,
             sweep_name
         );
@@ -250,9 +237,10 @@
     } */
     function calculate_equation() {
         submit_equation(
+            proj.port,
             equation,
-            dir,
-            file,
+            proj.dir,
+            proj.file,
             plotdata,
             db_data,
             ph_data,
@@ -298,6 +286,7 @@
     }
 */
     async function submit_equation(
+        port,
         equation,
         dir,
         file,
@@ -312,11 +301,11 @@
         console.log(`equation to send: ${equation}`);
         console.log(
             "plotdata:",
-            plotdata,
+            $state.snapshot(plotdata),
             "db_data:",
-            db_data,
+            $state.snapshot(db_data),
             "ph_data:",
-            ph_data,
+            $state.snapshot(ph_data),
         );
         const res = await fetch(
             `http://localhost:${port}/api/ltspctl/measure?${encoded_params}`,
@@ -348,7 +337,7 @@
         } else {
             calculated_value = result.calculated_value.slice(0);
         }
-        console.log(calculated_value);
+        console.log('calculated_value=', $state.snapshot(calculated_value));
         // return calculated_value; // maybe useless
     }
     equation = "x.where(y, 2.5){|x, y| x > 1e-6}";

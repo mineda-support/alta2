@@ -10,24 +10,16 @@
 </script>
 
 <script lang="ts">
-  import { run } from 'svelte/legacy';
   import { Tooltip } from 'flowbite-svelte'
-
-  // import { end_hydrating } from "svelte/internal";
-  // import { createEventDispatcher } from "svelte";
   import InputWideValue from "./Utils/input_wide_value.svelte";
-
-
-  // const dispatch = createEventDispatcher();
 
   async function openLTspice(port, dir, file, showup) {
     if (file == undefined) {
       alert("Please choose the circuit to open");
       return;
     }
-    port_number.set(port);
-    ckt_name.set(file);
-    dir_name.set(dir);
+    proj.file = file;
+    proj.dir = dir;
     console.log(`openLTspice port=${port} dir='${dir}' file='${file}'`);
     let encoded_params;
     if (showup) {
@@ -52,36 +44,34 @@
       // plot_result();
       // dispatch("open_end", { text: "fake simulation ended!" });
     }
-    ckt = res2;
+    ckt.elements = res2.elements;
+    ckt.models = res2.models;
+    ckt.info = res2.info;
     //console.log("ckt=", $inspect(ckt));
     if (ckt != undefined) {
-      elements = {};
+      proj.elements = {};
       for (const [ckt_name, elms] of Object.entries(ckt.elements)) {
         //console.log(ckt_name, "=", elms);
         if (ckt_name[0] == ".") {
           console.log("skip:", ckt_name);
           continue;
         }
-        elements[ckt_name] = {};
+        proj.elements[ckt_name] = {};
         for (const [elm, props] of Object.entries(elms)) {
           //console.log([elm, props]);
-          elements[ckt_name][elm] = get_control(props);
+          proj.elements[ckt_name][elm] = get_control(props);
         }
       }
-      //console.log("elements=", $inspect(elements));
-      models = {};
+      console.log("elements=", $state.snapshot(proj.elements));
+      proj.models = {};
       for (const [model_name, model_params] of Object.entries(ckt.models)) {
-        // console.log($inspect(model_name), "=", $inspect(model_params[1]));
-        models[model_name] = {};
+        proj.models[model_name] = {};
         for (const [par, value] of Object.entries(model_params[1])) {
-          models[model_name][par] = value;
+          proj.models[model_name][par] = value;
         }
       }
-      //console.log("models=", $inspect(models));
+      console.log("models=", $state.snapshot(proj.models));
     }
-    ckt_store.set(ckt);
-    elements_store.set(elements);
-    models_store.set(models);
     alter = [{}];
     alter_src = undefined;
     nvar = 0;
@@ -93,16 +83,6 @@
     alert(`you have chosen ${file}`);
   }
   
-  import {
-    port_number,
-    ckt_name,
-    dir_name,
-    ckt_store,
-    elements_store,
-    models_store,
-  } from "./stores.js";
-  
-  // import { element } from "svelte/internal";
   import { log } from "plotly.js-dist";
   let {
     data = $bindable(),
@@ -111,26 +91,7 @@
     nvar = $bindable(),
     current_plot = $bindable()
   } = $props();
-  let port;
-  port_number.subscribe((value) => {
-    port = value;
-  });
-  let ckt = $state();
-  ckt_store.subscribe((value) => {
-    ckt = value;
-  });
-  let dir = $state();
-  dir_name.subscribe((value) => {
-    dir = value;
-  });
-  let elements = $state({});
-  elements_store.subscribe((value) => {
-    elements = value;
-  });
-  let models = $state({});
-  models_store.subscribe((value) => {
-    models = value;
-  });
+  import { proj, ckt } from "./shared.svelte";
 
   let scoops; // = $state();
   if (data != undefined && data.props != undefined && data.props.ckt != undefined) {
@@ -158,14 +119,14 @@
   let alter_src = $state();
   let alter = $state([{}]);
   let c = $state(), e = $state();
-  run(() => {
+  //run(() => {
     if (alter_src != undefined) {
       [c, e] = alter_src.split(":");
       if (alter[0][alter_src] == undefined) {
-        alter[0][alter_src] = elements[c][e];
+        alter[0][alter_src] = proj.elements[c][e];
       }
     }
-  });
+  //});
 
   function add_alter() {}
 
@@ -198,7 +159,7 @@
     let ckt_name, elm;
     [ckt_name, elm] = src.split(":");
     //let new_elm = JSON.parse(JSON.stringify(elements[ckt_name][elm]));
-    const new_elm = elements[ckt_name][elm];
+    const new_elm = proj.elements[ckt_name][elm];
     console.log(`push elements[${ckt_name}][${elm}]=`, new_elm);
     variations[src].push(new_elm);
     console.log("variations=", variations);
@@ -239,9 +200,8 @@
   // let nvar = 0;
   let remove_index = $state(0);
   if (data != undefined && data.props != undefined) {
-    dir = data.props.wdir;
-    dir_name.set(dir);
-    console.log("*** dir=", dir);
+    proj.dir = data.props.wdir;
+    console.log("*** dir=", proj.dir);
   }
 </script>
 
@@ -249,7 +209,7 @@
   Work directory:
   {#if data != undefined && data.props != undefined && data.props.wdir != undefined}
     <input
-      bind:value={data.props.wdir}
+      value={data.props.wdir}
       style="border:darkgray solid 1px;width: 50%;"
     />
   {/if}
@@ -298,14 +258,14 @@
   <label class="tab-label" for="TAB-01">Circuit info</label>
   <div class="tab-content" style="border:red solid 2px;">
     {#if ckt != undefined}
-      {#each Object.entries(elements) as [ckt_name, elms]}
+      {#each Object.entries(proj.elements) as [ckt_name, elms]}
         [{ckt_name}]<br />
         {#each Object.entries(elms) as [elm]}
           <label
             >{elm}:
             <input
               style="border:darkgray solid 1px;"
-              bind:value={elements[ckt_name][elm]}
+              bind:value={proj.elements[ckt_name][elm]}
             /><br /></label
           >
         {/each}
@@ -315,14 +275,14 @@
   <input id="TAB-02" type="radio" name="TAB" class="tab-switch" />
   <label class="tab-label" for="TAB-02">SPICE models</label>
   <div class="tab-content" style="border:green solid 2px;">
-    {#each Object.entries(models) as [model_name, model_params]}
+    {#each Object.entries(proj.models) as [model_name, model_params]}
       [{model_name}]<br />
       {#each Object.entries(model_params) as [param]}
         <label
           >{param}:
           <input
             style="border:darkgray solid 1px;"
-            bind:value={models[model_name][param]}
+            bind:value={proj.models[model_name][param]}
           /><br /></label
         >
       {/each}
@@ -333,7 +293,7 @@
   <div class="tab-content" style="border:blue solid 2px;">
     <div>Add Alter</div>
     <select bind:value={alter_src} style="border:darkgray solid 1px;">
-      {#each Object.entries(elements) as [ckt_name, elms]}
+      {#each Object.entries(proj.elements) as [ckt_name, elms]}
         {#each Object.keys(elms) as elm}
           <option value={[ckt_name, elm].join(":")}
             >{[ckt_name, elm].join(":")}</option
@@ -354,7 +314,7 @@
     <div>
       Add Variation
       <select bind:value={src} style="border:darkgray solid 1px;">
-        {#each Object.entries(elements) as [ckt_name, elms]}
+        {#each Object.entries(proj.elements) as [ckt_name, elms]}
           {#each Object.keys(elms) as elm}
             <option value={[ckt_name, elm].join(":")}
               >{[ckt_name, elm].join(":")}</option

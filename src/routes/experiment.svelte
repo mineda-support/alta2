@@ -93,34 +93,8 @@
 	import { update_elements, update_models } from "./simulate.svelte";
 	import SweepSource from "./utils/sweep_source.svelte";
 	import ResultsPlot from "./utils/results_plot.svelte";
-	import {
-		port_number,
-		ckt_name,
-		dir_name,
-		ckt_store,
-		models_store,
-	} from "./stores.js";
 	import { bindAll, dot$1, number, R, update } from "plotly.js-dist";
-	let ckt;
-	let port, file, dir = $state();
-	let models;
-
-	port_number.subscribe((value) => {
-		port = value;
-	});
-	ckt_name.subscribe((value) => {
-		file = value;
-	});
-	dir_name.subscribe((value) => {
-		dir = value;
-	});
-	ckt_store.subscribe((value) => {
-		ckt = value;
-	});
-    models_store.subscribe((value) => {
-        models = value;
-    });
-
+	import { proj, ckt } from "./shared.svelte";
 	function get_sweep_values(plotdata) {
 		let values = [];
 		let sweep, value;
@@ -164,23 +138,21 @@
 	let src1;
 	//settings.src1 = src1;
 	
-	import { createEventDispatcher } from "svelte";
 	let {
-		settings = $bindable(),
 		results_data = $bindable(),
-		elements = $bindable(),
 		probes = $bindable(),
 		equation = $bindable(),
 		performance_names = $bindable(),
 		on_sim_start, on_sim_end
 	} = $props();
-	const dispatch = createEventDispatcher();
 
+	import {settings} from './shared.svelte.js';
+	
 	function postprocess(settings) {
 		eval(settings.postprocess);
 	}
 	let plot_data2 = $state();
-	settings.result_number = 0;
+	// settings.result_number = 0;
 	results_data[settings.result_number] = {};
 	function add_experiment() {
 		settings.result_number = settings.result_number + 1;
@@ -195,19 +167,15 @@
 	}
 
 	async function goLTspice2(ckt) {
-		console.log(`openLTspice dir='${dir}' file='${file}'`);
-		update_elements(dir, ckt, elements);
-		/* dispatch("elm_update", { text: "Update elements" });
-		const my_sleep = (ms) =>
-            new Promise((resolve) => setTimeout(resolve, ms));
-        await my_sleep(3000); */
+		console.log(`openLTspice dir='${proj.dir}' file='${proj.file}'`);
+		update_elements(proj.dir, ckt, proj.elements);
 		console.log("equation=", equation);
 		let encoded_params = `dir=${encodeURIComponent(
-			dir,
-		)}&file=${encodeURIComponent(file)}&probes=${encodeURIComponent(
+			proj.dir,
+		)}&file=${encodeURIComponent(proj.file)}&probes=${encodeURIComponent(
 			probes,
 		)}&equation=${encodeURIComponent(equation)}`;
-		const models_update = update_models(ckt, models);
+		const models_update = update_models(ckt, proj.models);
         if (models_update != {}) {
             encoded_params =
                 encoded_params +
@@ -225,7 +193,7 @@
 		[plotdata, db_data, ph_data, sweep_name] = set_trace_names(
 			res2,
 			probes,
-			elements,
+			proj.elements,
 			settings.step_precision[settings.result_number],
 		);
 		//dispatch("sim_end", { text: "LTspice simulation ended!" });
@@ -254,7 +222,7 @@
 		console.log("src in updates_plus=", src);
 		[target, var_name] = src.split(":");
 		let updates = create_updates(
-			elements[target][var_name],
+			proj.elements[target][var_name],
 			var_name,
 			par_name,
 			value,
@@ -264,15 +232,15 @@
 		}
 		for (const plus of src_plus) {
 			[target, var_name, par_name] = plus.split(":");
-			if (elements[target] == undefined) {
+			if (proj.elements[target] == undefined) {
 				alert(`${target} is not this circuit`);
 				return;
 			}
 			console.log("plus=", plus);
-			console.log(elements);
+			console.log(proj.elements);
 			updates = updates.concat(
 				create_updates(
-					elements[target][var_name],
+					proj.elements[target][var_name],
 					var_name,
 					par_name,
 					value,
@@ -281,18 +249,16 @@
 		}
 		return [updates, target];
 	}
-	// console.log("updates=", updates, `on ${dir}${target}.asc`);
-	// await update_elms(dir, target+'.asc', updates);
 
 	let performances = $state();
-	run(() => {
+	if (settings.performance_names != undefined) {
 		let performance_names = settings.performance_names[settings.plot_number];
 		if (performance_names != undefined) {
 			console.log(`performance_names[${settings.plot_number}]=`, performance_names);
 			performances = performance_names.split(",").map((a) => a.trim());
 			console.log('performances=', performances);
 		}
-	});
+	};
 
 	async function go_experiments(dir, settings, elements) {
 		if (ckt == undefined) {
@@ -318,7 +284,7 @@
 			//plot_trace.name = trace_name;
 			//result_trace.name = trace_name;
 			//console.log("updates=", updates, `on ${dir}${target}.asc`);
-			await update_elms(dir, target + ".asc", updates);
+			await update_elms(proj.dir, target + ".asc", updates);
 
 			// dispatch("sim_start", { text: "LTspice simulation started!" });
 			on_sim_start("LTspice simulation started!");
@@ -343,7 +309,7 @@
 					results_data[0][perf].push(undefined);
 				}
 			});
-			dispatch("sim_end", { text: "LTspice simulation ended!" });
+			on_sim_end("LTspice simulation ended!");
 			performances.forEach((perf) => {
 				console.log(`${perf}:`, results_data[0][perf]);
 			});
@@ -460,7 +426,7 @@
 		//console.log(target, var_name);
 		//const keep = elements[target][var_name];
 		settings.sweep_title = settings.src1;
-		settings.result_title = file;
+		settings.result_title = proj.file;
 		let updates;
 
 		for (const value2 of settings.src2_values) {
@@ -490,8 +456,7 @@
 				console.log("updates=", updates, `on ${dir}${target}.asc`);
 				await update_elms(dir, target + ".asc", updates);
 
-				//dispatch("sim_start", { text: "LTspice simulation started!" });
-				sim_start("LTspice simulation started!");
+				on_sim_start("LTspice simulation started!");
 				let calculated_value = await goLTspice2(ckt);
 				if (Array.isArray(calculated_value[0])) {
 					gb.push(calculated_value[0][0]);
@@ -500,7 +465,7 @@
 					gb.push(undefined);
 					pm.push(undefined);
 				}
-				dispatch("sim_end", { text: "LTspice simulation ended!" });
+				on_sim_end("LTspice simulation ended!");
 				plot_trace.x.push(Number(value));
 				result_trace.x.push(Number(value));
 			}
@@ -510,26 +475,6 @@
 			result_trace.y = pm;
 			plot_data.push({ ...plot_trace });
 			plot_data2.push({ ...result_trace });
-			/*
-			console.log(
-					`${var_name}: ${keep.replace(/(\.par\S+ *\S+ *= *)(\S+)/, "$1" + value)}`,
-				);
-				let updates = [
-					`${var_name}: '${keep.replace(/(\.par\S+ *\S+ *= *)(\S+)/, "$1" + value)}'`,
-				];
-				console.log(updates);
-				await update_elms(dir, target + ".asc", updates);
-			} else {
-				console.log(`${var_name}: ${value}`);
-			}
-			dispatch("sim_start", { text: "LTspice simulation started!" });
-			let calculated_value = await goLTspice2(ckt);
-			gb.push(calculated_value[0][0]);
-			pm.push(calculated_value[0][1]);
-			dispatch("sim_end", { text: "LTspice simulation ended!" });
-			plot_data[0].x.push(Number(value));
-			plot_data2[0].x.push(Number(value));
-*/
 		}
 		plot_data = plot_data;
 		plot_data2 = plot_data2;
@@ -547,7 +492,7 @@
 		console.log("src1_plus=", settings.src1_plus);
 		console.log("src1_values=", settings.src1_values);
 		settings.sweep_title = settings.src1;
-		settings.result_title = file;
+		settings.result_title = proj.file;
 		console.log("sweep_title=", settings.sweep_title);
 		console.log("result_title=", settings.result_title);
 
@@ -668,6 +613,8 @@
 		if (dec === 3) return "rd";
 		return "th";
 	}
+	console.log('settings=', $state.snapshot(settings));
+	settings.result_number = 0;
 	settings.src = Array(0);
 	settings.par_name = Array(0);
 	settings.src_values = Array(0);
@@ -707,7 +654,6 @@
 		bind:start_oct_val={settings.start_dec_val[i]}
 		bind:stop_oct_val={settings.stop_dec_val[i]}
 		bind:oct_points={settings.dec_points[i]}
-		bind:elements={elements}
 	></SweepSource>
 {/each}
 <label>
@@ -722,13 +668,13 @@
 <div>
 	<label>
 		<button
-			onclick={preview_experiments(dir, settings, elements)}
+			onclick={preview_experiments(dir, settings, proj.elements)}
 			class="button-1">Dry run</button
 		>
 	</label>
 	<label>
 		<button
-			onclick={() => go_experiments(dir, settings, elements)}
+			onclick={() => go_experiments(dir, settings, proj.elements)}
 			class="button-1">Go</button
 		>
 	</label>
@@ -799,34 +745,6 @@
 		<button on:click={load} class="button-1">Load</button>
 	</label>
 </div -->
-<div>
-	<!-- label>
-		<button
-			on:click={execute_script(settings.script, dir, settings, elements)}
-			class="button-1"
-		>
-			Execute below script</button
-		>
-		<textarea
-			bind:value={settings.script}
-			style="border:darkgray solid 1px; height: 200px; 
-width: 90%;"
-		/>
-	</label -->
-	<!-- label>
-		<button
-			on:click={submit_program(settings.program, dir, file)}
-			class="button-1"
-		>
-			Submit below program</button
-		>
-		<textarea
-			bind:value={settings.program}
-			style="border:darkgray solid 1px; height: 200px; 
-width: 90%;"
-		/>
-	</label -->
-</div>
 
 {#if plot_data !== undefined}
 	<Plot

@@ -1,65 +1,16 @@
 <script lang="ts">
-	import { run } from "svelte/legacy";
-
-	import { goto } from "$app/navigation";
-	import { json } from "@sveltejs/kit";
-	// import Testplot, {handleMessage} from "./test_plot.svelte";
-	// import { plot_result } from "./test_plot.svelte";
 	import Simulate from "./simulate.svelte";
 	import ConvertSchematic from "./convertSchematic.svelte";
 	import Experiment, { set_trace_names } from "./experiment.svelte";
-	// import OpenLTspice, {update_elements} from "./openLTspice.svelte";
 	import OpenLTspice, { get_control } from "./openLTspice.svelte";
 	import Settings from "./settings.svelte";
-	// import Plot from "svelte-plotly.js";
 	import PlotResults, {
 		measurement_results,
 		plot_result,
 	} from "./plotResults.svelte";
 
-	import {
-		port_number,
-		ckt_name,
-		dir_name,
-		ckt_store,
-		elements_store,
-		settings_store,
-		//models_store,
-	} from "./stores.js";
-	//import { stringify } from "postcss";
-	//import { A } from "plotly.js-dist";
-	let port;
-	let file = $state();
-	let dir = $state();
-	let ckt = $state();
-	let elements = $state();
-	//let models;
-	port_number.subscribe((value) => {
-		port = value;
-	});
-	ckt_name.subscribe((value) => {
-		file = value;
-	});
-	dir_name.subscribe((value) => {
-		dir = value;
-	});
-	ckt_store.subscribe((value) => {
-		ckt = value;
-	});
-	elements_store.subscribe((value) => {
-		elements = value;
-	});
-	elements_store.set({});
-	//models_store.subscribe((value) => {
-	//	models = value;
-	//});
-	//models_store.set({});
-	let settings = $state();
-	settings_store.subscribe((value) => {
-		settings = value;
-	});
-	ckt_store.set(undefined);
-
+	import {proj, ckt, settings} from './shared.svelte.js';
+	
 	let { data } = $props();
 
 	let results_data = []; // $state([]);
@@ -71,11 +22,6 @@
 		plot_result();
 	}
 
-	let calculated_value;
-	// $: calculated_value = calculated_value;
-	run(() => {
-		results_data = results_data;
-	});
 	let current_plot = $state(); //  = 0;
 
 	function plot_results() {
@@ -104,49 +50,6 @@
 			calculated_value: [],
 		};
 	}
-
-	settings = {
-		plot_number: 0,
-		plot_showhide: [],
-		meas_group: undefined,
-		measfile: [],
-		step_precision: [],
-		title: [],
-		title_x: [],
-		title_y: [],
-		title_y1: [],
-		title_y2: [],
-		yaxis_is_log: [],
-		xaxis_is_log: [],
-		equation: [],
-		performance_names: [],
-		probes: [],
-		selection: [],
-		reverse: [],
-		invert_x: [],
-		invert_y: [],
-		tracemode: [],
-		par_name: [],
-		sweep_type: [],
-		start_lin_val: [],
-		stop_lin_val: [],
-		lin_incr: [],
-		src_value: [],
-		start_dec_val: [],
-		stop_dec_val: [],
-		dec_points: [],
-		start_oct_val: [],
-		stop_oct_val: [],
-		oct_points: [],
-		src_title: [],
-		src_precision: [],
-
-		src: [],
-		src_plus: [],
-		src_values: [],
-		sweep_title: [],
-		result_title: [],
-	};
 	let ckt_data = $state({
 		measdata: [],
 		plotdata: [],
@@ -179,7 +82,7 @@
 			.decode(new Uint8Array(filedata))
 			.split(/\n/);
 		//measgrp_filedata = await file.arrayBuffer();
-		console.log("measurement group file=", settings.meas_group);
+		console.log("measurement group file=", $state.snapshot(settings.meas_group));
 	}
 
 	function setup_measurement_group() {
@@ -217,7 +120,6 @@
 			settings.invert_y[current_plot] = inv_y == "true" ? true : false;
 			current_plot = current_plot + 1;
 		});
-		settings = settings;
 		current_plot = 0;
 		console.log("variations=", $state.snapshot(variations), "nvar=", nvar);
 	}
@@ -232,7 +134,7 @@
 			let measfile = settings.measfile[i];
 			if (measfile != undefined && measfile != "") {
 				ckt_data.measdata[i] = await measurement_results(
-					port,
+					proj.port,
 					measfile,
 					settings.selection[i],
 					settings.reverse[i],
@@ -243,9 +145,9 @@
 			}
 			//ckt_data.measdata[i] = ckt_data.measdata[i];
 			let result = plot_result(
-				port,
-				dir,
-				file,
+				proj.port,
+				proj.dir,
+				proj.file,
 				settings.probes[i],
 				settings.equation[i],
 				ckt_data.plotdata[i],
@@ -269,8 +171,6 @@
 		}
 		console.log("ckt_data=", $state.snapshot(ckt_data));
 		console.log("sweep_name", sweep_name);
-		settings = settings;
-		ckt_data = ckt_data;
 	}
 
 	function clear_measurement_group() {
@@ -283,15 +183,14 @@
 
 	function add_plot() {
 		settings.plot_showhide.push(true);
-		console.log("settings.plot_showhide=", settings.plot_showhide);
+		console.log("settings.plot_showhide=", $state.snapshot(settings.plot_showhide));
 		// console.log('length=', settings.plot_showhide.length);
 		current_plot = settings.plot_showhide.length - 1;
-		settings = settings;
 		console.log(
 			"settings.plot_showhide=",
-			settings.plot_showhide,
+			$state.snapshot(settings.plot_showhide),
 			"current_plot=",
-			current_plot,
+			$state.snapshot(current_plot),
 		);
 	}
 
@@ -303,14 +202,14 @@
 				settings[obj].splice(current_plot, 1);
 			}
 		}
-		settings = settings;
 	}
 	let nvar = $state(0);
 	let show_meas_group = $state(true);
+	console.log('settings=', $state.snapshot(settings));
 </script>
 
 <main>
-	<ConvertSchematic {port} {dir} />
+	<ConvertSchematic port={proj.port} dir={proj.dir} />
 	<OpenLTspice
 		{data}
 		bind:probes={settings.probes[current_plot]}
@@ -319,7 +218,7 @@
 		bind:current_plot
 	/>
 	<!--	plot_on:open_end={plot_results} -->
-	<Settings {data} {ckt} bind:variations bind:settings />
+	<Settings {data} {ckt} bind:variations {settings} />
 	<div>
 		<Simulate
 			bind:probes={settings.probes[current_plot]}
@@ -335,7 +234,7 @@
 			>Load measurement group file</button
 		>
 		<!-- ConvertSchematic / -->
-		{#if settings.meas_group != undefined}
+		{#if settings != undefined && settings.meas_group != undefined}
 			<button onclick={setup_measurement_group} class="button-1"
 				>Setup</button
 			>
@@ -345,7 +244,7 @@
 			<button onclick={clear_measurement_group} class="button-1"
 				>Clear</button
 			>
-			<button onclick={show_meas_group = !show_meas_group}>show/hide</button>
+			<button onclick={() => show_meas_group = !show_meas_group}>show/hide</button>
 			{#if show_meas_group}
 				{#each settings.meas_group as line}
 					<div>{line}</div>
@@ -353,15 +252,14 @@
 			{/if}
 		{/if}
 	</div>
+	<!-- settings.plot_showhide = {settings.plot_showhide.length} -->
+    settings.equation = {settings.equation.length} 
 	{#each settings.plot_showhide as _, i}
 		<PlotResults
+		    plot_number: i
 			bind:current_plot
-			plot_number={i}
 			bind:plot_showhide={settings.plot_showhide[i]}
 			bind:results_data
-			bind:dir
-			bind:file
-			bind:elements
 			bind:measfile={settings.measfile[i]}
 			bind:step_precision={settings.step_precision[i]}
 			bind:title={settings.title[i]}
@@ -389,17 +287,22 @@
 
 	<button onclick={add_plot} class="button-2">Add plot</button>
 	<button onclick={delete_plot} class="button-2">Delete plot</button>
-
-	{#if settings.equation[current_plot] != undefined}
+    current_plot = {current_plot}
+    {#if current_plot != undefined}
+	results_data = {results_data}
+	settings.probes[current_plot] = {settings.probes[current_plot]}
+	settings.equation = {settings.equation[current_plot]}
+	settings.performance_names[current_plot] = {settings.performance_names[current_plot]}
+	{/if}
+	{#if current_plot != undefined && settings.equation[current_plot] != undefined} 
 		<Experiment
-			bind:settings
 			bind:results_data
-			{elements}
 			bind:probes={settings.probes[current_plot]}
 			bind:equation={settings.equation[current_plot]}
 			bind:performance_names={settings.performance_names[current_plot]}
 		/>
 	{/if}
+
 </main>
 <!-- style>
 	main {

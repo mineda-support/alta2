@@ -44,14 +44,6 @@
   //console.log("settings=", settings);
   let settings_name = $state("default");
   interface Props {
-    /*
-  import { settings_store } from "./stores.js";
-  let settings;
-
-  settings_store.subscribe((value) => {
-    settings = value;
-  });
-  */
     settings: any;
     data: any;
     ckt: any;

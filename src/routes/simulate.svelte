@@ -48,8 +48,8 @@
                 }
             }
         }
-        ckt_store.set(ckt);
-        elements_store.set(elements);
+        // ckt_store.set(ckt);
+        // elements_store.set(elements);
     }
 
     export function update_models(ckt, models) {
@@ -78,57 +78,26 @@
 
 <script lang="ts">
     import { get_control } from "./openLTspice.svelte";
-    import {
-        port_number,
-        ckt_name,
-        dir_name,
-        ckt_store,
-        elements_store,
-        models_store,
-    } from "./stores.js";
-    let port, file, dir, ckt, elements, models;
-    //let models;
-    //    let elements;
-    port_number.subscribe((value) => {
-        port = value;
-    });
-    ckt_name.subscribe((value) => {
-        file = value;
-    });
-    dir_name.subscribe((value) => {
-        dir = value;
-    });
-    ckt_store.subscribe((value) => {
-        ckt = value;
-    });
-    elements_store.subscribe((value) => {
-        elements = value;
-    });
-    models_store.subscribe((value) => {
-        models = value;
-    });
-
-    // import { createEventDispatcher } from "svelte";
-    // const dispatch = createEventDispatcher();
+    import { proj, ckt } from "./shared.svelte";
 
     export async function goLTspice() {
         if (ckt == undefined) {
             alert("Please read-in the circuit before simulation");
             return;
         }
-        console.log(`openLTspice dir='${dir}' file='${file}'`);
+        console.log(`openLTspice dir='${proj.dir}' file='${proj.file}'`);
         //dispatch("elm_update", { text: "Update elements" });
-        update_elements(dir, ckt, elements);
+        update_elements(prj.dir, ckt, proj.elements);
         //const my_sleep = (ms) =>
         //    new Promise((resolve) => setTimeout(resolve, ms));
         //await my_sleep(3000);
         console.log('variations', $state.snapshot(variations));
-        let encoded_params = `dir=${encodeURIComponent(
-            dir,
+        let encoded_params = `proj.dir=${encodeURIComponent(
+            proj.dir,
         )}&file=${encodeURIComponent(
-            file,
+            proj.file,
         )}&variations=${encodeURIComponent(JSON.stringify(variations))}`;
-        const models_update = update_models(ckt, models);
+        const models_update = update_models(ckt, proj.models);
         if (models_update != {}) {
             encoded_params =
                 encoded_params +
@@ -150,7 +119,7 @@
         res2 = await response.json();
         ckt.info = res2.info;
         // console.log(ckt.info);
-        ckt_store.set(ckt);
+        // ckt_store.set(ckt);
         //}
         on_sim_end("LTspice simulation ended!");
         
