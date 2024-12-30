@@ -9,8 +9,8 @@
 		plot_result,
 	} from "./plotResults.svelte";
 
-	import {proj, ckt, settings} from './shared.svelte.js';
-	
+	import { proj, ckt, settings } from "./shared.svelte.js";
+
 	let { data } = $props();
 
 	let results_data = []; // $state([]);
@@ -82,7 +82,10 @@
 			.decode(new Uint8Array(filedata))
 			.split(/\n/);
 		//measgrp_filedata = await file.arrayBuffer();
-		console.log("measurement group file=", $state.snapshot(settings.meas_group));
+		console.log(
+			"measurement group file=",
+			$state.snapshot(settings.meas_group),
+		);
 	}
 
 	function setup_measurement_group() {
@@ -153,7 +156,7 @@
 				ckt_data.plotdata[i],
 				ckt_data.db_data[i],
 				ckt_data.ph_data[i],
-				elements,
+				proj.elements,
 				settings.step_precision[i],
 				"",
 			);
@@ -183,7 +186,10 @@
 
 	function add_plot() {
 		settings.plot_showhide.push(true);
-		console.log("settings.plot_showhide=", $state.snapshot(settings.plot_showhide));
+		console.log(
+			"settings.plot_showhide=",
+			$state.snapshot(settings.plot_showhide),
+		);
 		// console.log('length=', settings.plot_showhide.length);
 		current_plot = settings.plot_showhide.length - 1;
 		console.log(
@@ -205,7 +211,7 @@
 	}
 	let nvar = $state(0);
 	let show_meas_group = $state(true);
-	console.log('settings=', $state.snapshot(settings));
+	console.log("settings=", $state.snapshot(settings));
 </script>
 
 <main>
@@ -218,7 +224,7 @@
 		bind:current_plot
 	/>
 	<!--	plot_on:open_end={plot_results} -->
-	<Settings {data} {ckt} bind:variations {settings} />
+	<Settings {data} {ckt} bind:variations />
 	<div>
 		<Simulate
 			bind:probes={settings.probes[current_plot]}
@@ -244,7 +250,9 @@
 			<button onclick={clear_measurement_group} class="button-1"
 				>Clear</button
 			>
-			<button onclick={() => show_meas_group = !show_meas_group}>show/hide</button>
+			<button onclick={() => (show_meas_group = !show_meas_group)}
+				>show/hide</button
+			>
 			{#if show_meas_group}
 				{#each settings.meas_group as line}
 					<div>{line}</div>
@@ -253,10 +261,10 @@
 		{/if}
 	</div>
 	<!-- settings.plot_showhide = {settings.plot_showhide.length} -->
-    settings.equation = {settings.equation.length} 
 	{#each settings.plot_showhide as _, i}
 		<PlotResults
-		    plot_number: i
+			plot_number:
+			i
 			bind:current_plot
 			bind:plot_showhide={settings.plot_showhide[i]}
 			bind:results_data
@@ -287,22 +295,15 @@
 
 	<button onclick={add_plot} class="button-2">Add plot</button>
 	<button onclick={delete_plot} class="button-2">Delete plot</button>
-    current_plot = {current_plot}
-    {#if current_plot != undefined}
-	results_data = {results_data}
-	settings.probes[current_plot] = {settings.probes[current_plot]}
-	settings.equation = {settings.equation[current_plot]}
-	settings.performance_names[current_plot] = {settings.performance_names[current_plot]}
-	{/if}
-	{#if current_plot != undefined && settings.equation[current_plot] != undefined} 
+	{#if current_plot != undefined && settings.equation[current_plot] != undefined}
 		<Experiment
 			bind:results_data
 			bind:probes={settings.probes[current_plot]}
 			bind:equation={settings.equation[current_plot]}
-			bind:performance_names={settings.performance_names[current_plot]}
-		/>
+			on_sim_end={plot_measurement_group}
+			on_sim_start={clear_all_plots}
+			/>
 	{/if}
-
 </main>
 <!-- style>
 	main {

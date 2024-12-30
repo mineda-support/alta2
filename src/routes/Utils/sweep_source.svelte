@@ -1,31 +1,13 @@
 <script lang="ts">
     import InputValue from "./input_value.svelte";
-    interface Props {
-        src: any;
-        par_name: any;
-        src_values: any;
-        src_plus: any;
-        sweep_type?: string;
-        start_lin_val: any;
-        stop_lin_val: any;
-        lin_incr: any;
-        start_dec_val: any;
-        stop_dec_val: any;
-        dec_points: any;
-        start_oct_val: any;
-        stop_oct_val: any;
-        oct_points: any;
-        elements: any;
-        source_title: any;
-        src_precision?: number;
-    }
-
-    let {
+        let {
+        source_title,
         src = $bindable(),
+        src_precision = $bindable(), // (3)
         par_name = $bindable(),
         src_values = $bindable(),
         src_plus = $bindable(),
-        sweep_type = $bindable('Linear'),
+        sweep_type = $bindable(), //'Linear'),
         start_lin_val = $bindable(),
         stop_lin_val = $bindable(),
         lin_incr = $bindable(),
@@ -35,10 +17,8 @@
         start_oct_val = $bindable(),
         stop_oct_val = $bindable(),
         oct_points = $bindable(),
-        elements = $bindable(),
-        source_title = $bindable(),
-        src_precision = $bindable(3)
-    }: Props = $props();
+        elements    
+    } = $props();
 
     function set_src_values() {
         console.log("sweep type:", sweep_type);
@@ -75,33 +55,35 @@
     function add_additional_source() {
         src_plus ||= [];
         if (src.match(/:M/)) {
-            src_plus.push(src + ':' + par_name);
+            src_plus.push(src + ":" + par_name);
         } else if (src.match(/:X/)) {
             // just ignore
         } else {
             src_plus.push(src);
         }
-        console.log("src_plus=", src_plus);
+        console.log("src_plus=", $state.snapshot(src_plus));
     }
-    function clear_additional_source(){
+    function clear_additional_source() {
         src_plus ||= [];
         src_plus.pop();
-        console.log("src_plus=", src_plus);
+        console.log("src_plus=", $state.snapshot(src_plus));
     }
-    let value_list=$state([]);
+    let value_list = $state([]);
 </script>
 
 <div>
     <label
         >{source_title}
         <select bind:value={src} style="border:darkgray solid 1px;">
-            {#each Object.entries(elements) as [ckt_name, elms]}
-                {#each Object.keys(elms) as elm}
-                    <option value={[ckt_name, elm].join(":")}
-                        >{[ckt_name, elm].join(":")}</option
-                    >
+            {#if elements != undefined}
+                {#each Object.entries(elements) as [ckt_name, elms]}
+                    {#each Object.keys(elms) as elm}
+                        <option value={[ckt_name, elm].join(":")}
+                            >{[ckt_name, elm].join(":")}</option
+                        >
+                    {/each}
                 {/each}
-            {/each}
+            {/if}
         </select>
         {#if src != undefined && src.match(/:M/)}
             <select bind:value={par_name} style="border:darkgray solid 1px;">
@@ -112,7 +94,8 @@
         <label>
             <button onclick={add_additional_source} class="button-1">
                 add
-            </button> {src_plus ? src_plus.join('&') : ''}
+            </button>
+            {src_plus ? src_plus.join("&") : ""}
         </label>
         <label>
             <button onclick={clear_additional_source} class="button-1">
@@ -158,12 +141,13 @@
             <button onclick={set_src_values} class="button-1"
                 >Set source values</button
             >
-            <label>precision:
-        <input value={src_precision} />
+            <label
+                >precision:
+                <input value={src_precision} />
             </label>
         </div>
-
-        {src} =&gt;{src_values} 
+         elements = {elements}
+        {src} =&gt;{src_values}
     </label>
 </div>
 

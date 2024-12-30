@@ -87,14 +87,12 @@
 </script>
 
 <script lang="ts">
-	import { run } from 'svelte/legacy';
-
 	import Plot from "svelte-plotly.js";
 	import { update_elements, update_models } from "./simulate.svelte";
 	import SweepSource from "./utils/sweep_source.svelte";
 	import ResultsPlot from "./utils/results_plot.svelte";
 	import { bindAll, dot$1, number, R, update } from "plotly.js-dist";
-	import { proj, ckt } from "./shared.svelte";
+	import { proj, ckt, settings } from "./shared.svelte.js";
 	function get_sweep_values(plotdata) {
 		let values = [];
 		let sweep, value;
@@ -120,7 +118,7 @@
 		)}&file=${encodeURIComponent(file)}`;
 		// console.log(`program to send: ${program}`);
 		const res = await fetch(
-			`http://localhost:${port}/api/ltspctl/execute?${encoded_params}`,
+			`http://localhost:${proj.port}/api/ltspctl/execute?${encoded_params}`,
 			{
 				method: "POST",
 				headers: {
@@ -142,12 +140,9 @@
 		results_data = $bindable(),
 		probes = $bindable(),
 		equation = $bindable(),
-		performance_names = $bindable(),
 		on_sim_start, on_sim_end
 	} = $props();
 
-	import {settings} from './shared.svelte.js';
-	
 	function postprocess(settings) {
 		eval(settings.postprocess);
 	}
@@ -183,7 +178,7 @@
         }
 		// dispatch("sim_start", { text: "LTspice simulation started!" });
 		let response = await fetch(
-			`http://localhost:${port}/api/ltspctl/simulate?${encoded_params}`,
+			`http://localhost:${proj.port}/api/ltspctl/simulate?${encoded_params}`,
 			{},
 		);
 		let res2 = await response.json();
@@ -250,15 +245,16 @@
 		return [updates, target];
 	}
 
-	let performances = $state();
-	if (settings.performance_names != undefined) {
+	let performances = $derived(settings.performance_names[settings.plot_number].split(",").map((a) => a.trim()));
+	/*
+	if (settings.performance_nams != undefined) {
 		let performance_names = settings.performance_names[settings.plot_number];
 		if (performance_names != undefined) {
 			console.log(`performance_names[${settings.plot_number}]=`, performance_names);
-			performances = performance_names.split(",").map((a) => a.trim());
+			performances = 
 			console.log('performances=', performances);
 		}
-	};
+	}; */
 
 	async function go_experiments(dir, settings, elements) {
 		if (ckt == undefined) {
@@ -557,7 +553,7 @@
 		let encoded_params = `dir=${encodeURIComponent(
 			dir,
 		)}&file=${encodeURIComponent(target)}`;
-		const command = `http://localhost:${port}/api/ltspctl/update?${encoded_params}&updates=${update_elms}`;
+		const command = `http://localhost:${proj.port}/api/ltspctl/update?${encoded_params}&updates=${update_elms}`;
 		console.log(command);
 		let response = await fetch(command, {});
 		let ckt = await response.json(); // ckt = {elements}
@@ -654,6 +650,7 @@
 		bind:start_oct_val={settings.start_dec_val[i]}
 		bind:stop_oct_val={settings.stop_dec_val[i]}
 		bind:oct_points={settings.dec_points[i]}
+		elements = {proj.elements}
 	></SweepSource>
 {/each}
 <label>
@@ -668,13 +665,13 @@
 <div>
 	<label>
 		<button
-			onclick={preview_experiments(dir, settings, proj.elements)}
+			onclick={preview_experiments(proj.dir, settings, proj.elements)}
 			class="button-1">Dry run</button
 		>
 	</label>
 	<label>
 		<button
-			onclick={() => go_experiments(dir, settings, proj.elements)}
+			onclick={() => go_experiments(proj.dir, settings, proj.elements)}
 			class="button-1">Go</button
 		>
 	</label>
@@ -688,63 +685,6 @@
 		<button onclick={load_experiments} class="button-1">Load</button>
 	</label>
 </div>
-
-<!-- SweepSource
-	source_title="1st source"
-	bind:src={settings.src1}
-	bind:par_name={settings.par_name1}
-	bind:src_values={settings.src1_values}
-	bind:src_plus={settings.src1_plus}
-	bind:sweep_type={settings.sweep_type1}
-	bind:start_lin_val={settings.start_lin_val1}
-	bind:stop_lin_val={settings.stop_lin_val1}
-	bind:lin_incr={settings.lin_incr1}
-	bind:src_value={settings.source_value1}
-	bind:start_dec_val={settings.start_dec_val1}
-	bind:stop_dec_val={settings.stop_dec_val1}
-	bind:dec_incr={settings.dec_points1}
-	bind:src_precision={settings.src_precision1}
-	bind:elements
-></SweepSource -->
-<!-- SweepSource
-	source_title="2nd source"
-	bind:src={settings.src2}
-	bind:par_name={settings.par_name2}
-	bind:src_values={settings.src2_values}
-	bind:src_plus={settings.src2_plus}
-	bind:sweep_type={settings.sweep_type2}
-	bind:start_lin_val={settings.start_lin_val2}
-	bind:stop_lin_val={settings.stop_lin_val2}
-	bind:lin_incr={settings.lin_incr2}
-	bind:src_value={settings.source_value2}
-	bind:start_dec_val={settings.start_dec_val2}
-	bind:stop_dec_val={settings.stop_dec_val2}
-	bind:dec_incr={settings.dec_points2}
-	bind:src_precision={settings.src_precision2}
-	bind:elements
-></SweepSource -->
-<!-- div>
-	<label>
-		<button
-			on:click={preview_updates(dir, settings, elements)}
-			class="button-1">Dry run</button
-		>
-	</label>
-	<label>
-		<button on:click={go(dir, settings, elements)} class="button-1"
-			>Go</button
-		>
-	</label>
-	<label>
-		<button on:click={clear} class="button-1">clear</button>
-	</label>
-	<label>
-		<button on:click={save} class="button-1">Save</button>
-	</label>
-	<label>
-		<button on:click={load} class="button-1">Load</button>
-	</label>
-</div -->
 
 {#if plot_data !== undefined}
 	<Plot

@@ -1,6 +1,5 @@
 <script lang="ts">
-  
-
+  import { settings } from "./shared.svelte.js";
   async function save_settings(data, settings_name, ckt, variations) {
     const props = data.props;
     props.settings_name = settings_name;
@@ -38,24 +37,19 @@
     // probes_name.set(probes);
     console.log("props=", props);
     // settings = {};
-    settings = props.settings;
+    //settings = props.settings;
+    for (const [k, v] of Object.entries(props.settings)){
+      settings[k] = v;
+    };
     variations = props.variations;
   }
   //console.log("settings=", settings);
   let settings_name = $state("default");
-  interface Props {
-    settings: any;
-    data: any;
-    ckt: any;
-    variations: any;
-  }
-
   let {
-    settings = $bindable(),
     data,
     ckt,
     variations = $bindable()
-  }: Props = $props();
+  } = $props();
 </script>
 
 <div>

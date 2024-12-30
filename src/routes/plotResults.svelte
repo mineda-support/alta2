@@ -107,8 +107,7 @@
     import BodePlot from "./utils/bode_plot.svelte";
     import SinglePlot from "./utils/single_plot.svelte";
     import { set_trace_names } from "./experiment.svelte";
-    import Settings from "./settings.svelte";
-    import { proj, ckt } from "./shared.svelte.js";
+    import { proj, ckt, settings } from "./shared.svelte.js";
     let {
         plot_number = $bindable(),
         current_plot = $bindable(),
@@ -139,12 +138,7 @@
     } = $props();
 
     let sweep_name;
-    let performances = $state();
-    // run(() => {
-        if (performance_names != undefined) {
-            performances = performance_names.split(",").map((a) => a.trim());
-        }
-    // });
+	let performances = $derived(settings.performance_names[settings.plot_number].split(",").map((a) => a.trim()));
 
     const options = {
         types: [
@@ -248,12 +242,13 @@
                 ? []
                 : measdata.filter((trace) => trace.checked),
         );
-        console.log("values in calculate_equation:", calculated_value);
+        console.log("values in calculate_equation:", $state.snapshot(calculated_value));
         const equation_array = equation.split(",");
         if (performances == undefined) {
             alert("Performance name(s) for equation(s) not defined");
             return;
         }
+        console.log('performances =', $state.snapshot(performances));
         performances.forEach(function (perf, index) {
             //console.log("perf, index=", [perf, index]);
             //console.log('results_data:', results_data);
@@ -261,11 +256,13 @@
             if (results_data[0][perf] == undefined) {
                 results_data[0][perf] = [];
             }
-            results_data[0][perf].push({
-                x: get_sweep_values(plotdata != undefined ? plotdata : db_data),
-                y: get_performance(calculated_value, index),
-                name: equation_array[index],
-            });
+            if (calculated_value != undefined) {
+                results_data[0][perf].push({
+                    x: get_sweep_values(plotdata != undefined ? plotdata : db_data),
+                    y: get_performance(calculated_value, index),
+                    name: equation_array[index],
+                });
+            }
             //} else {
             //	console.log('Error: calculate value is not available yet');
             //}

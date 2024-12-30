@@ -247,7 +247,8 @@
     {/each}
   </div -->
 
-<div class="tab-wrap">
+{#if proj.file != undefined}
+  <div class="tab-wrap">
   <input
     id="TAB-01"
     type="radio"
@@ -368,6 +369,7 @@
     </table>
   </div>
 </div>
+{/if}
 {#if ckt != undefined}
   <div class="sample">
     {#each ckt.info as node}
