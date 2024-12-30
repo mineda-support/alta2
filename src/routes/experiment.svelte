@@ -293,14 +293,14 @@
 			});
 			on_sim_end("LTspice simulation ended!");
 			performances.forEach((perf) => {
-				console.log(`${perf}:`, results_data[0][perf]);
+				console.log(`${perf}:`, $state.snapshot(results_data[0][perf]));
 			});
 			//plot_trace.y = gb;
 			//result_trace.y = pm;
 			//plot_data.push({ ...plot_trace });
 			//plot_data2.push({ ...result_trace });
 		}
-		console.log("results_data=", results_data);
+		console.log("results_data=", $state.snapshot(results_data));
 	}
 	// plot_data = [{x:[1,2,3,4], y:[1,2,4,3]}];
 
@@ -316,15 +316,15 @@
 		console.log("probes=", probes);
 		console.log("equation=", equation);
 		console.log("src[0]=", settings.src[0]);
-		console.log("src_plus[0]=", settings.src_plus[0]);
-		console.log("src_values[0]=", settings.src_values[0]);
+		console.log("src_plus[0]=", $state.snapshot(settings.src_plus[0]));
+		console.log("src_values[0]=", $state.snapshot(settings.src_values[0]));
 		//settings.sweep_title = settings.src[0];
 		console.log("sweep_title=", settings.sweep_title[0]);
 		//settings.result_title = [];
 		console.log("result_title=", settings.result_title[0]);
 		results_data = [];
 		results_data[0] = [];
-		let preview_table = `count: ${settings.src[0]} ${settings.src_plus[0].join(" ")}}\n`;
+		let preview_table = `count: ${settings.src[0]} ${settings.src_plus[0].join(" ")}\n`;
 		let count = 0;
 		for (const value2 of settings.src_values[0]) {
 			//src, par_name, src_plus) {

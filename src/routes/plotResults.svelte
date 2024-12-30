@@ -268,8 +268,8 @@
             //}
             //console.log(`results_data[0][${perf}]=`, results_data[0][perf]);
         });
-        results_data[0] = results_data[0];
-        console.log("results_data=", results_data);
+        // results_data[0] = results_data[0];
+        console.log("results_data=", $state.snapshot(results_data));
     }
     /*
     function select(measdata, selection) {
