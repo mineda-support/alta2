@@ -13,7 +13,7 @@
 
 	let { data } = $props();
 
-	let results_data = []; // $state([]);
+	let results_data = $state([]); // $state([]);
 	results_data[0] = [];
 
 	export function handleMessage(event) {

@@ -91,7 +91,6 @@
 	import { update_elements, update_models } from "./simulate.svelte";
 	import SweepSource from "./utils/sweep_source.svelte";
 	import ResultsPlot from "./utils/results_plot.svelte";
-	import { bindAll, dot$1, number, R, update } from "plotly.js-dist";
 	import { proj, ckt, settings } from "./shared.svelte.js";
 	function get_sweep_values(plotdata) {
 		let values = [];
@@ -133,9 +132,6 @@
 	let plot_data = $state();
 	let sweep_name = $state();
 
-	let src1;
-	//settings.src1 = src1;
-	
 	let {
 		results_data = $bindable(),
 		probes = $bindable(),
@@ -246,15 +242,6 @@
 	}
 
 	let performances = $derived(settings.performance_names[settings.plot_number].split(",").map((a) => a.trim()));
-	/*
-	if (settings.performance_nams != undefined) {
-		let performance_names = settings.performance_names[settings.plot_number];
-		if (performance_names != undefined) {
-			console.log(`performance_names[${settings.plot_number}]=`, performance_names);
-			performances = 
-			console.log('performances=', performances);
-		}
-	}; */
 
 	async function go_experiments(dir, settings, elements) {
 		if (ckt == undefined) {
@@ -281,7 +268,6 @@
 			//result_trace.name = trace_name;
 			//console.log("updates=", updates, `on ${dir}${target}.asc`);
 			await update_elms(proj.dir, target + ".asc", updates);
-
 			// dispatch("sim_start", { text: "LTspice simulation started!" });
 			on_sim_start("LTspice simulation started!");
 			let calculated_value, plotdata, db_data, ph_data;
@@ -313,10 +299,6 @@
 			//result_trace.y = pm;
 			//plot_data.push({ ...plot_trace });
 			//plot_data2.push({ ...result_trace });
-			for (let [perf, plotdata] of Object.entries(results_data[0])) {
-				plotdata = plotdata;
-			}
-			results_data = results_data;
 		}
 		console.log("results_data=", results_data);
 	}
@@ -451,9 +433,12 @@
 				);
 				console.log("updates=", updates, `on ${dir}${target}.asc`);
 				await update_elms(dir, target + ".asc", updates);
-
+				//await my_sleep(3000);
 				on_sim_start("LTspice simulation started!");
 				let calculated_value = await goLTspice2(ckt);
+				//const my_sleep = (ms) =>
+        	    //	new Promise((resolve) => setTimeout(resolve, ms));
+        		//await my_sleep(3000);
 				if (Array.isArray(calculated_value[0])) {
 					gb.push(calculated_value[0][0]);
 					pm.push(calculated_value[0][1]);
@@ -472,8 +457,6 @@
 			plot_data.push({ ...plot_trace });
 			plot_data2.push({ ...result_trace });
 		}
-		plot_data = plot_data;
-		plot_data2 = plot_data2;
 		console.log("plot_data=", plot_data);
 	}
 	// plot_data = [{x:[1,2,3,4], y:[1,2,4,3]}];
@@ -553,6 +536,9 @@
 		let encoded_params = `dir=${encodeURIComponent(
 			dir,
 		)}&file=${encodeURIComponent(target)}`;
+		const my_sleep = (ms) =>
+     	   	new Promise((resolve) => setTimeout(resolve, ms));
+        await my_sleep(1000);
 		const command = `http://localhost:${proj.port}/api/ltspctl/update?${encoded_params}&updates=${update_elms}`;
 		console.log(command);
 		let response = await fetch(command, {});
@@ -665,7 +651,7 @@
 <div>
 	<label>
 		<button
-			onclick={preview_experiments(proj.dir, settings, proj.elements)}
+			onclick={() => preview_experiments(proj.dir, settings, proj.elements)}
 			class="button-1">Dry run</button
 		>
 	</label>
