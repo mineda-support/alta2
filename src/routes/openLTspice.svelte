@@ -10,7 +10,7 @@
 </script>
 
 <script lang="ts">
-  import { Tooltip } from 'flowbite-svelte'
+  import { tooltip } from "./utils/tooltip.svelte";
   import InputWideValue from "./Utils/input_wide_value.svelte";
 
   async function openLTspice(port, dir, file, showup) {
@@ -82,22 +82,26 @@
   function fakeOpen(file) {
     alert(`you have chosen ${file}`);
   }
-  
+
   import { log } from "plotly.js-dist";
   let {
     data = $bindable(),
     probes = $bindable(),
     variations = $bindable({}),
     nvar = $bindable(),
-    current_plot = $bindable()
+    current_plot = $bindable(),
   } = $props();
   import { proj, ckt } from "./shared.svelte";
 
   let scoops; // = $state();
-  if (data != undefined && data.props != undefined && data.props.ckt != undefined) {
+  if (
+    data != undefined &&
+    data.props != undefined &&
+    data.props.ckt != undefined
+  ) {
     scoops = data.props.ckt;
   }
-  
+
   let traces = "";
   let showup = $state(false);
   if (scoops != undefined) {
@@ -118,14 +122,15 @@
   }
   let alter_src = $state();
   let alter = $state([{}]);
-  let c = $state(), e = $state();
+  let c = $state(),
+    e = $state();
   //run(() => {
-    if (alter_src != undefined) {
-      [c, e] = alter_src.split(":");
-      if (alter[0][alter_src] == undefined) {
-        alter[0][alter_src] = proj.elements[c][e];
-      }
+  if (alter_src != undefined) {
+    [c, e] = alter_src.split(":");
+    if (alter[0][alter_src] == undefined) {
+      alter[0][alter_src] = proj.elements[c][e];
     }
+  }
   //});
 
   function add_alter() {}
@@ -213,10 +218,13 @@
       style="border:darkgray solid 1px;width: 50%;"
     />
   {/if}
-  <button onclick={() => switch_wdir(data.props.wdir)} class="button-1"
-    >Switch Wdir</button
+  <!-- input bind:value={content} / -->
+
+  <button
+    use:tooltip={() => ({ content: "switch working directory" })}
+    onclick={() => switch_wdir(data.props.wdir)}
+    class="button-1">Switch Wdir</button
   >
-  <Tooltip>switch working directory</Tooltip>
 </p>
 <div class="sample">
   {#if data.props != undefined}
@@ -230,12 +238,14 @@
 </div>
 <div>
   <button
-    onclick={() => openLTspice(data.props.port, data.props.wdir, scoops, showup)}
+    onclick={() =>
+      openLTspice(data.props.port, data.props.wdir, scoops, showup)}
     class="button-1"
+    use:tooltip={() => ({ content: "readin circuit checked above" })}
   >
     Click here to read-in</button
   >
-  <label>
+  <label use:tooltip={() => ({ content: "show up LTspice" })}>
     <input type="checkbox" bind:checked={showup} />
     show schematic
   </label>
@@ -249,72 +259,57 @@
 
 {#if proj.file != undefined}
   <div class="tab-wrap">
-  <input
-    id="TAB-01"
-    type="radio"
-    name="TAB"
-    class="tab-switch"
-    checked="checked"
-  />
-  <label class="tab-label" for="TAB-01">Circuit info</label>
-  <div class="tab-content" style="border:red solid 2px;">
-    {#if ckt != undefined}
-      {#each Object.entries(proj.elements) as [ckt_name, elms]}
-        [{ckt_name}]<br />
-        {#each Object.entries(elms) as [elm]}
+    <input
+      id="TAB-01"
+      type="radio"
+      name="TAB"
+      class="tab-switch"
+      checked="checked"
+    />
+    <label
+      class="tab-label"
+      for="TAB-01"
+      use:tooltip={() => ({ content: "elements and control" })}
+    >
+      Circuit info</label
+    >
+    <div class="tab-content" style="border:red solid 2px;">
+      {#if ckt != undefined}
+        {#each Object.entries(proj.elements) as [ckt_name, elms]}
+          [{ckt_name}]<br />
+          {#each Object.entries(elms) as [elm]}
+            <label
+              >{elm}:
+              <input
+                style="border:darkgray solid 1px;"
+                bind:value={proj.elements[ckt_name][elm]}
+              /><br /></label
+            >
+          {/each}
+        {/each}
+      {/if}
+    </div>
+    <input id="TAB-02" type="radio" name="TAB" class="tab-switch" />
+    <label class="tab-label" for="TAB-02">SPICE models</label>
+    <div class="tab-content" style="border:green solid 2px;">
+      {#each Object.entries(proj.models) as [model_name, model_params]}
+        [{model_name}]<br />
+        {#each Object.entries(model_params) as [param]}
           <label
-            >{elm}:
+            >{param}:
             <input
               style="border:darkgray solid 1px;"
-              bind:value={proj.elements[ckt_name][elm]}
+              bind:value={proj.models[model_name][param]}
             /><br /></label
           >
         {/each}
       {/each}
-    {/if}
-  </div>
-  <input id="TAB-02" type="radio" name="TAB" class="tab-switch" />
-  <label class="tab-label" for="TAB-02">SPICE models</label>
-  <div class="tab-content" style="border:green solid 2px;">
-    {#each Object.entries(proj.models) as [model_name, model_params]}
-      [{model_name}]<br />
-      {#each Object.entries(model_params) as [param]}
-        <label
-          >{param}:
-          <input
-            style="border:darkgray solid 1px;"
-            bind:value={proj.models[model_name][param]}
-          /><br /></label
-        >
-      {/each}
-    {/each}
-  </div>
-  <input id="TAB-03" type="radio" name="TAB" class="tab-switch" />
-  <label class="tab-label" for="TAB-03">Alter</label>
-  <div class="tab-content" style="border:blue solid 2px;">
-    <div>Add Alter</div>
-    <select bind:value={alter_src} style="border:darkgray solid 1px;">
-      {#each Object.entries(proj.elements) as [ckt_name, elms]}
-        {#each Object.keys(elms) as elm}
-          <option value={[ckt_name, elm].join(":")}
-            >{[ckt_name, elm].join(":")}</option
-          >
-        {/each}
-      {/each}
-    </select>
-    <input
-      style="border:darkgray solid 1px;"
-      bind:value={alter[0][alter_src]}
-    /><br />
-    <button onclick={add_alter} class="button-item">New Tab</button>
-    <button onclick={check_alter} class="button-item">Check Alter</button>
-  </div>
-  <input id="TAB-04" type="radio" name="TAB" class="tab-switch" />
-  <label class="tab-label" for="TAB-04">Variation</label>
-  <div class="tab-content" style="border:yellow solid 2px;">
-    <div>
-      Add Variation
-      <select bind:value={src} style="border:darkgray solid 1px;">
+    </div>
+    <input id="TAB-03" type="radio" name="TAB" class="tab-switch" />
+    <label class="tab-label" for="TAB-03">Alter</label>
+    <div class="tab-content" style="border:blue solid 2px;">
+      <div>Add Alter</div>
+      <select bind:value={alter_src} style="border:darkgray solid 1px;">
         {#each Object.entries(proj.elements) as [ckt_name, elms]}
           {#each Object.keys(elms) as elm}
             <option value={[ckt_name, elm].join(":")}
@@ -323,57 +318,92 @@
           {/each}
         {/each}
       </select>
-      <button onclick={() => add_variation_item(src)} class="td-button">+</button>
-      <button onclick={() => emove_variation_item(src)} class="td-button">-</button>
-      (nvar={nvar})
+      <input
+        style="border:darkgray solid 1px;"
+        bind:value={alter[0][alter_src]}
+      /><br />
+      <button onclick={add_alter} class="button-item">New Tab</button>
+      <button onclick={check_alter} class="button-item">Check Alter</button>
     </div>
-    <table>
-      <thead>
-        <tr
-          ><th>Name</th>
-          {#each Object.entries(variations) as [elm, vals]}
-            <th>{elm}</th>
+    <input id="TAB-04" type="radio" name="TAB" class="tab-switch" />
+    <label class="tab-label" for="TAB-04"
+      use:tooltip={() => ({ content: "variations on device parameters" })}
+    >
+      Variation</label
+    >
+    <div class="tab-content" style="border:yellow solid 2px;">
+      <div>
+        Add Variation
+        <select bind:value={src} style="border:darkgray solid 1px;">
+          {#each Object.entries(proj.elements) as [ckt_name, elms]}
+            {#each Object.keys(elms) as elm}
+              <option value={[ckt_name, elm].join(":")}
+                >{[ckt_name, elm].join(":")}</option
+              >
+            {/each}
           {/each}
-        </tr>
-      </thead>
-      <tbody>
-        {#if nvar > 0}
-          {#each Array(nvar) as _, i}
-            <tr>
-              <td>
-                {i}
-                <!--button on:click={remove_variation(i)} class="td-button"
+        </select>
+        <button onclick={() => add_variation_item(src)} class="td-button"
+          >+</button
+        >
+        <button onclick={() => emove_variation_item(src)} class="td-button"
+          >-</button
+        >
+        (nvar={nvar})
+      </div>
+      <table>
+        <thead>
+          <tr
+            ><th>Name</th>
+            {#each Object.entries(variations) as [elm, vals]}
+              <th>{elm}</th>
+            {/each}
+          </tr>
+        </thead>
+        <tbody>
+          {#if nvar > 0}
+            {#each Array(nvar) as _, i}
+              <tr>
+                <td>
+                  {i}
+                  <!--button on:click={remove_variation(i)} class="td-button"
                   >-</button
                 -->
-              </td>
-              {#each Object.entries(variations) as [elm, vals]}
-                <td
-                  ><InputWideValue
-                    lab={elm + "#" + String(i + 1)}
-                    bind:val={vals[i]}
-                  />
                 </td>
-              {/each}
-            </tr>
-          {/each}
-        {/if}
-        <tr>
-          <td><button onclick={add_variation} class="td-button">+</button></td>
+                {#each Object.entries(variations) as [elm, vals]}
+                  <td
+                    ><InputWideValue
+                      lab={elm + "#" + String(i + 1)}
+                      bind:val={vals[i]}
+                    />
+                  </td>
+                {/each}
+              </tr>
+            {/each}
+          {/if}
+          <tr>
+            <td><button onclick={add_variation} class="td-button">+</button></td
+            >
 
-          <td><button onclick={() => remove_variation(remove_index)} class="td-button"
-            >-</button
-          ></td>
-          <td>remove_index:</td> <td><input bind:value={remove_index} /></td>
-        </tr>
-      </tbody>
-    </table>
+            <td
+              ><button
+                onclick={() => remove_variation(remove_index)}
+                class="td-button">-</button
+              ></td
+            >
+            <td>remove_index:</td> <td><input bind:value={remove_index} /></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
-</div>
 {/if}
 {#if ckt != undefined}
   <div class="sample">
     {#each ckt.info as node}
-      <button onclick={() => push_button(node)} class="button-item">{node}</button>
+      <button onclick={() => push_button(node)} class="button-item"
+        >{node}</button
+      >
     {/each}
   </div>
 {/if}

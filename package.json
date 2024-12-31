@@ -17,9 +17,9 @@
 	},
 	"dependencies": {
 		"child_process": "^1.0.2",
-		"flowbite-svelte": "^0.47.4",
 		"get-port": "^7.1.0",
 		"glob": "^11.0.0",
-		"svelte-plotly.js": "^1.2.0"
+		"svelte-plotly.js": "^1.2.0",
+		"tippy.js": "^6.3.7"
 	}
 }

@@ -79,6 +79,7 @@
 <script lang="ts">
     import { get_control } from "./openLTspice.svelte";
     import { proj, ckt } from "./shared.svelte";
+    import tooltip from './utils/tooltip.svelte';
 
     export async function goLTspice() {
         if (ckt == undefined) {
@@ -129,7 +130,9 @@
     let { variations = $bindable(), probes = $bindable() , on_sim_start, on_sim_end } = $props();
 </script>
 
-<button onclick={goLTspice} class="button-1">
+<button onclick={goLTspice} class="button-1"
+  use:tooltip={() => ({ content: "run LTspice simulation" })}
+>
     Click here to Start LTspice simulation</button
 >
 
