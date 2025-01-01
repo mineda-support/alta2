@@ -1,5 +1,5 @@
 <script module>
-  import { goto } from "$app/navigation";
+  // import { goto } from "$app/navigation";
   export function get_control(props) {
     if (Array.isArray(props)) {
       return props[0].control;
@@ -10,7 +10,7 @@
 </script>
 
 <script lang="ts">
-  import { tooltip } from "./utils/tooltip.svelte";
+  import { tooltip, msg } from "./Utils/tooltip.svelte";
   import InputWideValue from "./Utils/input_wide_value.svelte";
 
   async function openLTspice(port, dir, file, showup) {
@@ -93,11 +93,11 @@
   } = $props();
   import { proj, ckt } from "./shared.svelte";
 
-  let scoops; // = $state();
+  let scoops = $state();
   if (
     data != undefined &&
     data.props != undefined &&
-    data.props.ckt != undefined
+    data.props.ckt != undefined 
   ) {
     scoops = data.props.ckt;
   }
@@ -118,20 +118,22 @@
   function switch_wdir(wdir) {
     //const handle = await window.showDirectoryPicker();
     //wdir = handle.name; # does not return path
-    goto("?wdir=" + wdir.replace(/^"/, "").replace(/"$/, ""));
+    console.log('wdir=', wdir);
+    //goto("?wdir=" + wdir.replace(/^"/, "").replace(/"$/, ""));
+    window.location = "?wdir=" + wdir.replace(/^"/, "").replace(/"$/, "");
   }
   let alter_src = $state();
   let alter = $state([{}]);
   let c = $state(),
     e = $state();
-  //run(() => {
+  /* run(() => {
   if (alter_src != undefined) {
     [c, e] = alter_src.split(":");
     if (alter[0][alter_src] == undefined) {
       alter[0][alter_src] = proj.elements[c][e];
     }
   }
-  //});
+  }); */
 
   function add_alter() {}
 
@@ -214,14 +216,14 @@
   Work directory:
   {#if data != undefined && data.props != undefined && data.props.wdir != undefined}
     <input
-      value={data.props.wdir}
+      bind:value={data.props.wdir}
       style="border:darkgray solid 1px;width: 50%;"
     />
   {/if}
   <!-- input bind:value={content} / -->
 
   <button
-    use:tooltip={() => ({ content: "switch working directory" })}
+    use:tooltip={()=>msg("switch working directory")}
     onclick={() => switch_wdir(data.props.wdir)}
     class="button-1">Switch Wdir</button
   >
@@ -241,11 +243,11 @@
     onclick={() =>
       openLTspice(data.props.port, data.props.wdir, scoops, showup)}
     class="button-1"
-    use:tooltip={() => ({ content: "readin circuit checked above" })}
+    use:tooltip={()=>msg("readin circuit checked above" )}
   >
     Click here to read-in</button
   >
-  <label use:tooltip={() => ({ content: "show up LTspice" })}>
+  <label use:tooltip={()=>msg("show up LTspice")}>
     <input type="checkbox" bind:checked={showup} />
     show schematic
   </label>
@@ -269,7 +271,7 @@
     <label
       class="tab-label"
       for="TAB-01"
-      use:tooltip={() => ({ content: "elements and control" })}
+      use:tooltip={()=>msg("elements and control")}
     >
       Circuit info</label
     >
@@ -327,7 +329,7 @@
     </div>
     <input id="TAB-04" type="radio" name="TAB" class="tab-switch" />
     <label class="tab-label" for="TAB-04"
-      use:tooltip={() => ({ content: "variations on device parameters" })}
+      use:tooltip={()=>msg("variations on device parameters")}
     >
       Variation</label
     >
@@ -398,16 +400,20 @@
     </div>
   </div>
 {/if}
+<!--
 {#if ckt != undefined}
+[Probes list (clicked probe will be put in probes for a current plot)]
   <div class="sample">
     {#each ckt.info as node}
-      <button onclick={() => push_button(node)} class="button-item"
+      <button 
+      use:tooltip={()=>msg("push probe in probes for a current plot")}
+      onclick={() => push_button(node)} class="button-item"
         >{node}</button
       >
     {/each}
   </div>
 {/if}
-
+-->
 <style>
   .sample {
     display: flex;

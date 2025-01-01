@@ -31,7 +31,7 @@
                     probes,
                     )}`;
 
-                const command = `http://localhost:${port}/api/ltspctl/update?${encoded_params}&updates=${update_elms}`;
+                const command = `http://localhost:${proj.port}/api/ltspctl/update?${encoded_params}&updates=${update_elms}`;
                 console.log(command);
                 let response = await fetch(command, {});
                 let ckt = await response.json(); // ckt = {elements}
@@ -79,8 +79,7 @@
 <script lang="ts">
     import { get_control } from "./openLTspice.svelte";
     import { proj, ckt } from "./shared.svelte";
-    import tooltip from './utils/tooltip.svelte';
-
+    import { tooltip, msg } from "./Utils/tooltip.svelte";
     export async function goLTspice() {
         if (ckt == undefined) {
             alert("Please read-in the circuit before simulation");
@@ -88,12 +87,12 @@
         }
         console.log(`openLTspice dir='${proj.dir}' file='${proj.file}'`);
         //dispatch("elm_update", { text: "Update elements" });
-        update_elements(prj.dir, ckt, proj.elements);
+        update_elements(proj.dir, ckt, proj.elements);
         //const my_sleep = (ms) =>
         //    new Promise((resolve) => setTimeout(resolve, ms));
         //await my_sleep(3000);
         console.log('variations', $state.snapshot(variations));
-        let encoded_params = `proj.dir=${encodeURIComponent(
+        let encoded_params = `dir=${encodeURIComponent(
             proj.dir,
         )}&file=${encodeURIComponent(
             proj.file,
@@ -107,14 +106,14 @@
         // dispatch("sim_start", { text: "LTspice simulation started!" });
         on_sim_start("LTspice simulation started!");
         let response = await fetch(
-            `http://localhost:${port}/api/ltspctl/simulate?${encoded_params}`,
+            `http://localhost:${proj.port}/api/ltspctl/simulate?${encoded_params}`,
             {},
         );
         let res2 = await response.json();
         console.log(res2);
         //if (ckt.info == null) {
         response = await fetch(
-            `http://localhost:${port}/api/ltspctl/info?${encoded_params}`,
+            `http://localhost:${proj.port}/api/ltspctl/info?${encoded_params}`,
             {},
         );
         res2 = await response.json();
@@ -131,10 +130,7 @@
 </script>
 
 <button onclick={goLTspice} class="button-1"
-  use:tooltip={() => ({ content: "run LTspice simulation" })}
+  use:tooltip={()=>msg("run LTspice simulation")}
 >
     Click here to Start LTspice simulation</button
 >
-
-<style>
-</style>

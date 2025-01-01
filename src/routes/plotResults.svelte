@@ -20,6 +20,7 @@
 
     export async function measurement_results(
         port,
+        dir,
         measfile,
         selection,
         reverse,
@@ -34,7 +35,8 @@
         //console.log(handle.name);
         //const file = await handle.getFile();
         //console.log(file);
-        let encoded_params = `dir=&file=${encodeURIComponent(measfile)}&selection=${selection}`;
+        console.log('dir=', dir);
+        let encoded_params = `dir=${encodeURIComponent(dir)}&file=${encodeURIComponent(measfile)}&selection=${selection}`;
         if (invert_x != undefined) {
             encoded_params = encoded_params + `&invert_x=${invert_x}`;
         }
@@ -46,8 +48,9 @@
             {},
         );
         let res2 = await response.json();
+        console.log('res2=', res2);
         let measdata = reverse ? res2.traces.reverse() : res2.traces;
-        // console.log("measdata=", measdata);
+        console.log("measdata=", measdata);
         for (const trace of measdata) {
             trace.checked = true;
             trace.mode = tracemode;
@@ -92,12 +95,15 @@
         );
         let res2 = await response.json();
         console.log(res2);
-        [plotdata, db_data, ph_data, sweep_name] = set_trace_names(
-            res2,
-            probes,
-            proj.elements,
-            step_precision,
-        );
+        console.log('probes=', probes);
+        if (probes != undefined && probes.trim().length > 0) {
+          [plotdata, db_data, ph_data, sweep_name] = set_trace_names(
+              res2,
+              probes,
+              proj.elements,
+              step_precision,
+          );
+        } 
         return [plotdata, db_data, ph_data, sweep_name];
     }
 
@@ -108,6 +114,7 @@
     import SinglePlot from "./utils/single_plot.svelte";
     import { set_trace_names } from "./experiment.svelte";
     import { proj, ckt, settings } from "./shared.svelte.js";
+    import { tooltip, msg } from "./Utils/tooltip.svelte";
     let {
         plot_number = $bindable(),
         current_plot = $bindable(),
@@ -153,6 +160,7 @@
 
     async function get_measurement_results(
         port,
+        dir,
         measfile,
         selection,
         reverse,
@@ -165,6 +173,7 @@
         }
         measdata = await measurement_results(
             port,
+            dir,
             measfile,
             selection,
             reverse,
@@ -338,19 +347,44 @@
         // return calculated_value; // maybe useless
     }
     equation = "x.where(y, 2.5){|x, y| x > 1e-6}";
+  function push_button(node) {
+    console.log(`${probes}, ${node}`);
+    if (probes == null || probes == undefined || probes == "") {
+      probes = node;
+    } else {
+      probes = probes + ", " + node;
+    }
+  }
 </script>
-
-<button onclick={() => (plot_showhide = !plot_showhide)} class="button-2"
-    >Show/hide</button
+{#if ckt != undefined}
+[Probes list (clicked probe will be put in probes for a current plot)]
+  <div class="sample">
+    {#each ckt.info as node}
+      <button 
+      use:tooltip={()=>msg("push probe in probes for a current plot")}
+      onclick={() => push_button(node)} class="button-item"
+        >{node}</button
+      >
+    {/each}
+  </div>
+{/if}
+<button
+use:tooltip={()=>msg("show or hide plot settings")}
+onclick={() => (plot_showhide = !plot_showhide)} class="button-2"
+   >Show/hide</button
 >plot#{plot_number}
 {#if plot_showhide}
-    <button onclick={() => (current_plot = plot_number)} class="button-2"
+    <button 
+    use:tooltip={()=>msg("make this plot current to push probes")}
+    onclick={() => (current_plot = plot_number)} class="button-2"
         >Make current</button
     >
     <div>
         <button
+        use:tooltip={()=>msg("get a measurement data file")}
             onclick={() => get_measurement_results(
-                port,
+                proj.port,
+                proj.dir,
                 measfile.trim().replace(/^"/, "").replace(/"$/, ""),
                 selection,
                 reverse,
@@ -526,4 +560,26 @@
 	    font-family: Arial, "Helvetica Neue", "BIZ UDPGothic", Meiryo, "Hiragino Kaku Gothic Pro", sans-serif;
     	font-size: 10pt;
 	}
+  .sample {
+    display: flex;
+    flex-wrap: wrap;
+    /* border: green solid 5px; */
+    height: 200px;
+    /* background:yellow; */
+    overflow: scroll;
+  }
+  .box-item {
+    width: 25%;
+    background: orange;
+    text-align: left;
+    padding: 5px 10px;
+    border: 5px solid #ddd;
+  }
+  .button-item {
+    /* width: 25%; */
+    background: lightblue;
+    text-align: left;
+    padding: 2px 3px;
+    border: 2px solid yellow;
+  }
 </style>

@@ -1,6 +1,6 @@
 <slot></slot>
 
-<style>
+<!-- style>
     :global {
         [data-tippy-root] {
             --bg: #666;
@@ -25,4 +25,4 @@
             border-bottom-color: var(--bg);
         }
     }
-</style>
+</style -->

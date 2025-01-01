@@ -148,7 +148,7 @@ module Test
         probes = params[:probes] 
         Dir.chdir(work_dir){
           ckt = LTspiceControl.new(File.basename ckt_name)
-          if probes
+          if probes && probes.strip != ''
             vars, traces = ckt.get_traces *(probes.split(','))
             if probes.start_with? 'frequency'
               db_traces = traces.map{|trace| {name: trace[:name], x: trace[:x], y: trace[:y].map{|a| 20.0*Math.log10(a.abs)}}}

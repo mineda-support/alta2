@@ -4,6 +4,7 @@
 	import Experiment, { set_trace_names } from "./experiment.svelte";
 	import OpenLTspice, { get_control } from "./openLTspice.svelte";
 	import Settings from "./settings.svelte";
+	import { tooltip, msg } from "./Utils/tooltip.svelte";
 	import PlotResults, {
 		measurement_results,
 		plot_result,
@@ -138,6 +139,7 @@
 			if (measfile != undefined && measfile != "") {
 				ckt_data.measdata[i] = await measurement_results(
 					proj.port,
+					proj.dir,
 					measfile,
 					settings.selection[i],
 					settings.reverse[i],
@@ -236,21 +238,31 @@
 	</div>
 	<hr />
 	<div>
-		<button onclick={load_measurement_group_file} class="button-2"
+		<button 
+        use:tooltip={()=>msg("load measurement group")}
+		onclick={load_measurement_group_file} class="button-2"
 			>Load measurement group file</button
 		>
 		<!-- ConvertSchematic / -->
 		{#if settings != undefined && settings.meas_group != undefined}
-			<button onclick={setup_measurement_group} class="button-1"
+			<button 
+            use:tooltip={()=>msg("setup simulation for measurement group")}
+			onclick={setup_measurement_group} class="button-1"
 				>Setup</button
 			>
-			<button onclick={plot_measurement_group} class="button-2"
+			<button             
+			use:tooltip={()=>msg("plot measurement group with simulation")}
+			onclick={plot_measurement_group} class="button-2"
 				>Plot measurement group</button
 			>
-			<button onclick={clear_measurement_group} class="button-1"
+			<button
+			use:tooltip={()=>msg("clear measurement group")}
+			 onclick={clear_measurement_group} class="button-1"
 				>Clear</button
 			>
-			<button onclick={() => (show_meas_group = !show_meas_group)}
+			<button 
+			use:tooltip={()=>msg("show or hide measurement group files list")}
+			onclick={() => (show_meas_group = !show_meas_group)}
 				>show/hide</button
 			>
 			{#if show_meas_group}
@@ -263,8 +275,7 @@
 	<!-- settings.plot_showhide = {settings.plot_showhide.length} -->
 	{#each settings.plot_showhide as _, i}
 		<PlotResults
-			plot_number:
-			i
+			plot_number={i}
 			bind:current_plot
 			bind:plot_showhide={settings.plot_showhide[i]}
 			bind:results_data
@@ -305,9 +316,32 @@
 			/>
 	{/if}
 </main>
+<svelte:head>
+	<link rel="stylesheet" href="https://unpkg.com/tippy.js@6.3.2/dist/tippy.css">
+</svelte:head>
 <!-- style>
-	main {
-	    font-family: Arial, "Helvetica Neue", "BIZ UDPGothic", Meiryo, "Hiragino Kaku Gothic Pro", sans-serif;
-    	font-size: 10pt;
-	}
+    :global {
+        [data-tippy-root] {
+            --bg: #666;
+            background-color: var(--bg);
+            color: white;
+            border-radius: 0.2rem;
+            padding: 0.2rem 0.6rem;
+            filter: drop-shadow(1px 1px 3px rgb(0 0 0 / 0.1));
+
+            * {
+                transition: none;
+            }
+        }
+
+        [data-tippy-root]::before {
+            --size: 0.4rem;
+            content: "";
+            position: absolute;
+            left: calc(50% - var(--size));
+            top: calc(-2 * var(--size) + 1px);
+            border: var(--size) solid transparent;
+            border-bottom-color: var(--bg);
+        }
+    }
 </style -->

@@ -1,12 +1,12 @@
 <script lang="ts">
   import { settings } from "./shared.svelte.js";
-	import tooltip from './utils/tooltip.svelte';
+	import { tooltip, msg } from "./Utils/tooltip.svelte";
   async function save_settings(data, settings_name, ckt, variations) {
     const props = data.props;
     props.settings_name = settings_name;
     props.ckt = ckt;
     props.variations = variations;
-    console.log("settings=", settings);
+    console.log("settings=", $state.snapshot(settings));
     props.settings = {};
     for (const [item, value] of Object.entries(settings)) {
       props.settings[item] = value;
@@ -57,7 +57,7 @@
   <button
     onclick={() => save_settings(data, settings_name, ckt, variations)}
     class="button-1"
-    use:tooltip={() => ({ content: "save settings in a working directory" })}
+    use:tooltip={()=>msg("save settings in a working directory")}
     >
     Save settings in:</button
   >
@@ -77,7 +77,7 @@
   <button
     onclick={() => load_settings(settings_name, data.props.wdir)}
     class="button-1"
-    use:tooltip={() => ({ content: "load settings from a file" })}
+    use:tooltip={()=>msg("load settings from a file")}
     >Load settings from:
   </button>
   <select

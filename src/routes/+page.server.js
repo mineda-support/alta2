@@ -5,21 +5,15 @@ import getPort from 'get-port';
 import { exec } from 'node:child_process';
 //const { exec } = require('child_process');
 
-/*
-import { goto } from '$app/navigation';
-export const actions = {
-    default: async (event) => {
-        console.log('form sent'); //alert('form sent');
-        goto('/development/test3/');
-    }
-};    
-*/
 export async function load({ url }) {
     // const probes = cookies.get('probes')
     const home = process.env.HOME.replaceAll('\\', '/');
     let wdir = url.searchParams.get('wdir') || home + '/Seafile/PTS06_2022_8/BGR_TEG/';
     let ckt = url.searchParams.get('ckt');
     console.log(`wdir: ${wdir}`);
+    console.log('home=', home);
+    console.log('href = ', url.href);
+    console.log('origin = ', url.origin);
     if (!wdir.endsWith('/')) wdir = wdir + '/';
     if (fs.existsSync(wdir)) {
         fs.readdir(wdir, (err, files) => {
@@ -36,7 +30,7 @@ export async function load({ url }) {
         console.log(setting_files);
         return {
             props: {
-                home: home, port: await startGrape(),
+                home: home, port: await startGrape(), origin: url.origin,
                 wdir: wdir, ckt: ckt, files: files.map(a => path.basename(a)), //, probes: probes
                 setting_names: setting_files.map(a => path.basename(a).replace('_settings.json', ''))
             }

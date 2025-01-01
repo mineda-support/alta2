@@ -7,53 +7,43 @@
     //    alert("conversion to " + selected);
     // }
     let selected = $state();
-    let program = $state();
-
-      if (selected == "Xschem") {
-           program = `
+    let program = $derived(
+   `
    create_cdraw()
    dir = Dir.pwd
-   cdraw2target 'xschem', File.join(dir,'cdraw'), File.join(dir,'./Xschem')
-   `;
+   cdraw2target 'xschem', File.join(dir,'cdraw'), File.join(dir, '${selected}')
+   `);
 
-   }
-    /*
-    function convert_from_ltspice(program) {
-        const encoded_params = `dir=${encodeURIComponent(dir)}`;
-        console.log(program);
-        `http://localhost:9292/api/ltspctl/convert_from_LTspice?${encoded_params}`;
-    }
-    */
-    function encoded_params(dir) {
+    function encoded_params(dir, program) {
         console.log(`dir=${encodeURIComponent(dir)}`);
-        return `dir=${encodeURIComponent(dir)}`;
+        return `dir=${encodeURIComponent(dir)}&program=${program}`;
     }
-    /* function handleSubmit() {
-        goto("/development/test3/");
-    } */
-</script>
+ </script>
 
 <!-- form method="POST" on:submit={handleSubmit} class='button-2'></form -->
 <form
     method="POST"
     use:enhance={({ formElement, formData, action, cancel }) => {
         return async ({ result }) => {
-            // `result` is an `ActionResult` object
-            if (result.type === "redirect") {
-                goto(result.location);
+            console.log('result=', result);
+            // `result` is an `ActionResult` object --- this is not true 
+            /* if (result.type === "redirect") {
+                //goto(result.location);
+                window.location = result.location;
             } else {
                 await applyAction(result);
-            }
+            } */
             if (dir == undefined || dir == '') {
                 alert('Conversion failed --- please read-in the circuit data');
             } else {
                 alert(`Xschem folder created under ${dir}`);
             }
+            window.location = "?wdir=" + dir.replace(/^"/, "").replace(/"$/, "")+selected;
         };
     }}
     class="button-2"
     action={`http://localhost:${port}/api/ltspctl/convert_from_LTspice?${encoded_params(
-        dir,
+        dir, program
     )}`}
 >
     <button>Convert schematic</button> to
@@ -66,14 +56,5 @@
         <option value="Edif">Edif</option>
     </select>
 </form>
-
-<!-- button on:click={convertSchematic(selected)} class="button-2">
-   Convert schematic</button> to 
-<select bind:value={selected}>
-    <option value='Xschem'>Xschem</option>
-    <option value='EEschema'>EEschema</option>
-    <option value='Qucs'>Qucs</option>
-    <option value='Edif'>Edif</option>
-</select -->
 <style>
 </style>
