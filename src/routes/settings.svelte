@@ -1,6 +1,6 @@
 <script lang="ts">
   import { settings } from "./shared.svelte.js";
-	import { tooltip, msg } from "./Utils/tooltip.svelte";
+  import { tooltip, msg } from "./Utils/tooltip.svelte";
   async function save_settings(data, settings_name, ckt, variations) {
     const props = data.props;
     props.settings_name = settings_name;
@@ -29,9 +29,7 @@
 
   async function load_settings(settings_name, dir) {
     const response = await fetch(
-      `settings?dir=${encodeURIComponent(
-        dir,
-      )}&settings_name=${settings_name}`,
+      `settings?dir=${encodeURIComponent(dir)}&settings_name=${settings_name}`,
     );
     // const result = await response.json();
     const props = await response.json();
@@ -39,26 +37,22 @@
     console.log("props=", props);
     // settings = {};
     //settings = props.settings;
-    for (const [k, v] of Object.entries(props.settings)){
+    for (const [k, v] of Object.entries(props.settings)) {
       settings[k] = v;
-    };
+    }
     variations = props.variations;
   }
   //console.log("settings=", settings);
   let settings_name = $state("default");
-  let {
-    data,
-    ckt,
-    variations = $bindable()
-  } = $props();
+  let { data, ckt, variations = $bindable() } = $props();
 </script>
 
 <div>
   <button
     onclick={() => save_settings(data, settings_name, ckt, variations)}
     class="button-1"
-    use:tooltip={()=>msg("save settings in a working directory")}
-    >
+    use:tooltip={() => msg("save settings in a working directory")}
+  >
     Save settings in:</button
   >
   <label>
@@ -77,7 +71,7 @@
   <button
     onclick={() => load_settings(settings_name, data.props.wdir)}
     class="button-1"
-    use:tooltip={()=>msg("load settings from a file")}
+    use:tooltip={() => msg("load settings from a file")}
     >Load settings from:
   </button>
   <select

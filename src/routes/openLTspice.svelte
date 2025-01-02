@@ -97,7 +97,7 @@
   if (
     data != undefined &&
     data.props != undefined &&
-    data.props.ckt != undefined 
+    data.props.ckt != undefined
   ) {
     scoops = data.props.ckt;
   }
@@ -118,7 +118,7 @@
   function switch_wdir(wdir) {
     //const handle = await window.showDirectoryPicker();
     //wdir = handle.name; # does not return path
-    console.log('wdir=', wdir);
+    console.log("wdir=", wdir);
     //goto("?wdir=" + wdir.replace(/^"/, "").replace(/"$/, ""));
     window.location = "?wdir=" + wdir.replace(/^"/, "").replace(/"$/, "");
   }
@@ -223,7 +223,7 @@
   <!-- input bind:value={content} / -->
 
   <button
-    use:tooltip={()=>msg("switch working directory")}
+    use:tooltip={() => msg("switch working directory")}
     onclick={() => switch_wdir(data.props.wdir)}
     class="button-1">Switch Wdir</button
   >
@@ -243,11 +243,11 @@
     onclick={() =>
       openLTspice(data.props.port, data.props.wdir, scoops, showup)}
     class="button-1"
-    use:tooltip={()=>msg("readin circuit checked above" )}
+    use:tooltip={() => msg("readin circuit checked above")}
   >
     Click here to read-in</button
   >
-  <label use:tooltip={()=>msg("show up LTspice")}>
+  <label use:tooltip={() => msg("show up LTspice")}>
     <input type="checkbox" bind:checked={showup} />
     show schematic
   </label>
@@ -271,7 +271,7 @@
     <label
       class="tab-label"
       for="TAB-01"
-      use:tooltip={()=>msg("elements and control")}
+      use:tooltip={() => msg("elements and control")}
     >
       Circuit info</label
     >
@@ -328,8 +328,10 @@
       <button onclick={check_alter} class="button-item">Check Alter</button>
     </div>
     <input id="TAB-04" type="radio" name="TAB" class="tab-switch" />
-    <label class="tab-label" for="TAB-04"
-      use:tooltip={()=>msg("variations on device parameters")}
+    <label
+      class="tab-label"
+      for="TAB-04"
+      use:tooltip={() => msg("variations on device parameters")}
     >
       Variation</label
     >
@@ -400,6 +402,7 @@
     </div>
   </div>
 {/if}
+
 <!--
 {#if ckt != undefined}
 [Probes list (clicked probe will be put in probes for a current plot)]

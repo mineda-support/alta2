@@ -238,31 +238,34 @@
 	</div>
 	<hr />
 	<div>
-		<button 
-        use:tooltip={()=>msg("load measurement group")}
-		onclick={load_measurement_group_file} class="button-2"
-			>Load measurement group file</button
+		<button
+			use:tooltip={() => msg("load measurement group")}
+			onclick={load_measurement_group_file}
+			class="button-2">Load measurement group file</button
 		>
 		<!-- ConvertSchematic / -->
 		{#if settings != undefined && settings.meas_group != undefined}
-			<button 
-            use:tooltip={()=>msg("setup simulation for measurement group")}
-			onclick={setup_measurement_group} class="button-1"
-				>Setup</button
-			>
-			<button             
-			use:tooltip={()=>msg("plot measurement group with simulation")}
-			onclick={plot_measurement_group} class="button-2"
-				>Plot measurement group</button
+			<button
+				use:tooltip={() =>
+					msg("setup simulation for measurement group")}
+				onclick={setup_measurement_group}
+				class="button-1">Setup</button
 			>
 			<button
-			use:tooltip={()=>msg("clear measurement group")}
-			 onclick={clear_measurement_group} class="button-1"
-				>Clear</button
+				use:tooltip={() =>
+					msg("plot measurement group with simulation")}
+				onclick={plot_measurement_group}
+				class="button-2">Plot measurement group</button
 			>
-			<button 
-			use:tooltip={()=>msg("show or hide measurement group files list")}
-			onclick={() => (show_meas_group = !show_meas_group)}
+			<button
+				use:tooltip={() => msg("clear measurement group")}
+				onclick={clear_measurement_group}
+				class="button-1">Clear</button
+			>
+			<button
+				use:tooltip={() =>
+					msg("show or hide measurement group files list")}
+				onclick={() => (show_meas_group = !show_meas_group)}
 				>show/hide</button
 			>
 			{#if show_meas_group}
@@ -304,8 +307,16 @@
 		></PlotResults>
 	{/each}
 
-	<button onclick={add_plot} class="button-2">Add plot</button>
-	<button onclick={delete_plot} class="button-2">Delete plot</button>
+	<button
+		use:tooltip={() => msg("add a new plot")}
+		onclick={add_plot}
+		class="button-2">Add plot</button
+	>
+	<button
+		use:tooltip={() => msg("delete this plot")}
+		onclick={delete_plot}
+		class="button-2">Delete plot</button
+	>
 	{#if current_plot != undefined && settings.equation[current_plot] != undefined}
 		<Experiment
 			bind:results_data
@@ -313,11 +324,14 @@
 			bind:equation={settings.equation[current_plot]}
 			on_sim_end={plot_measurement_group}
 			on_sim_start={clear_all_plots}
-			/>
+		/>
 	{/if}
 </main>
 <svelte:head>
-	<link rel="stylesheet" href="https://unpkg.com/tippy.js@6.3.2/dist/tippy.css">
+	<link
+		rel="stylesheet"
+		href="https://unpkg.com/tippy.js@6.3.2/dist/tippy.css"
+	/>
 </svelte:head>
 <!-- style>
     :global {

@@ -35,7 +35,7 @@
         //console.log(handle.name);
         //const file = await handle.getFile();
         //console.log(file);
-        console.log('dir=', dir);
+        console.log("dir=", dir);
         let encoded_params = `dir=${encodeURIComponent(dir)}&file=${encodeURIComponent(measfile)}&selection=${selection}`;
         if (invert_x != undefined) {
             encoded_params = encoded_params + `&invert_x=${invert_x}`;
@@ -48,7 +48,7 @@
             {},
         );
         let res2 = await response.json();
-        console.log('res2=', res2);
+        console.log("res2=", res2);
         let measdata = reverse ? res2.traces.reverse() : res2.traces;
         console.log("measdata=", measdata);
         for (const trace of measdata) {
@@ -70,7 +70,7 @@
         ph_data,
         elements,
         step_precision,
-        sweep_name
+        sweep_name,
     ) {
         // cookies.et('probes', probes, { path: '/conditions'});
         console.log(
@@ -95,18 +95,17 @@
         );
         let res2 = await response.json();
         console.log(res2);
-        console.log('probes=', probes);
+        console.log("probes=", probes);
         if (probes != undefined && probes.trim().length > 0) {
-          [plotdata, db_data, ph_data, sweep_name] = set_trace_names(
-              res2,
-              probes,
-              proj.elements,
-              step_precision,
-          );
-        } 
+            [plotdata, db_data, ph_data, sweep_name] = set_trace_names(
+                res2,
+                probes,
+                proj.elements,
+                step_precision,
+            );
+        }
         return [plotdata, db_data, ph_data, sweep_name];
     }
-
 </script>
 
 <script lang="ts">
@@ -145,7 +144,11 @@
     } = $props();
 
     let sweep_name;
-	let performances = $derived(settings.performance_names[settings.plot_number].split(",").map((a) => a.trim()));
+    let performances = $derived(
+        settings.performance_names[settings.plot_number]
+            .split(",")
+            .map((a) => a.trim()),
+    );
 
     const options = {
         types: [
@@ -182,24 +185,25 @@
             tracemode,
         );
         measdata = measdata;
-        console.log('measdata =', measdata);
+        console.log("measdata =", measdata);
     }
     function check_probes_valid() {
-        const sweep_var = probes.match(/\w+,/)[0].replace(',', '')
-        if (probes.includes(sweep_var)) { // like 'frequency'
+        const sweep_var = probes.match(/\w+,/)[0].replace(",", "");
+        if (probes.includes(sweep_var)) {
+            // like 'frequency'
             for (let match_string of probes.matchAll(/\w*\(\w+\)|\w+,|\w+$/g)) {
-                let node = match_string[0].replace(',','').trim();
-                console.log('node=', node);
-                if (! ckt.info.includes(node)) {
+                let node = match_string[0].replace(",", "").trim();
+                console.log("node=", node);
+                if (!ckt.info.includes(node)) {
                     alert(`${node} is not a valid probe name`);
-                    return(false);
+                    return false;
                 }
             }
-            return(true);
+            return true;
         }
-        return(false);
+        return false;
     }
-    async function plot_result_clicked () {
+    async function plot_result_clicked() {
         if (!check_probes_valid()) return;
         let result = await plot_result(
             proj.port,
@@ -212,9 +216,9 @@
             ph_data,
             proj.elements,
             step_precision,
-            sweep_name
+            sweep_name,
         );
-        [plotdata, db_data, ph_data, sweep_name] = result; 
+        [plotdata, db_data, ph_data, sweep_name] = result;
     }
 
     step_precision = 3;
@@ -251,13 +255,16 @@
                 ? []
                 : measdata.filter((trace) => trace.checked),
         );
-        console.log("values in calculate_equation:", $state.snapshot(calculated_value));
+        console.log(
+            "values in calculate_equation:",
+            $state.snapshot(calculated_value),
+        );
         const equation_array = equation.split(",");
         if (performances == undefined) {
             alert("Performance name(s) for equation(s) not defined");
             return;
         }
-        console.log('performances =', $state.snapshot(performances));
+        console.log("performances =", $state.snapshot(performances));
         performances.forEach(function (perf, index) {
             //console.log("perf, index=", [perf, index]);
             //console.log('results_data:', results_data);
@@ -267,7 +274,9 @@
             }
             if (calculated_value != undefined) {
                 results_data[0][perf].push({
-                    x: get_sweep_values(plotdata != undefined ? plotdata : db_data),
+                    x: get_sweep_values(
+                        plotdata != undefined ? plotdata : db_data,
+                    ),
                     y: get_performance(calculated_value, index),
                     name: equation_array[index],
                 });
@@ -343,55 +352,58 @@
         } else {
             calculated_value = result.calculated_value.slice(0);
         }
-        console.log('calculated_value=', $state.snapshot(calculated_value));
+        console.log("calculated_value=", $state.snapshot(calculated_value));
         // return calculated_value; // maybe useless
     }
     equation = "x.where(y, 2.5){|x, y| x > 1e-6}";
-  function push_button(node) {
-    console.log(`${probes}, ${node}`);
-    if (probes == null || probes == undefined || probes == "") {
-      probes = node;
-    } else {
-      probes = probes + ", " + node;
+    function push_button(node) {
+        console.log(`${probes}, ${node}`);
+        if (probes == null || probes == undefined || probes == "") {
+            probes = node;
+        } else {
+            probes = probes + ", " + node;
+        }
     }
-  }
 </script>
+
 {#if ckt != undefined}
-[Probes list (clicked probe will be put in probes for a current plot)]
-  <div class="sample">
-    {#each ckt.info as node}
-      <button 
-      use:tooltip={()=>msg("push probe in probes for a current plot")}
-      onclick={() => push_button(node)} class="button-item"
-        >{node}</button
-      >
-    {/each}
-  </div>
+    [Probes list (clicked probe will be put in probes for a current plot)]
+    <div class="sample">
+        {#each ckt.info as node}
+            <button
+                use:tooltip={() =>
+                    msg("push probe in probes for a current plot")}
+                onclick={() => push_button(node)}
+                class="button-item">{node}</button
+            >
+        {/each}
+    </div>
 {/if}
 <button
-use:tooltip={()=>msg("show or hide plot settings")}
-onclick={() => (plot_showhide = !plot_showhide)} class="button-2"
-   >Show/hide</button
+    use:tooltip={() => msg("show or hide plot settings")}
+    onclick={() => (plot_showhide = !plot_showhide)}
+    class="button-2">Show/hide</button
 >plot#{plot_number}
 {#if plot_showhide}
-    <button 
-    use:tooltip={()=>msg("make this plot current to push probes")}
-    onclick={() => (current_plot = plot_number)} class="button-2"
-        >Make current</button
+    <button
+        use:tooltip={() => msg("make this plot current to push probes")}
+        onclick={() => (current_plot = plot_number)}
+        class="button-2">Make current</button
     >
     <div>
         <button
-        use:tooltip={()=>msg("get a measurement data file")}
-            onclick={() => get_measurement_results(
-                proj.port,
-                proj.dir,
-                measfile.trim().replace(/^"/, "").replace(/"$/, ""),
-                selection,
-                reverse,
-                invert_x,
-                invert_y,
-                tracemode,
-            )}
+            use:tooltip={() => msg("get a measurement data file")}
+            onclick={() =>
+                get_measurement_results(
+                    proj.port,
+                    proj.dir,
+                    measfile.trim().replace(/^"/, "").replace(/"$/, ""),
+                    selection,
+                    reverse,
+                    invert_x,
+                    invert_y,
+                    tracemode,
+                )}
             class="button-1">Get measured data:</button
         >
         <input
@@ -399,16 +411,31 @@ onclick={() => (plot_showhide = !plot_showhide)} class="button-2"
             style="border:darkgray solid 1px; width:40%;"
         />
         <label
+            use:tooltip={() =>
+                msg("select two data columns to display in a graph")}
             >Selection:<input
                 bind:value={selection}
                 style="border:darkgray solid 1px; width:5%"
             /></label
         >
         <br />
-        <label>Reverse<input type="checkbox" bind:checked={reverse} /></label>
-        <label>InvertX<input type="checkbox" bind:checked={invert_x} /></label>
-        <label>InvertY<input type="checkbox" bind:checked={invert_y} /></label>
-        <button>Trace mode</button>
+        <label use:tooltip={() => msg("reverse traces in a graph")}
+            >Selection:<input />Reverse<input
+                type="checkbox"
+                bind:checked={reverse}
+            /></label
+        >
+        <label use:tooltip={() => msg("invert X data")}
+            >InvertX<input type="checkbox" bind:checked={invert_x} /></label
+        >
+        <label use:tooltip={() => msg("invert Y data")}
+            >InvertY<input type="checkbox" bind:checked={invert_x} /></label
+        >
+        <button
+            use:tooltip={() =>
+                msg("select trace mode from, markers, lines, markers+lines")}
+            >Trace mode</button
+        >
         <input name="tracemodes" value={tracemode} type="hidden" />
         <select bind:value={tracemode} style="border:darkgray solid 1px;">
             <option value="markers">markers</option>
@@ -431,46 +458,54 @@ onclick={() => (plot_showhide = !plot_showhide)} class="button-2"
             <button onclick={checkall_measdata} class="button-1"
                 >check all</button
             >
-            <button onclick={clear_measdata} class="button-1">clear all</button
-            >
+            <button onclick={clear_measdata} class="button-1">clear all</button>
         </div>
     {/if}
     <button
+        use:tooltip={() =>
+            msg("set probes list (separated by comma) for a current plot")}
         onclick={plot_result_clicked}
         class="button-1">Plot with probes:</button
     >
     <input bind:value={probes} style="border:darkgray solid 1px;" />
+    <label
+        use:tooltip={() =>
+            msg("set probes list (separated by comma) for a current plot")}
+        >step precision:
+        <input bind:value={step_precision} />
+    </label>
+
     {#if probes == undefined || !probes.startsWith("frequency")}
-        <label>
+        <label use:tooltip={() => msg("X axis is log scale if checked")}>
             <input type="checkbox" bind:checked={xaxis_is_log} />
             xaxis is log
         </label>
-        <label>
+        <label use:tooltip={() => msg("Y axis is log scale if checked")}>
             <input type="checkbox" bind:checked={yaxis_is_log} />
             yaxis is log
         </label>
     {/if}
-    <label
-        >step precision:
-        <input bind:value={step_precision} />
-    </label>
     <label>
-        <button onclick={clear_plot} class="button-1">clear</button>
+        <button
+            use:tooltip={() => msg("clear plot")}
+            onclick={clear_plot}
+            class="button-1">clear</button
+        >
     </label>
     <!-- label>
         <button on:click={redraw} class="button-1">redraw</button>
     </label -->
     <div>
-        <label
+        <label use:tooltip={() => msg("title for a graph")}
             >Title
             <input bind:value={title} style="border:darkgray solid 1px;" />
         </label>
-        <label
+        <label use:tooltip={() => msg("X axis title")}
             >X title
             <input bind:value={title_x} style="border:darkgray solid 1px;" />
         </label>
         {#if probes == undefined || !probes.startsWith("frequency")}
-            <label
+            <label use:tooltip={() => msg("Y axis title")}
                 >Y title
                 <input
                     bind:value={title_y}
@@ -512,7 +547,7 @@ onclick={() => (plot_showhide = !plot_showhide)} class="button-2"
 
 {#if plot_showhide}
     <div>
-        <label>
+        <label use:tooltip={() => msg("performance names separated by commaa")}>
             Performance name(s)
             <input
                 bind:value={performance_names}
@@ -520,12 +555,17 @@ onclick={() => (plot_showhide = !plot_showhide)} class="button-2"
             />
         </label>
     </div>
-
     <div>
         <label
+            use:tooltip={() => msg("performance equations in an array format")}
             >Equation(s)
-            <input bind:value={equation} style="border:darkgray solid 1px; width: 50%" />
+            <input
+                bind:value={equation}
+                style="border:darkgray solid 1px; width: 50%"
+            />
             <button
+                use:tooltip={() =>
+                    msg("calculate equations for a current plot")}
                 onclick={() => calculate_equation(results_data[0])}
                 class="button-1"
             >
@@ -535,19 +575,19 @@ onclick={() => (plot_showhide = !plot_showhide)} class="button-2"
                 <table>
                     <thead>
                         <tr>
-                        {#each performances as perf}
-                            <th>{perf}</th>
-                        {/each}
-                        </tr>  
-                    </thead>
-                    <tbody>
-                    {#each calculated_value as vals}
-                        <tr>
-                            {#each vals as val}
-                                <td>{val}</td>
+                            {#each performances as perf}
+                                <th>{perf}</th>
                             {/each}
                         </tr>
-                    {/each}
+                    </thead>
+                    <tbody>
+                        {#each calculated_value as vals}
+                            <tr>
+                                {#each vals as val}
+                                    <td>{val}</td>
+                                {/each}
+                            </tr>
+                        {/each}
                     </tbody>
                 </table>
             {/if}
@@ -555,31 +595,33 @@ onclick={() => (plot_showhide = !plot_showhide)} class="button-2"
     </div>
     <hr />
 {/if}
+
 <style>
-	label {
-	    font-family: Arial, "Helvetica Neue", "BIZ UDPGothic", Meiryo, "Hiragino Kaku Gothic Pro", sans-serif;
-    	font-size: 10pt;
-	}
-  .sample {
-    display: flex;
-    flex-wrap: wrap;
-    /* border: green solid 5px; */
-    height: 200px;
-    /* background:yellow; */
-    overflow: scroll;
-  }
-  .box-item {
-    width: 25%;
-    background: orange;
-    text-align: left;
-    padding: 5px 10px;
-    border: 5px solid #ddd;
-  }
-  .button-item {
-    /* width: 25%; */
-    background: lightblue;
-    text-align: left;
-    padding: 2px 3px;
-    border: 2px solid yellow;
-  }
+    label {
+        font-family: Arial, "Helvetica Neue", "BIZ UDPGothic", Meiryo,
+            "Hiragino Kaku Gothic Pro", sans-serif;
+        font-size: 10pt;
+    }
+    .sample {
+        display: flex;
+        flex-wrap: wrap;
+        /* border: green solid 5px; */
+        height: 200px;
+        /* background:yellow; */
+        overflow: scroll;
+    }
+    .box-item {
+        width: 25%;
+        background: orange;
+        text-align: left;
+        padding: 5px 10px;
+        border: 5px solid #ddd;
+    }
+    .button-item {
+        /* width: 25%; */
+        background: lightblue;
+        text-align: left;
+        padding: 2px 3px;
+        border: 2px solid yellow;
+    }
 </style>

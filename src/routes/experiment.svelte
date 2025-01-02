@@ -23,7 +23,10 @@
 				//console.log([elm, props]);
 				if (elm == "step" || elm == "dc") {
 					[sweep_name, src_values] = parse_step_command(
-						props.replace(/\.dc +\S+ \S+ \S+ \S+ +/, '.step param '),
+						props.replace(
+							/\.dc +\S+ \S+ \S+ \S+ +/,
+							".step param ",
+						),
 						/* props could be like '.dc v3 0 3 0.01 V2 0 3 0.5' */
 						step_precision,
 					);
@@ -75,7 +78,7 @@
 		//console.log("step=", [name, start, stop, step]);
 		let src_values = [];
 		for (let v = start; v < stop; v = v + step) {
-			console.log('precision=', precision);
+			console.log("precision=", precision);
 			src_values.push(`${name}=${v.toPrecision(precision)}`);
 		}
 		if (stop > start + step * (src_values.length - 1)) {
@@ -89,8 +92,9 @@
 <script lang="ts">
 	import Plot from "svelte-plotly.js";
 	import { update_elements, update_models } from "./simulate.svelte";
-	import SweepSource from "./utils/sweep_source.svelte";
-	import ResultsPlot from "./utils/results_plot.svelte";
+	import SweepSource from "./Utils/sweep_source.svelte";
+	import ResultsPlot from "./Utils/results_plot.svelte";
+	import { tooltip, msg } from "./Utils/tooltip.svelte";
 	import { proj, ckt, settings } from "./shared.svelte.js";
 	function get_sweep_values(plotdata) {
 		let values = [];
@@ -136,7 +140,8 @@
 		results_data = $bindable(),
 		probes = $bindable(),
 		equation = $bindable(),
-		on_sim_start, on_sim_end
+		on_sim_start,
+		on_sim_end,
 	} = $props();
 
 	function postprocess(settings) {
@@ -167,11 +172,11 @@
 			probes,
 		)}&equation=${encodeURIComponent(equation)}`;
 		const models_update = update_models(ckt, proj.models);
-        if (models_update != {}) {
-            encoded_params =
-                encoded_params +
-                `&models_update=${encodeURIComponent(JSON.stringify(models_update))}`;
-        }
+		if (models_update != {}) {
+			encoded_params =
+				encoded_params +
+				`&models_update=${encodeURIComponent(JSON.stringify(models_update))}`;
+		}
 		// dispatch("sim_start", { text: "LTspice simulation started!" });
 		let response = await fetch(
 			`http://localhost:${proj.port}/api/ltspctl/simulate?${encoded_params}`,
@@ -241,12 +246,16 @@
 		return [updates, target];
 	}
 
-	let performances = $derived(settings.performance_names[settings.plot_number].split(",").map((a) => a.trim()));
+	let performances = $derived(
+		settings.performance_names[settings.plot_number]
+			.split(",")
+			.map((a) => a.trim()),
+	);
 
 	async function go_experiments(dir, settings, elements) {
 		if (ckt == undefined) {
-            alert("Please read-in the circuit before experiment");
-        }
+			alert("Please read-in the circuit before experiment");
+		}
 		if (settings.src == undefined || settings.src_values[0] == undefined) {
 			alert("ERROR: src is not set");
 			return;
@@ -301,6 +310,7 @@
 			//plot_data2.push({ ...result_trace });
 		}
 		console.log("results_data=", $state.snapshot(results_data));
+		console.log("results_data[0]=", results_data[0]);
 	}
 	// plot_data = [{x:[1,2,3,4], y:[1,2,4,3]}];
 
@@ -359,6 +369,7 @@
 	}
 
 	async function save_experiments() {
+		console.log("results_data =", $state.snapshot(results_data));
 		const blob = JSON.stringify([settings, results_data]);
 		const handle = await window.showSaveFilePicker();
 		const ws = await handle.createWritable();
@@ -437,8 +448,8 @@
 				on_sim_start("LTspice simulation started!");
 				let calculated_value = await goLTspice2(ckt);
 				//const my_sleep = (ms) =>
-        	    //	new Promise((resolve) => setTimeout(resolve, ms));
-        		//await my_sleep(3000);
+				//	new Promise((resolve) => setTimeout(resolve, ms));
+				//await my_sleep(3000);
 				if (Array.isArray(calculated_value[0])) {
 					gb.push(calculated_value[0][0]);
 					pm.push(calculated_value[0][1]);
@@ -537,13 +548,13 @@
 			dir,
 		)}&file=${encodeURIComponent(target)}`;
 		const my_sleep = (ms) =>
-     	   	new Promise((resolve) => setTimeout(resolve, ms));
-        await my_sleep(1000);
+			new Promise((resolve) => setTimeout(resolve, ms));
+		await my_sleep(1000);
 		const command = `http://localhost:${proj.port}/api/ltspctl/update?${encoded_params}&updates=${update_elms}`;
 		console.log(command);
 		let response = await fetch(command, {});
 		let ckt = await response.json(); // ckt = {elements}
-		console.log("ckt=", ckt);		
+		console.log("ckt=", ckt);
 	}
 
 	function clear() {
@@ -552,8 +563,19 @@
 	}
 
 	async function save() {
+		let saveFileOptions = {
+			suggestedName: "xxxxxx.json",
+			types: [
+				{
+					description: "JSON Files",
+					accept: {
+						"application/json": [".json"],
+					},
+				},
+			],
+		};
 		const blob = JSON.stringify([settings, plot_data, plot_data2]);
-		const handle = await window.showSaveFilePicker();
+		const handle = await window.showSaveFilePicker(saveFileOptions);
 		const ws = await handle.createWritable();
 		await ws.write(blob);
 		await ws.close();
@@ -595,7 +617,7 @@
 		if (dec === 3) return "rd";
 		return "th";
 	}
-	console.log('settings=', $state.snapshot(settings));
+	console.log("settings=", $state.snapshot(settings));
 	settings.result_number = 0;
 	settings.src = Array(0);
 	settings.par_name = Array(0);
@@ -636,27 +658,36 @@
 		bind:start_oct_val={settings.start_dec_val[i]}
 		bind:stop_oct_val={settings.stop_dec_val[i]}
 		bind:oct_points={settings.dec_points[i]}
-		elements = {proj.elements}
+		elements={proj.elements}
 	></SweepSource>
 {/each}
 <label>
-	<button onclick={add_experiment} class="button-2">Add experiment</button>
+	<button
+		use:tooltip={() => msg("add new source parameter to sweep")}
+		onclick={add_experiment}
+		class="button-2">Add experiment</button
+	>
 </label>
 <label>
-	<button onclick={clear_experiment} class="button-1"
-		>Clear experiment</button
+	<button
+		use:tooltip={() => msg("delete an added source parameter")}
+		onclick={clear_experiment}
+		class="button-1">Clear experiment</button
 	>
 </label>
 
 <div>
 	<label>
 		<button
-			onclick={() => preview_experiments(proj.dir, settings, proj.elements)}
+			use:tooltip={() => msg("dry run a sweep experiment")}
+			onclick={() =>
+				preview_experiments(proj.dir, settings, proj.elements)}
 			class="button-1">Dry run</button
 		>
 	</label>
 	<label>
 		<button
+			use:tooltip={() => msg("execute a sweep experiment")}
 			onclick={() => go_experiments(proj.dir, settings, proj.elements)}
 			class="button-1">Go</button
 		>

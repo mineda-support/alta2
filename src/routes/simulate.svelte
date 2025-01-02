@@ -27,9 +27,9 @@
 
                 let encoded_params = `dir=${encodeURIComponent(
                     dir,
-                    )}&file=${encodeURIComponent(file)}&probes=${encodeURIComponent(
+                )}&file=${encodeURIComponent(file)}&probes=${encodeURIComponent(
                     probes,
-                    )}`;
+                )}`;
 
                 const command = `http://localhost:${proj.port}/api/ltspctl/update?${encoded_params}&updates=${update_elms}`;
                 console.log(command);
@@ -91,7 +91,7 @@
         //const my_sleep = (ms) =>
         //    new Promise((resolve) => setTimeout(resolve, ms));
         //await my_sleep(3000);
-        console.log('variations', $state.snapshot(variations));
+        console.log("variations", $state.snapshot(variations));
         let encoded_params = `dir=${encodeURIComponent(
             proj.dir,
         )}&file=${encodeURIComponent(
@@ -122,15 +122,22 @@
         // ckt_store.set(ckt);
         //}
         on_sim_end("LTspice simulation ended!");
-        
+
         // plotdata = get_results();
         return res2;
     }
-    let { variations = $bindable(), probes = $bindable() , on_sim_start, on_sim_end } = $props();
+    let {
+        variations = $bindable(),
+        probes = $bindable(),
+        on_sim_start,
+        on_sim_end,
+    } = $props();
 </script>
 
-<button onclick={goLTspice} class="button-1"
-  use:tooltip={()=>msg("run LTspice simulation")}
+<button
+    onclick={goLTspice}
+    class="button-1"
+    use:tooltip={() => msg("run LTspice simulation")}
 >
     Click here to Start LTspice simulation</button
 >

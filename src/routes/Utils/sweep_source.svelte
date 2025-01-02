@@ -1,6 +1,7 @@
 <script lang="ts">
     import InputValue from "./input_value.svelte";
-        let {
+    import { tooltip, msg } from "./tooltip.svelte";
+    let {
         source_title,
         src = $bindable(),
         src_precision = $bindable(), // (3)
@@ -17,7 +18,7 @@
         start_oct_val = $bindable(),
         stop_oct_val = $bindable(),
         oct_points = $bindable(),
-        elements    
+        elements,
     } = $props();
 
     function set_src_values() {
@@ -49,8 +50,11 @@
                     src_values.push(Math.pow(10, i));
                 }
                 break;
+            case "List":
+                src_values = value_list.split(",").map((a) => a.trim());
+                break;
         }
-        console.log(src_values);
+        console.log($state.snapshot(src_values));
     }
     function add_additional_source() {
         src_plus ||= [];
@@ -92,13 +96,21 @@
             </select>
         {/if}
         <label>
-            <button onclick={add_additional_source} class="button-1">
+            <button
+                use:tooltip={() => msg("add a source parameter to sweep")}
+                onclick={add_additional_source}
+                class="button-1"
+            >
                 add
             </button>
             {src_plus ? src_plus.join("&") : ""}
         </label>
         <label>
-            <button onclick={clear_additional_source} class="button-1">
+            <button
+                use:tooltip={() => msg("clear a last added source parameter")}
+                onclick={clear_additional_source}
+                class="button-1"
+            >
                 clear
             </button>
         </label>
@@ -115,22 +127,62 @@
 				bind:value={settings.start_value1}
 				style="border:darkgray solid 1px;"
 			/></label -->
-                <InputValue lab="Start" bind:val={start_lin_val} />
-                <InputValue lab="Stop" bind:val={stop_lin_val} />
-                <InputValue lab="Increment" bind:val={lin_incr} />
+                <InputValue
+                    tooltip_msg="set start for a source parameter"
+                    lab="Start"
+                    bind:val={start_lin_val}
+                />
+                <InputValue
+                    tooltip_msg="set stop for a source parameter"
+                    lab="Stop"
+                    bind:val={stop_lin_val}
+                />
+                <InputValue
+                    tooltip_msg="set increment for a source parameter"
+                    lab="Increment"
+                    bind:val={lin_incr}
+                />
             {/if}
             {#if sweep_type == "Decade"}
-                <InputValue lab="# of points /dec." bind:val={dec_points} />
-                <InputValue lab="Start" bind:val={start_dec_val} />
-                <InputValue lab="Stop" bind:val={stop_dec_val} />
+                <InputValue
+                    tooltip_msg="set number of points per decade for a source parameter"
+                    lab="# of points /dec."
+                    bind:val={dec_points}
+                />
+                <InputValue
+                    tooltip_msg="set start for a decade sweep source parameter"
+                    lab="Start"
+                    bind:val={start_dec_val}
+                />
+                <InputValue
+                    tooltip_msg="set stop for a decade sweep source parameter"
+                    lab="Stop"
+                    bind:val={stop_dec_val}
+                />
             {/if}
             {#if sweep_type == "Octave"}
-                <InputValue lab="# of points /oct." bind:val={oct_points} />
-                <InputValue lab="Start" bind:val={start_oct_val} />
-                <InputValue lab="Stop" bind:val={stop_oct_val} />
+                <InputValue
+                    tooltip_msg="set number of points per octave for a source parameter"
+                    lab="# of points /oct."
+                    bind:val={oct_points}
+                />
+                <InputValue
+                    tooltip_msg="set stop for an octave sweep source parameter"
+                    lab="Start"
+                    bind:val={start_oct_val}
+                />
+                <InputValue
+                    tooltip_msg="set stop for an octave sweep source parameter"
+                    lab="Stop"
+                    bind:val={stop_oct_val}
+                />
             {/if}
             {#if sweep_type == "List"}
                 <label
+                    use:tooltip={() =>
+                        msg(
+                            "set a list of points separated by comma for sweep source parameter",
+                        )}
                     >List
                     <input
                         bind:value={value_list}
@@ -138,16 +190,21 @@
                     /></label
                 >
             {/if}
-            <button onclick={set_src_values} class="button-1"
-                >Set source values</button
-            >
-            <label
-                >precision:
-                <input value={src_precision} />
-            </label>
+            <div>
+                <button
+                    use:tooltip={() => msg("generate source parameter values")}
+                    onclick={set_src_values}
+                    class="button-1">Set source values</button
+                >
+                <label
+                    use:tooltip={() =>
+                        msg("set precision for source parameter numbers")}
+                    >precision:
+                    <input value={src_precision} />
+                </label>
+            </div>
         </div>
-         elements = {elements}
-        {src} =&gt;{src_values}
+        Sweep '{src}' =&gt;{src_values}
     </label>
 </div>
 
