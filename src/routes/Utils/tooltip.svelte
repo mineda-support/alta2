@@ -57,11 +57,14 @@
         'set stop for an octave sweep source parameter': '\nソースパラメータの最終値を設定する',
         'set a list of points separated by comma for sweep source parameter': '\nソースパラメータをカンマで区切ったリストで設定する',
         'generate source parameter values': '\ソースパラメータの設定値のリストを生成する',
-        'set precision for source parameter numbers': '\ソースパラメータの表示桁数を設定する',
+        'set precision for source parameter numbers': '\nソースパラメータの表示桁数を設定する',
         'add new source parameter to sweep': '\nパラメータスイープ実験のためのソースパラメータを新規に追加する',
         'delete an added source parameter': '\n追加したソースパラメータを削除する',
         'dry run a sweep experiment': '\nソースパラメータのスイープ実験の予行演習をする',
-        'execute a sweep experiment': '\nソースパラメータのスイープ実験を実行する'
+        'execute a sweep experiment': '\nソースパラメータのスイープ実験を実行する',
+        'clear all experiments': '\nすべての実験結果を削除する', 
+        'save experiment': '\n実験結果のグラフをJSON形式のファイルにセーブする',
+        'load experiment': '\n実験結果のグラフをファイルからロードする'
        }
 
     export function msg(message){

@@ -23,6 +23,7 @@
 
     function set_src_values() {
         console.log("sweep type:", sweep_type);
+        console.log("src_precision=", src_precision)
         src_values = [];
         switch (sweep_type) {
             case "Linear":
@@ -200,7 +201,7 @@
                     use:tooltip={() =>
                         msg("set precision for source parameter numbers")}
                     >precision:
-                    <input value={src_precision} />
+                    <input bind:value={src_precision} />
                 </label>
             </div>
         </div>

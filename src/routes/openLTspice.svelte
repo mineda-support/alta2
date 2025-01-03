@@ -79,11 +79,6 @@
     return res2;
   }
 
-  function fakeOpen(file) {
-    alert(`you have chosen ${file}`);
-  }
-
-  import { log } from "plotly.js-dist";
   let {
     data = $bindable(),
     probes = $bindable(),
@@ -102,22 +97,16 @@
     scoops = data.props.ckt;
   }
 
-  let traces = "";
-  let showup = $state(false);
+    let showup = $state(false);
   if (scoops != undefined) {
     openLTspice(data.props.port, data.props.wdir, scoops, showup);
   }
-  function push_button(node) {
-    console.log(`${probes}, ${node}`);
-    if (probes == null || probes == undefined || probes == "") {
-      probes = node;
-    } else {
-      probes = probes + ", " + node;
-    }
-  }
-  function switch_wdir(wdir) {
-    //const handle = await window.showDirectoryPicker();
-    //wdir = handle.name; # does not return path
+
+  async function switch_wdir(wdir) {
+    /* if (wdir == undefined) {
+      const handle = await window.showDirectoryPicker();
+      wdir = handle.name; //USELESS because does not return PATH
+    } */
     console.log("wdir=", wdir);
     //goto("?wdir=" + wdir.replace(/^"/, "").replace(/"$/, ""));
     window.location = "?wdir=" + wdir.replace(/^"/, "").replace(/"$/, "");

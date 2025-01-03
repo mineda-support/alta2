@@ -188,6 +188,16 @@
         console.log("measdata =", measdata);
     }
     function check_probes_valid() {
+        console.log('probes=', probes);
+        let count = 0;
+        for(let c of probes){
+            if (c == '(') { count++
+            } else if (c == ')') {count-- }
+        }
+        if (count != 0) {
+            alert(`parentheses do not match in '${probes}'`);
+            return false;
+        }
         const sweep_var = probes.match(/\w+,/)[0].replace(",", "");
         if (probes.includes(sweep_var)) {
             // like 'frequency'

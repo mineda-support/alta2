@@ -261,8 +261,8 @@
 			return;
 		}
 		let updates, target;
-		results_data = [];
-		results_data[0] = [];
+		//results_data = [];
+		//results_data[0] = {};
 		for (const value2 of settings.src_values[0]) {
 			//src, par_name, src_plus) {
 			[updates, target] = updates_plus(
@@ -332,8 +332,8 @@
 		console.log("sweep_title=", settings.sweep_title[0]);
 		//settings.result_title = [];
 		console.log("result_title=", settings.result_title[0]);
-		results_data = [];
-		results_data[0] = [];
+		//results_data = [];
+		//results_data[0] = {};
 		let preview_table = `count: ${settings.src[0]} ${settings.src_plus[0].join(" ")}\n`;
 		let count = 0;
 		for (const value2 of settings.src_values[0]) {
@@ -370,8 +370,19 @@
 
 	async function save_experiments() {
 		console.log("results_data =", $state.snapshot(results_data));
+		let saveFileOptions = {
+			suggestedName: "xxxxxx.json",
+			types: [
+				{
+					description: "JSON Files",
+					accept: {
+						"application/json": [".json"],
+					},
+				},
+			],
+		};
 		const blob = JSON.stringify([settings, results_data]);
-		const handle = await window.showSaveFilePicker();
+		const handle = await window.showSaveFilePicker(saveFileOptions);
 		const ws = await handle.createWritable();
 		await ws.write(blob);
 		await ws.close();
@@ -557,56 +568,6 @@
 		console.log("ckt=", ckt);
 	}
 
-	function clear() {
-		plot_data = plot_data2 = undefined;
-		results_data[settings.result_number] = undefined;
-	}
-
-	async function save() {
-		let saveFileOptions = {
-			suggestedName: "xxxxxx.json",
-			types: [
-				{
-					description: "JSON Files",
-					accept: {
-						"application/json": [".json"],
-					},
-				},
-			],
-		};
-		const blob = JSON.stringify([settings, plot_data, plot_data2]);
-		const handle = await window.showSaveFilePicker(saveFileOptions);
-		const ws = await handle.createWritable();
-		await ws.write(blob);
-		await ws.close();
-	}
-
-	async function load() {
-		const pickerOpts = {
-			types: [
-				{ description: "JSON(.json)", accept: { "json/*": [".json"] } },
-			],
-			multiple: false,
-		};
-		let fileHandle;
-		[fileHandle] = await window.showOpenFilePicker(pickerOpts);
-		const file = await fileHandle.getFile();
-		/* const reader = new FileReader();
-		reader.readAsText(file, 'UTF-8');
-		let filedata;
-		reader.onload = (event) => {
-			filedata = (event.target.result);
-		}*/
-		let filedata = await file.text();
-		let tempsettings;
-		console.log(filedata);
-		console.log("before:", plot_data);
-		[tempsettings, plot_data, plot_data2] = JSON.parse(filedata);
-		settings.result_title = tempsettings.result_title;
-		settings.sweep_title = tempsettings.sweep_title;
-		console.log("after:", plot_data);
-	}
-
 	function indicator(i) {
 		i = Math.abs(i);
 		var cent = i % 100;
@@ -631,7 +592,8 @@
 	settings.start_dec_val = Array(0);
 	settings.stop_dec_val = Array(0);
 	settings.dec_points = Array(0);
-	settings.src_precision = Array(0);
+	settings.src_precision = Array(1);
+	settings.src_precision[0] = 3;
 </script>
 
 <!-- {#if results_data != undefined && results_data[0].length > 0} -->
@@ -639,7 +601,7 @@
 	<ResultsPlot {plot_data} title={performance} {performance} {sweep_name} />
 {/each}
 <!-- {/if} -->
-<div>Make Experiments</div>
+<div><p>Make Experiments</p></div>
 {#each Array(settings.result_number + 1) as _, i}
 	<SweepSource
 		source_title="{i + 1}{`${indicator(i + 1)} source`}"
@@ -693,13 +655,25 @@
 		>
 	</label>
 	<label>
-		<button onclick={clear_experiments} class="button-1">clear</button>
+		<button
+			use:tooltip={() => msg("clear all experiments")}
+			onclick={clear_experiments}
+			class="button-1">Clear</button
+		>
 	</label>
 	<label>
-		<button onclick={save_experiments} class="button-1">Save</button>
+		<button
+			use:tooltip={() => msg("save experiment")}
+			onclick={save_experiments}
+			class="button-1">Save</button
+		>
 	</label>
 	<label>
-		<button onclick={load_experiments} class="button-1">Load</button>
+		<button
+			use:tooltip={() => msg("load experiment")}
+			onclick={load_experiments}
+			class="button-1">Load</button
+		>
 	</label>
 </div>
 
@@ -761,4 +735,9 @@ width: 90%;"
 {/if}
 
 <style>
+    .p {
+        font-family: Arial, "Helvetica Neue", "BIZ UDPGothic", Meiryo,
+            "Hiragino Kaku Gothic Pro", sans-serif;
+        font-size: 8pt;
+    }	
 </style>

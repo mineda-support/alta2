@@ -8,7 +8,7 @@ import { exec } from 'node:child_process';
 export async function load({ url }) {
     // const probes = cookies.get('probes')
     const home = process.env.HOME.replaceAll('\\', '/');
-    let wdir = url.searchParams.get('wdir') || home + '/Seafile/PTS06_2022_8/BGR_TEG/';
+    let wdir = url.searchParams.get('wdir') || home;
     let ckt = url.searchParams.get('ckt');
     console.log(`wdir: ${wdir}`);
     console.log('home=', home);

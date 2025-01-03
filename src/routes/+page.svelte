@@ -15,7 +15,7 @@
 	let { data } = $props();
 
 	let results_data = $state([]); // $state([]);
-	results_data[0] = [];
+	results_data[0] = {};
 
 	export function handleMessage(event) {
 		console.log("handleMessage");
