@@ -3,7 +3,7 @@
 	import ConvertSchematic from "./convertSchematic.svelte";
 	import Experiment, { set_trace_names } from "./experiment.svelte";
 	import OpenLTspice, { get_control } from "./openLTspice.svelte";
-	import Settings from "./settings.svelte";
+	import Settings from "./settings/settings.svelte";
 	import { tooltip, msg } from "./Utils/tooltip.svelte";
 	import PlotResults, {
 		measurement_results,
@@ -138,7 +138,7 @@
 			let measfile = settings.measfile[i];
 			if (measfile != undefined && measfile != "") {
 				ckt_data.measdata[i] = await measurement_results(
-					proj.port,
+					data.props.port,
 					proj.dir,
 					measfile,
 					settings.selection[i],
@@ -150,7 +150,7 @@
 			}
 			//ckt_data.measdata[i] = ckt_data.measdata[i];
 			let result = plot_result(
-				proj.port,
+				data.props.port,
 				proj.dir,
 				proj.file,
 				settings.probes[i],
@@ -217,7 +217,7 @@
 </script>
 
 <main>
-	<ConvertSchematic port={proj.port} dir={proj.dir} />
+	<ConvertSchematic port={data.props.port} dir={proj.dir} />
 	<OpenLTspice
 		{data}
 		bind:probes={settings.probes[current_plot]}
@@ -229,6 +229,7 @@
 	<Settings {data} {ckt} bind:variations />
 	<div>
 		<Simulate
+			port = {data.props.port}
 			bind:probes={settings.probes[current_plot]}
 			bind:variations
 			on_sim_end={plot_measurement_group}
@@ -278,6 +279,7 @@
 	<!-- settings.plot_showhide = {settings.plot_showhide.length} -->
 	{#each settings.plot_showhide as _, i}
 		<PlotResults
+			port = {data.props.port}
 			plot_number={i}
 			bind:current_plot
 			bind:plot_showhide={settings.plot_showhide[i]}
@@ -319,6 +321,7 @@
 	>
 	{#if current_plot != undefined && settings.equation[current_plot] != undefined}
 		<Experiment
+			port={data.props.port}
 			bind:results_data
 			bind:probes={settings.probes[current_plot]}
 			bind:equation={settings.equation[current_plot]}

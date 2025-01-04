@@ -121,7 +121,7 @@
 		)}&file=${encodeURIComponent(file)}`;
 		// console.log(`program to send: ${program}`);
 		const res = await fetch(
-			`http://localhost:${proj.port}/api/ltspctl/execute?${encoded_params}`,
+			`http://localhost:${port}/api/ltspctl/execute?${encoded_params}`,
 			{
 				method: "POST",
 				headers: {
@@ -137,6 +137,7 @@
 	let sweep_name = $state();
 
 	let {
+		port,
 		results_data = $bindable(),
 		probes = $bindable(),
 		equation = $bindable(),
@@ -179,7 +180,7 @@
 		}
 		// dispatch("sim_start", { text: "LTspice simulation started!" });
 		let response = await fetch(
-			`http://localhost:${proj.port}/api/ltspctl/simulate?${encoded_params}`,
+			`http://localhost:${port}/api/ltspctl/simulate?${encoded_params}`,
 			{},
 		);
 		let res2 = await response.json();
@@ -561,7 +562,7 @@
 		const my_sleep = (ms) =>
 			new Promise((resolve) => setTimeout(resolve, ms));
 		await my_sleep(1000);
-		const command = `http://localhost:${proj.port}/api/ltspctl/update?${encoded_params}&updates=${update_elms}`;
+		const command = `http://localhost:${port}/api/ltspctl/update?${encoded_params}&updates=${update_elms}`;
 		console.log(command);
 		let response = await fetch(command, {});
 		let ckt = await response.json(); // ckt = {elements}

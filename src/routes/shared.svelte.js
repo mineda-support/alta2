@@ -1,5 +1,4 @@
 export let proj = $state({
-    port: 9292,
     file: '',
     dir: '',
     elements: {},

@@ -115,6 +115,7 @@
     import { proj, ckt, settings } from "./shared.svelte.js";
     import { tooltip, msg } from "./Utils/tooltip.svelte";
     let {
+        port,
         plot_number = $bindable(),
         current_plot = $bindable(),
         plot_showhide = $bindable(),
@@ -216,7 +217,7 @@
     async function plot_result_clicked() {
         if (!check_probes_valid()) return;
         let result = await plot_result(
-            proj.port,
+            port,
             proj.dir,
             proj.file,
             probes,
@@ -254,7 +255,7 @@
     } */
     function calculate_equation() {
         submit_equation(
-            proj.port,
+            port,
             equation,
             proj.dir,
             proj.file,
@@ -405,7 +406,7 @@
             use:tooltip={() => msg("get a measurement data file")}
             onclick={() =>
                 get_measurement_results(
-                    proj.port,
+                    port,
                     proj.dir,
                     measfile.trim().replace(/^"/, "").replace(/"$/, ""),
                     selection,
