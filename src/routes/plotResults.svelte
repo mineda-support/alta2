@@ -367,29 +367,8 @@
         // return calculated_value; // maybe useless
     }
     equation = "x.where(y, 2.5){|x, y| x > 1e-6}";
-    function push_button(node) {
-        console.log(`${probes}, ${node}`);
-        if (probes == null || probes == undefined || probes == "") {
-            probes = node;
-        } else {
-            probes = probes + ", " + node;
-        }
-    }
 </script>
 
-{#if ckt != undefined}
-    [Probes list (clicked probe will be put in probes for a current plot)]
-    <div class="sample">
-        {#each ckt.info as node}
-            <button
-                use:tooltip={() =>
-                    msg("push probe in probes for a current plot")}
-                onclick={() => push_button(node)}
-                class="button-item">{node}</button
-            >
-        {/each}
-    </div>
-{/if}
 <button
     use:tooltip={() => msg("show or hide plot settings")}
     onclick={() => (plot_showhide = !plot_showhide)}
@@ -612,27 +591,5 @@
         font-family: Arial, "Helvetica Neue", "BIZ UDPGothic", Meiryo,
             "Hiragino Kaku Gothic Pro", sans-serif;
         font-size: 10pt;
-    }
-    .sample {
-        display: flex;
-        flex-wrap: wrap;
-        /* border: green solid 5px; */
-        height: 200px;
-        /* background:yellow; */
-        overflow: scroll;
-    }
-    .box-item {
-        width: 25%;
-        background: orange;
-        text-align: left;
-        padding: 5px 10px;
-        border: 5px solid #ddd;
-    }
-    .button-item {
-        /* width: 25%; */
-        background: lightblue;
-        text-align: left;
-        padding: 2px 3px;
-        border: 2px solid yellow;
     }
 </style>

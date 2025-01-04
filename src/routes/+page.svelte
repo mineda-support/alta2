@@ -3,6 +3,7 @@
 	import ConvertSchematic from "./convertSchematic.svelte";
 	import Experiment, { set_trace_names } from "./experiment.svelte";
 	import OpenLTspice, { get_control } from "./openLTspice.svelte";
+	import SetProbes from "./setProbes.svelte";
 	import Settings from "./settings/settings.svelte";
 	import { tooltip, msg } from "./Utils/tooltip.svelte";
 	import PlotResults, {
@@ -210,7 +211,7 @@
 				settings[obj].splice(current_plot, 1);
 			}
 		}
-	}
+	}    
 	let nvar = $state(0);
 	let show_meas_group = $state(true);
 	console.log("settings=", $state.snapshot(settings));
@@ -277,6 +278,10 @@
 		{/if}
 	</div>
 	<!-- settings.plot_showhide = {settings.plot_showhide.length} -->
+	<SetProbes 
+	bind:probes={settings.probes[current_plot]}
+		bind:current_plot
+	/>
 	{#each settings.plot_showhide as _, i}
 		<PlotResults
 			port = {data.props.port}
@@ -336,29 +341,3 @@
 		href="https://unpkg.com/tippy.js@6.3.2/dist/tippy.css"
 	/>
 </svelte:head>
-<!-- style>
-    :global {
-        [data-tippy-root] {
-            --bg: #666;
-            background-color: var(--bg);
-            color: white;
-            border-radius: 0.2rem;
-            padding: 0.2rem 0.6rem;
-            filter: drop-shadow(1px 1px 3px rgb(0 0 0 / 0.1));
-
-            * {
-                transition: none;
-            }
-        }
-
-        [data-tippy-root]::before {
-            --size: 0.4rem;
-            content: "";
-            position: absolute;
-            left: calc(50% - var(--size));
-            top: calc(-2 * var(--size) + 1px);
-            border: var(--size) solid transparent;
-            border-bottom-color: var(--bg);
-        }
-    }
-</style -->
