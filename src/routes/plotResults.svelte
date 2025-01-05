@@ -419,7 +419,7 @@
             >InvertX<input type="checkbox" bind:checked={invert_x} /></label
         >
         <label use:tooltip={() => msg("invert Y data")}
-            >InvertY<input type="checkbox" bind:checked={invert_x} /></label
+            >InvertY<input type="checkbox" bind:checked={invert_y} /></label
         >
         <button
             use:tooltip={() =>
