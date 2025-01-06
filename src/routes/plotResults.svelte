@@ -568,14 +568,16 @@
                             {#each performances as perf}
                                 <th>{perf}</th>
                             {/each}
+                            <th>Sweep parameter</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {#each calculated_value as vals}
+                        {#each calculated_value as vals, i}
                             <tr>
                                 {#each vals as val}
                                     <td>{val}</td>
                                 {/each}
+                                <td>{plotdata == undefined ? db_data[i].name : plotdata[i].name}</td>
                             </tr>
                         {/each}
                     </tbody>
