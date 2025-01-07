@@ -31,9 +31,10 @@
 						step_precision,
 					);
 					src_values.forEach(function (src_value, index) {
-						plotdata[index].name = src_value;
-					});
-					return sweep_name;
+                        if (plotdata[index] != undefined) {
+                            plotdata[index].name = src_value;
+                        }
+                    });
 				}
 			}
 		}
