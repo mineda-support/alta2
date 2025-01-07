@@ -253,6 +253,8 @@
 	);
 
 	async function go_experiments(dir, settings, elements) {
+		proj.results_data = [];
+        proj.results_data[0] = {};
 		if (ckt == undefined) {
 			alert("Please read-in the circuit before experiment");
 		}
@@ -300,7 +302,7 @@
 			});
 			on_sim_end("LTspice simulation ended!");
 			performances.forEach((perf) => {
-				console.log(`${perf}:`, $state.snapshot(results_data[0][perf]));
+				console.log(`${perf}:`, $state.snapshot(proj.results_data[0][perf]));
 			});
 			//plot_trace.y = gb;
 			//result_trace.y = pm;
@@ -454,7 +456,7 @@
 	settings.src_precision[0] = 3;
 </script>
 
-{#if proj.results_data != undefined}
+{#if proj.results_data != undefined && proj.results_data[0] != undefined}
 	{#each Object.entries(proj.results_data[0]) as [performance, plot_data]}
 		<ResultsPlot
 			{plot_data}

@@ -258,8 +258,10 @@
 
    	proj.results_data[0] = {};
 
-    function calculate_equation() {
-        submit_equation(
+    async function calculate_equation() {
+        proj.results_data = [];
+        proj.results_data[0] = {};
+        calculated_value = await submit_equation(
             port,
             equation,
             proj.dir,
@@ -272,7 +274,7 @@
                 : measdata.filter((trace) => trace.checked),
         );
         console.log(
-            "values in calculate_equation:",
+            "calculated_value in calculate_equation:",
             $state.snapshot(calculated_value),
         );
         const equation_array = equation.split(",");
@@ -282,8 +284,8 @@
         }
         console.log("performances =", $state.snapshot(performances));
         performances.forEach(function (perf, index) {
-            console.log("perf, index=", [perf, index]);
-            console.log('proj.results_data:', $state.snapshot(proj.results_data));
+            //console.log("perf, index=", [perf, index]);
+            //console.log('proj.results_data:', $state.snapshot(proj.results_data));
             //if (calculated_value != undefined) {
             if (proj.results_data[0][perf] == undefined) {
                 proj.results_data[0][perf] = [];
@@ -294,7 +296,7 @@
                         plotdata != undefined ? plotdata : db_data,
                     ),
                     y: get_performance(calculated_value, index),
-                    name: equation_array[index],
+                    // name: equation_array[index],
                 });
             }
         });
@@ -340,7 +342,7 @@
         let result = await res.json();
         //console.log('result in submit_equation:', result);
         if (plotdata != undefined) {
-            calculated_value = result.calculated_value.slice(
+            calculated_value = await result.calculated_value.slice(
                 0,
                 plotdb_datadata.length,
             );
@@ -350,10 +352,10 @@
                 );
             }
         } else {
-            calculated_value = result.calculated_value.slice(0);
+            calculated_value = await result.calculated_value.slice(0);
         }
         console.log("calculated_value=", $state.snapshot(calculated_value));
-        // return calculated_value; // maybe useless
+        return calculated_value; 
     }
     equation = "x.where(y, 2.5){|x, y| x > 1e-6}";
 </script>
@@ -545,7 +547,7 @@
             <button
                 use:tooltip={() =>
                     msg("calculate equations for a current plot")}
-                onclick={() => calculate_equation(proj.results_data[0])}
+                onclick={() => calculate_equation()}
                 class="button-1"
             >
                 Calculate</button
