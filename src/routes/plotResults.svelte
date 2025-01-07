@@ -119,7 +119,6 @@
         plot_number = $bindable(),
         current_plot = $bindable(),
         plot_showhide = $bindable(),
-        results_data = $bindable(),
         measfile = $bindable(),
         step_precision = $bindable(),
         title = $bindable(),
@@ -189,11 +188,14 @@
         console.log("measdata =", measdata);
     }
     function check_probes_valid() {
-        console.log('probes=', probes);
+        console.log("probes=", probes);
         let count = 0;
-        for(let c of probes){
-            if (c == '(') { count++
-            } else if (c == ')') {count-- }
+        for (let c of probes) {
+            if (c == "(") {
+                count++;
+            } else if (c == ")") {
+                count--;
+            }
         }
         if (count != 0) {
             alert(`parentheses do not match in '${probes}'`);
@@ -253,6 +255,9 @@
         ph_data = ph_data;
         console.log('plotdata', plotdata);
     } */
+
+   	proj.results_data[0] = {};
+
     function calculate_equation() {
         submit_equation(
             port,
@@ -277,14 +282,14 @@
         }
         console.log("performances =", $state.snapshot(performances));
         performances.forEach(function (perf, index) {
-            //console.log("perf, index=", [perf, index]);
-            //console.log('results_data:', results_data);
+            console.log("perf, index=", [perf, index]);
+            console.log('proj.results_data:', $state.snapshot(proj.results_data));
             //if (calculated_value != undefined) {
-            if (results_data[0][perf] == undefined) {
-                results_data[0][perf] = [];
+            if (proj.results_data[0][perf] == undefined) {
+                proj.results_data[0][perf] = [];
             }
             if (calculated_value != undefined) {
-                results_data[0][perf].push({
+                proj.results_data[0][perf].push({
                     x: get_sweep_values(
                         plotdata != undefined ? plotdata : db_data,
                     ),
@@ -292,25 +297,9 @@
                     name: equation_array[index],
                 });
             }
-            //} else {
-            //	console.log('Error: calculate value is not available yet');
-            //}
-            //console.log(`results_data[0][${perf}]=`, results_data[0][perf]);
         });
-        // results_data[0] = results_data[0];
-        console.log("results_data=", $state.snapshot(results_data));
+        console.log("proj.results_data=", $state.snapshot(proj.results_data));
     }
-    /*
-    function select(measdata, selection) {
-        const sel_list = selection.split(',');
-        let selected_data = [];
-        // performances = performance_names.split(",").map((a) => a.trim());
-        measdata.forEach((row => {
-            let new_row = sel_list.map((a) => row[a]);
-            selected_data.push(new_row);
-        }));
-    }
-*/
     async function submit_equation(
         port,
         equation,
@@ -556,7 +545,7 @@
             <button
                 use:tooltip={() =>
                     msg("calculate equations for a current plot")}
-                onclick={() => calculate_equation(results_data[0])}
+                onclick={() => calculate_equation(proj.results_data[0])}
                 class="button-1"
             >
                 Calculate</button
@@ -577,7 +566,11 @@
                                 {#each vals as val}
                                     <td>{val}</td>
                                 {/each}
-                                <td>{plotdata == undefined ? db_data[i].name : plotdata[i].name}</td>
+                                <td
+                                    >{plotdata == undefined
+                                        ? db_data[i].name
+                                        : plotdata[i].name}</td
+                                >
                             </tr>
                         {/each}
                     </tbody>

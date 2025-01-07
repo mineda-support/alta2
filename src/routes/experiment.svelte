@@ -138,7 +138,6 @@
 
 	let {
 		port,
-		results_data = $bindable(),
 		probes = $bindable(),
 		equation = $bindable(),
 		on_sim_start,
@@ -150,7 +149,7 @@
 	}
 	let plot_data2 = $state();
 	// settings.result_number = 0;
-	results_data[settings.result_number] = {};
+	proj.results_data[settings.result_number] = {};
 	function add_experiment() {
 		settings.result_number = settings.result_number + 1;
 	}
@@ -262,8 +261,6 @@
 			return;
 		}
 		let updates, target;
-		//results_data = [];
-		//results_data[0] = {};
 		for (const value2 of settings.src_values[0]) {
 			//src, par_name, src_plus) {
 			[updates, target] = updates_plus(
@@ -284,8 +281,8 @@
 			[calculated_value, plotdata, db_data, ph_data, sweep_name] =
 				await goLTspice2(ckt);
 			performances.forEach(function (perf, index) {
-				if (results_data[0][perf] == undefined) {
-					results_data[0][perf] = [];
+				if (proj.results_data[0][perf] == undefined) {
+					proj.results_data[0][perf] = [];
 				}
 				if (Array.isArray(calculated_value[0])) {
 					let result = {
@@ -296,9 +293,9 @@
 						name: trace_name,
 					};
 					console.log("result=", result);
-					results_data[0][perf].push(result);
+					proj.results_data[0][perf].push(result);
 				} else {
-					results_data[0][perf].push(undefined);
+					proj.results_data[0][perf].push(undefined);
 				}
 			});
 			on_sim_end("LTspice simulation ended!");
@@ -310,8 +307,8 @@
 			//plot_data.push({ ...plot_trace });
 			//plot_data2.push({ ...result_trace });
 		}
-		console.log("results_data=", $state.snapshot(results_data));
-		console.log("results_data[0]=", results_data[0]);
+		console.log("proj.results_data=", $state.snapshot(proj.results_data));
+		console.log("proj.results_data[0]=", proj.results_data[0]);
 	}
 	// plot_data = [{x:[1,2,3,4], y:[1,2,4,3]}];
 
@@ -333,8 +330,6 @@
 		console.log("sweep_title=", settings.sweep_title[0]);
 		//settings.result_title = [];
 		console.log("result_title=", settings.result_title[0]);
-		//results_data = [];
-		//results_data[0] = {};
 		let preview_table = `count: ${settings.src[0]} ${settings.src_plus[0].join(" ")}\n`;
 		let count = 0;
 		for (const value2 of settings.src_values[0]) {
@@ -366,11 +361,11 @@
 	}
 
 	function clear_experiments() {
-		results_data[settings.result_number] = undefined;
+		proj.results_data[settings.result_number] = undefined;
 	}
 
 	async function save_experiments() {
-		console.log("results_data =", $state.snapshot(results_data));
+		console.log("proj.results_data =", $state.snapshot(proj.results_data));
 		let saveFileOptions = {
 			suggestedName: "xxxxxx.json",
 			types: [
@@ -382,7 +377,7 @@
 				},
 			],
 		};
-		const blob = JSON.stringify([settings, results_data]);
+		const blob = JSON.stringify([settings, proj.results_data]);
 		const handle = await window.showSaveFilePicker(saveFileOptions);
 		const ws = await handle.createWritable();
 		await ws.write(blob);
@@ -409,148 +404,10 @@
 		let tempsettings;
 		console.log(filedata);
 		//console.log("before:", plot_data);
-		[tempsettings, results_data] = JSON.parse(filedata);
+		[tempsettings, proj.results_data] = JSON.parse(filedata);
 		settings.result_title = tempsettings.result_title;
 		settings.sweep_title = tempsettings.sweep_title;
 		//console.log("after:", plot_data);
-	}
-
-	async function go(dir, settings, elements) {
-		plot_data = [];
-		let plot_trace = { x: [], y: [] };
-		plot_data2 = [];
-		let result_trace = { x: [], y: [] };
-		//alert(settings.src1);
-		let var_name;
-		let target;
-		[target, var_name] = settings.src1.split(":");
-		//console.log(target, var_name);
-		//const keep = elements[target][var_name];
-		settings.sweep_title = settings.src1;
-		settings.result_title = proj.file;
-		let updates;
-
-		for (const value2 of settings.src2_values) {
-			//src, par_name, src_plus) {
-			[updates, target] = updates_plus(
-				value2,
-				settings.src2,
-				settings.par_name2,
-				settings.src2_plus,
-			);
-			const trace_name = settings.src2.replace(/^.*:/, "") + ":" + value2;
-			plot_trace.name = trace_name;
-			result_trace.name = trace_name;
-			console.log("updates=", updates, `on ${dir}${target}.asc`);
-			await update_elms(dir, target + ".asc", updates);
-			let gb = []; // Gain Bandwidth product
-			let pm = []; // Phase Margin
-			plot_trace.x = [];
-			result_trace.x = [];
-			for (const value of settings.src1_values) {
-				[updates, target] = updates_plus(
-					value,
-					settings.src1,
-					settings.par_name1,
-					settings.src1_plus,
-				);
-				console.log("updates=", updates, `on ${dir}${target}.asc`);
-				await update_elms(dir, target + ".asc", updates);
-				//await my_sleep(3000);
-				on_sim_start("LTspice simulation started!");
-				let calculated_value = await goLTspice2(ckt);
-				//const my_sleep = (ms) =>
-				//	new Promise((resolve) => setTimeout(resolve, ms));
-				//await my_sleep(3000);
-				if (Array.isArray(calculated_value[0])) {
-					gb.push(calculated_value[0][0]);
-					pm.push(calculated_value[0][1]);
-				} else {
-					gb.push(undefined);
-					pm.push(undefined);
-				}
-				on_sim_end("LTspice simulation ended!");
-				plot_trace.x.push(Number(value));
-				result_trace.x.push(Number(value));
-			}
-			console.log("gb=", gb);
-			console.log("pm=", pm);
-			plot_trace.y = gb;
-			result_trace.y = pm;
-			plot_data.push({ ...plot_trace });
-			plot_data2.push({ ...result_trace });
-		}
-		console.log("plot_data=", plot_data);
-	}
-	// plot_data = [{x:[1,2,3,4], y:[1,2,4,3]}];
-
-	function preview_updates(dir, settings, elements) {
-		plot_data = [];
-		let var_name;
-		let target;
-		console.log("probes=", probes);
-		console.log("equation=", equation);
-		console.log("src1=", settings.src1);
-		console.log("src1_plus=", settings.src1_plus);
-		console.log("src1_values=", settings.src1_values);
-		settings.sweep_title = settings.src1;
-		settings.result_title = proj.file;
-		console.log("sweep_title=", settings.sweep_title);
-		console.log("result_title=", settings.result_title);
-
-		[target, var_name] = settings.src1.split(":");
-		// console.log(target, var_name);
-		if (
-			elements[target] == undefined ||
-			elements[target][var_name] == undefined
-		) {
-			return;
-		}
-		let plot_trace = { x: [], y: [] };
-		let updates;
-		let count = 0;
-		if (settings.src1_plus == undefined) {
-			settings.src1_plus = [];
-		}
-		if (settings.src2_plus == undefined) {
-			settings.src2_plus = [];
-		}
-		let preview_table = `count: ${settings.src2} ${settings.src2_plus.join(" ")}, ${settings.src1} ${settings.src1_plus.join(" ")}\n`;
-		for (const value2 of settings.src2_values) {
-			//src, par_name, src_plus) {
-			[updates, target] = updates_plus(
-				value2,
-				settings.src2,
-				settings.par_name2,
-				settings.src2_plus,
-			);
-			plot_trace.name = settings.src2 + ":" + value2;
-			console.log("plot_trace!!!", count, plot_trace);
-			console.log("updates=", updates, `on ${dir}${target}.asc`);
-			//preview_table = preview_table + settings.src2 + ':' + value2 + "\n";
-			//preview_table = preview_table + `plot_trace.name = ${settings.src2} + ':' + ${value2}\n`;
-
-			for (const value of settings.src1_values) {
-				[updates, target] = updates_plus(
-					value,
-					settings.src1,
-					settings.par_name1,
-					settings.src1_plus,
-				);
-				console.log("updates=", updates, `on ${dir}${target}.asc`);
-				// await update_elms(dir, target+'.asc', updates);
-				count = count + 1;
-				preview_table = preview_table + `${count}: ${value2}\n`;
-			}
-			plot_data.push({ ...plot_trace });
-			console.log("plot_trace=", count, plot_trace);
-		}
-		console.log("plot_data =", plot_data);
-		let blob = new Blob([preview_table], { type: "text/plain" });
-		const link = document.createElement("a");
-		link.href = URL.createObjectURL(blob);
-		link.download = "experiment_preview.txt";
-		link.click();
 	}
 
 	async function update_elms(dir, target, update_elms) {
@@ -597,11 +454,17 @@
 	settings.src_precision[0] = 3;
 </script>
 
-<!-- {#if results_data != undefined && results_data[0].length > 0} -->
-{#each Object.entries(results_data[0]) as [performance, plot_data]}
-	<ResultsPlot {plot_data} title={performance} {performance} {sweep_name} />
-{/each}
-<!-- {/if} -->
+{#if proj.results_data != undefined}
+	{#each Object.entries(proj.results_data[0]) as [performance, plot_data]}
+		<ResultsPlot
+			{plot_data}
+			title={performance}
+			{performance}
+			{sweep_name}
+		/>
+	{/each}
+{/if}
+
 <div><p>Make Experiments</p></div>
 {#each Array(settings.result_number + 1) as _, i}
 	<SweepSource
@@ -736,9 +599,9 @@ width: 90%;"
 {/if}
 
 <style>
-    .p {
-        font-family: Arial, "Helvetica Neue", "BIZ UDPGothic", Meiryo,
-            "Hiragino Kaku Gothic Pro", sans-serif;
-        font-size: 8pt;
-    }	
+	.p {
+		font-family: Arial, "Helvetica Neue", "BIZ UDPGothic", Meiryo,
+			"Hiragino Kaku Gothic Pro", sans-serif;
+		font-size: 8pt;
+	}
 </style>

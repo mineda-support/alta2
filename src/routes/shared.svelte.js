@@ -2,7 +2,8 @@ export let proj = $state({
     file: '',
     dir: '',
     elements: {},
-    models: {}
+    models: {},
+	results_data: []
 });
 export let ckt = $state({
     elements: {},

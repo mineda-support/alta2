@@ -15,9 +15,6 @@
 
 	let { data } = $props();
 
-	let results_data = $state([]); // $state([]);
-	results_data[0] = {};
-
 	export function handleMessage(event) {
 		console.log("handleMessage");
 		alert(event.detail.text);
@@ -211,7 +208,7 @@
 				settings[obj].splice(current_plot, 1);
 			}
 		}
-	}    
+	}
 	let nvar = $state(0);
 	let show_meas_group = $state(true);
 	console.log("settings=", $state.snapshot(settings));
@@ -230,7 +227,7 @@
 	<Settings {data} {ckt} bind:variations />
 	<div>
 		<Simulate
-			port = {data.props.port}
+			port={data.props.port}
 			bind:probes={settings.probes[current_plot]}
 			bind:variations
 			on_sim_end={plot_measurement_group}
@@ -278,17 +275,13 @@
 		{/if}
 	</div>
 	<!-- settings.plot_showhide = {settings.plot_showhide.length} -->
-	<SetProbes 
-	bind:probes={settings.probes[current_plot]}
-		bind:current_plot
-	/>
+	<SetProbes bind:probes={settings.probes[current_plot]} bind:current_plot />
 	{#each settings.plot_showhide as _, i}
 		<PlotResults
-			port = {data.props.port}
+			port={data.props.port}
 			plot_number={i}
 			bind:current_plot
 			bind:plot_showhide={settings.plot_showhide[i]}
-			bind:results_data
 			bind:measfile={settings.measfile[i]}
 			bind:step_precision={settings.step_precision[i]}
 			bind:title={settings.title[i]}
@@ -327,7 +320,6 @@
 	{#if current_plot != undefined && settings.equation[current_plot] != undefined}
 		<Experiment
 			port={data.props.port}
-			bind:results_data
 			bind:probes={settings.probes[current_plot]}
 			bind:equation={settings.equation[current_plot]}
 			on_sim_end={plot_measurement_group}
