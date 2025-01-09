@@ -13,6 +13,17 @@
   import { tooltip, msg } from "./Utils/tooltip.svelte";
   import InputWideValue from "./Utils/input_wide_value.svelte";
 
+  /*
+  function ctl_type(file) {
+    if (file.match(/\.asc/)) {
+      console.log(`${file} type is ltspice`)
+      return "ltspice";
+    } else if (files.match(/\.sch/)) {
+      console.log(`${file} type is ngspice`)
+      return "ngspice";
+    }
+  } */
+
   async function openLTspice(port, dir, file, showup) {
     if (file == undefined) {
       alert("Please choose the circuit to open");
@@ -87,6 +98,8 @@
     current_plot = $bindable(),
   } = $props();
   import { proj, ckt } from "./shared.svelte";
+  import { files } from "$service-worker";
+  //import { esbuildVersion } from "vite";
 
   let scoops = $state();
   if (
@@ -97,7 +110,7 @@
     scoops = data.props.ckt;
   }
 
-    let showup = $state(false);
+  let showup = $state(false);
   if (scoops != undefined) {
     openLTspice(data.props.port, data.props.wdir, scoops, showup);
   }
