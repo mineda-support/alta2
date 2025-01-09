@@ -13,16 +13,15 @@
   import { tooltip, msg } from "./Utils/tooltip.svelte";
   import InputWideValue from "./Utils/input_wide_value.svelte";
 
-  /*
   function ctl_type(file) {
     if (file.match(/\.asc/)) {
       console.log(`${file} type is ltspice`)
-      return "ltspice";
-    } else if (files.match(/\.sch/)) {
+      return "ltspctl";
+    } else if (file.match(/\.sch/)) {
       console.log(`${file} type is ngspice`)
-      return "ngspice";
+      return "ngspctl";
     }
-  } */
+  }
 
   async function openLTspice(port, dir, file, showup) {
     if (file == undefined) {
@@ -44,7 +43,7 @@
     }
     console.log(encoded_params);
     let response = await fetch(
-      `http://localhost:${port}/api/ltspctl/open?${encoded_params}`,
+      `http://localhost:${port}/api/${ctl_type(file)}/open?${encoded_params}`,
       {},
     );
     let res2 = await response.json();
@@ -98,7 +97,7 @@
     current_plot = $bindable(),
   } = $props();
   import { proj, ckt } from "./shared.svelte";
-  import { files } from "$service-worker";
+  //import { files } from "$service-worker";
   //import { esbuildVersion } from "vite";
 
   let scoops = $state();

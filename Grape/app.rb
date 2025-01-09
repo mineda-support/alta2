@@ -58,17 +58,6 @@ module Test
   class API < Grape::API
     format :json
     prefix :api
-
-    resource :blog do
-      desc 'Return an article.'
-      get :article do
-        {
-          "title" => "title",
-          "body" => "body"
-        }
-      end
-    end
-
     resource :misc do
       desc 'Load program'
       get :load do
@@ -97,6 +86,7 @@ module Test
         {"traces" => d}
       end      
     end
+
     helpers do 
       def open(type)
         work_dir, ckt_name = Utils::get_params(params)
@@ -105,21 +95,22 @@ module Test
           when 'LTspice'
             ckt = LTspiceControl.new(File.basename(ckt_name), true)
           when 'Xschem'
-            ckt = NgspiceControl.new(File.basename(ckt_name), true)
+            ckt = NgspiceControl.new(File.basename(ckt_name), true, true)
           end
-          ckt.open(File.basename(ckt_name), true) if params[:showup]
+          ckt.open(File.basename(ckt_name), true, true) if params[:showup]
           puts ckt.elements
-          {"elements" => ckt.elements, "info" => ckt.info, "models" => ckt.models}
+          puts '????'
+          {"elements" => ckt.elements, "info" => nil, "models" => ckt.models}
         }              
       end
     end
-    resource :xschem do
+    
+    resource :ngspctl do
       desc 'Open Xschem'
       get :open do
         open('Xschem')
       end
     end
-
     resource :ltspctl do      
       desc 'Open LTspice'
       get :open do
