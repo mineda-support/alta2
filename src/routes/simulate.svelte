@@ -81,6 +81,7 @@
     import { proj, ckt } from "./shared.svelte";
     import { tooltip, msg } from "./Utils/tooltip.svelte";
     export async function goLTspice() {
+        console.log('ckt=', ckt);
         if (ckt == undefined) {
             alert("Please read-in the circuit before simulation");
             return;

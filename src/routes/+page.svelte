@@ -90,6 +90,11 @@
 	function setup_measurement_group() {
 		if (ckt == undefined || ckt.elements == undefined) {
 			alert("Please read in circuit data first");
+			return;
+		}
+		if (ckt.info == undefined) {
+			alert("Simuation results are not available");
+			return;
 		}
 		let line, file, sel, inv_x, inv_y, meas_elm, elm, val, key;
 		current_plot = 0;

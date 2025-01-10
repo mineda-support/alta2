@@ -88,19 +88,10 @@ module Test
     end
 
     helpers do 
-      def open(type)
+      def open
         work_dir, ckt_name = Utils::get_params(params)
         Dir.chdir(work_dir){
-          case type
-          when 'LTspice'
-            ckt = LTspiceControl.new(File.basename(ckt_name), true)
-          when 'Xschem'
-            ckt = NgspiceControl.new(File.basename(ckt_name), true, true)
-          end
-          ckt.open(File.basename(ckt_name), true, true) if params[:showup]
-          puts ckt.elements
-          puts '????'
-          {"elements" => ckt.elements, "info" => nil, "models" => ckt.models}
+          yield ckt_name
         }              
       end
     end
@@ -108,21 +99,22 @@ module Test
     resource :ngspctl do
       desc 'Open Xschem'
       get :open do
-        open('Xschem')
+        open{|ckt_name|
+          ckt = NgspiceControl.new(File.basename(ckt_name), true, true)
+          ckt.open(File.basename(ckt_name), true, true) if params[:showup]
+          {"elements" => ckt.elements, "info" => nil, "models" => ckt.models}
+        }
       end
     end
     resource :ltspctl do      
       desc 'Open LTspice'
       get :open do
-        open('LTspice')
-=begin
-        Dir.chdir(work_dir){
+        open{|ckt_name|
           ckt = LTspiceControl.new(File.basename(ckt_name), true)
-          ckt.open(File.basename(ckt_name), true) if params[:showup]
+          ckt.open(File.basename(ckt_name), true, true) if params[:showup]
           puts ckt.elements
           {"elements" => ckt.elements, "info" => ckt.info, "models" => ckt.models}
-        } 
-=end        
+        }
       end
       desc 'Simulate'
       get :simulate do
