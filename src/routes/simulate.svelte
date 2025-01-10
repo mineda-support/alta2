@@ -77,7 +77,7 @@
 </script>
 
 <script lang="ts">
-    import { get_control } from "./openLTspice.svelte";
+    import { get_control } from "./openCircuit.svelte";
     import { proj, ckt } from "./shared.svelte";
     import { tooltip, msg } from "./Utils/tooltip.svelte";
     export async function goLTspice() {
@@ -86,7 +86,7 @@
             alert("Please read-in the circuit before simulation");
             return;
         }
-        console.log(`openLTspice dir='${proj.dir}' file='${proj.file}'`);
+        console.log(`openCircuit dir='${proj.dir}' file='${proj.file}'`);
         //dispatch("elm_update", { text: "Update elements" });
         update_elements(proj.dir, ckt, proj.elements);
         //const my_sleep = (ms) =>

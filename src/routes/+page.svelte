@@ -2,7 +2,7 @@
 	import Simulate from "./simulate.svelte";
 	import ConvertSchematic from "./convertSchematic.svelte";
 	import Experiment, { set_trace_names } from "./experiment.svelte";
-	import OpenLTspice, { get_control } from "./openLTspice.svelte";
+	import OpenCircuit, { get_control } from "./openCircuit.svelte";
 	import SetProbes from "./setProbes.svelte";
 	import Settings from "./settings/settings.svelte";
 	import { tooltip, msg } from "./Utils/tooltip.svelte";
@@ -221,7 +221,7 @@
 
 <main>
 	<ConvertSchematic port={data.props.port} dir={proj.dir} />
-	<OpenLTspice
+	<OpenCircuit
 		{data}
 		bind:probes={settings.probes[current_plot]}
 		bind:variations
