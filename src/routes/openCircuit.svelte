@@ -111,7 +111,7 @@
 
   let showup = $state(false);
   if (scoops != undefined) {
-    openLTspice(data.props.port, data.props.wdir, scoops, showup);
+    openCircuit(data.props.port, data.props.wdir, scoops, showup);
   }
 
   async function switch_wdir(wdir) {
@@ -242,7 +242,7 @@
 <div>
   <button
     onclick={() =>
-      openLTspice(data.props.port, data.props.wdir, scoops, showup)}
+      openCircuit(data.props.port, data.props.wdir, scoops, showup)}
     class="button-1"
     use:tooltip={() => msg("readin circuit checked above")}
   >
