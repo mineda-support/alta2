@@ -105,6 +105,130 @@ module Test
           {"elements" => ckt.elements, "info" => nil, "models" => ckt.models}
         }
       end
+      desc 'Simulate'
+      get :simulate do
+        work_dir, ckt_name = Utils::get_params(params)
+        probes = params[:probes] 
+        Dir.chdir(work_dir){
+          ckt = NgspiceControl.new(File.basename ckt_name)
+          puts "models_update: #{params[:models_update]}"
+          puts "variations: #{params[:variations]}"
+          variations = params[:variations] ? eval(params[:variations].gsub('null', 'nil')) : {}
+          models_update = params[:models_update] ? eval(params[:models_update]) : {}
+          ckt.simulate models_update: models_update, variations: variations
+          puts "probes=#{probes}"
+          if probes
+            vars, traces = ckt.get_traces *(probes.split(','))
+            if probes.start_with? 'frequency'
+              db_traces = traces.map{|trace| {name: trace[:name], x: trace[:x], y: trace[:y].map{|a| 20.0*Math.log10(a.abs)}}}
+              phase_traces = traces.map{|trace| {name: trace[:name], x: trace[:x], y: trace[:y].map{|a| Utils::shift360(a.phase*(180.0/Math::PI))}}}
+              if equation = params[:equation]
+                results = eval_db_ph_equation db_traces, phase_traces, equation
+              end
+              {"vars" => vars, "db" => db_traces, "phase" => phase_traces, "calculated_value" => results}
+            else
+              if equation = params[:equation]
+                results = eval_equation traces, equation
+              end
+              {"vars" => vars, "traces" => traces, "calculated_value" => results}
+            end 
+          else
+            {"log" => ckt.sim_log}
+          end
+          }
+        end
+      desc 'Results'
+      get :results do
+        work_dir, ckt_name = Utils::get_params(params)
+        #probes = params[:probes] ? URI.decode_www_form_component(params[:probes]): nil
+        probes = params[:probes] 
+        Dir.chdir(work_dir){
+          ckt = NgspiceControl.new(File.basename ckt_name)
+          if probes && probes.strip != ''
+            vars, traces = ckt.get_traces *(probes.split(','))
+            if probes.start_with? 'frequency'
+              db_traces = traces.map{|trace| {name: trace[:name], x: trace[:x], y: trace[:y].map{|a| 20.0*Math.log10(a.abs)}}}
+              phase_traces = traces.map{|trace| {name: trace[:name], x: trace[:x], y: trace[:y].map{|a| Utils::shift360(a.phase*(180.0/Math::PI))}}}
+              if equation = params[:equation]
+                results = eval_db_ph_equation db_traces, phase_traces, equation
+              end
+              {"vars" => vars, "db" => db_traces, "phase" => phase_traces, "calculated_value" => results}
+            else
+              if equation = params[:equation]
+                results = eval_equation traces, equation
+              end
+              {"vars" => vars, "traces" => traces, "calculated_value" => results}
+            end 
+          else
+            {"log" => ckt.sim_log}
+          end
+        }
+      end
+      desc 'Updates'
+      get :update do
+        work_dir, ckt_name = Utils::get_params(params)
+        updates = eval params[:updates]
+        puts "updates: #{updates}"
+        Dir.chdir(work_dir){
+          ckt = NgspiceControl.new(File.basename ckt_name)
+          ckt.set updates
+          {"elements" => ckt.elements, "info" => ckt.info}
+        }
+      end
+      desc 'Info'
+      get :info do
+        work_dir, ckt_name = Utils::get_params(params)
+        Dir.chdir(work_dir){
+          ckt = NgspiceControl.new(File.basename ckt_name)
+          {"info" => ckt.info}
+        }
+      end   
+      desc 'Measurement'
+      post :measure do
+        require 'json'
+        # puts params.keys
+        # puts params
+        work_dir, ckt_name = Utils::get_params(params)
+        results = []
+        Dir.chdir(work_dir){
+          puts "equation for measurement: #{params[:equation]}"
+          ckt = LTspiceControl.new(File.basename ckt_name)
+          puts "plotdata: '#{params[:plotdata].inspect}', size=#{params[:plotdata].size}"
+          if params[:plotdata] && params[:plotdata].size > 0
+            params[:plotdata].each{|plotdata|
+              # debugger
+              # puts plotdata[:x]
+              # puts plotdata[:y]
+              x = Array_with_interpolation.new plotdata[:x]
+              y = Array_with_interpolation.new plotdata[:y]
+              begin
+                results << eval(params[:equation])
+              rescue
+                results << nil
+              end
+            }
+          else # db and phase
+            puts params[:db_data].size
+            if params[:db_data] && params[:db_data].size > 0
+              params[:db_data].each_index{|i|
+                db_data = params[:db_data][i]
+                ph_data = params[:ph_data][i]
+                x = Array_with_interpolation.new db_data[:x]
+                db = Array_with_interpolation.new db_data[:y]
+                ph = Array_with_interpolation.new ph_data[:y]
+                # puts "db=#{db}"
+                begin
+                  results << eval(params[:equation])
+                  #puts "results === #{results}"
+                rescue
+                  results << nil
+                end
+              }
+            end
+          end
+          {"calculated_value" => results}
+        }
+      end
     end
     resource :ltspctl do      
       desc 'Open LTspice'

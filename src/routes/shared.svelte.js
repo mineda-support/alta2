@@ -1,4 +1,7 @@
 export let proj = $state({
+	ctl_type: 'ltspctl', // ltspctl or ngspctl
+	simulator: 'LTspice', // LTspice, Ngspice, (XYCE), (Qucsator)
+	schema_editor: 'LTspice', // Xschem, Qucs, EEschema 
     file: '',
     dir: '',
     elements: {},

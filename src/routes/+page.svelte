@@ -23,6 +23,7 @@
 
 	let current_plot = $state(); //  = 0;
 
+	/*
 	function plot_results() {
 		if (variations == {}) {
 			return;
@@ -39,6 +40,7 @@
 			}
 		}
 	}
+	*/
 
 	function clear_all_plots() {
 		ckt_data = {
@@ -96,7 +98,7 @@
 			alert("Simuation results are not available");
 			return;
 		}
-		let line, file, sel, inv_x, inv_y, meas_elm, elm, val, key;
+		let file, sel, inv_x, inv_y, meas_elm, elm, val, key;
 		current_plot = 0;
 		settings.meas_group.forEach(function (line, index) {
 			[file, sel, inv_x, inv_y, meas_elm, val] = line

@@ -122,7 +122,7 @@
 		)}&file=${encodeURIComponent(file)}`;
 		// console.log(`program to send: ${program}`);
 		const res = await fetch(
-			`http://localhost:${port}/api/ltspctl/execute?${encoded_params}`,
+			`http://localhost:${port}/api/${proj.ctl_type}/execute?${encoded_params}`,
 			{
 				method: "POST",
 				headers: {
@@ -164,7 +164,7 @@
 	}
 
 	async function goLTspice2(ckt) {
-		console.log(`openLTspice dir='${proj.dir}' file='${proj.file}'`);
+		console.log(`openCircuit dir='${proj.dir}' file='${proj.file}'`);
 		update_elements(proj.dir, ckt, proj.elements);
 		console.log("equation=", equation);
 		let encoded_params = `dir=${encodeURIComponent(
@@ -180,7 +180,7 @@
 		}
 		// dispatch("sim_start", { text: "LTspice simulation started!" });
 		let response = await fetch(
-			`http://localhost:${port}/api/ltspctl/simulate?${encoded_params}`,
+			`http://localhost:${port}/api/${proj.ctl_type}/simulate?${encoded_params}`,
 			{},
 		);
 		let res2 = await response.json();
@@ -422,7 +422,7 @@
 		const my_sleep = (ms) =>
 			new Promise((resolve) => setTimeout(resolve, ms));
 		await my_sleep(1000);
-		const command = `http://localhost:${port}/api/ltspctl/update?${encoded_params}&updates=${update_elms}`;
+		const command = `http://localhost:${port}/api/${proj.ctl_type}/update?${encoded_params}&updates=${update_elms}`;
 		console.log(command);
 		let response = await fetch(command, {});
 		let ckt = await response.json(); // ckt = {elements}

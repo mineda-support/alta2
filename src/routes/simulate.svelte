@@ -31,7 +31,7 @@
                     probes,
                 )}`;
 
-                const command = `http://localhost:${port}/api/ltspctl/update?${encoded_params}&updates=${update_elms}`;
+                const command = `http://localhost:${port}/api/${proj.ctl_type}/update?${encoded_params}&updates=${update_elms}`;
                 console.log(command);
                 let response = await fetch(command, {});
                 let ckt = await response.json(); // ckt = {elements}
@@ -107,14 +107,14 @@
         // dispatch("sim_start", { text: "LTspice simulation started!" });
         on_sim_start("LTspice simulation started!");
         let response = await fetch(
-            `http://localhost:${port}/api/ltspctl/simulate?${encoded_params}`,
+            `http://localhost:${port}/api/${proj.ctl_type}/simulate?${encoded_params}`,
             {},
         );
         let res2 = await response.json();
         console.log(res2);
         //if (ckt.info == null) {
         response = await fetch(
-            `http://localhost:${port}/api/ltspctl/info?${encoded_params}`,
+            `http://localhost:${port}/api/${proj.ctl_type}/info?${encoded_params}`,
             {},
         );
         res2 = await response.json();

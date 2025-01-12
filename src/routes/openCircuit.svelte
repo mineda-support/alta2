@@ -13,13 +13,17 @@
   import { tooltip, msg } from "./Utils/tooltip.svelte";
   import InputWideValue from "./Utils/input_wide_value.svelte";
 
-  function ctl_type(file) {
+  function set_ctl_type(file) {
     if (file.match(/\.asc/)) {
       console.log(`${file} type is ltspice`)
-      return "ltspctl";
+      proj.ctl_type = 'ltspctl';
+      proj.simulator = 'LTspice';
+      proj.ckt_editor = 'LTspice';
     } else if (file.match(/\.sch/)) {
       console.log(`${file} type is ngspice`)
-      return "ngspctl";
+      proj.ctl_type = 'ngspctl';
+      proj.simulator = 'Ngspice';
+      proj.ckt_editor = 'Xschem';
     }
   }
 
@@ -29,6 +33,7 @@
       return;
     }
     proj.file = file;
+    set_ctl_type(file);
     proj.dir = dir;
     console.log(`openCircuit port=${port} dir='${dir}' file='${file}'`);
     let encoded_params;
@@ -43,7 +48,7 @@
     }
     console.log(encoded_params);
     let response = await fetch(
-      `http://localhost:${port}/api/${ctl_type(file)}/open?${encoded_params}`,
+      `http://localhost:${port}/api/${proj.ctl_type}/open?${encoded_params}`,
       {},
     );
     let res2 = await response.json();
@@ -100,18 +105,10 @@
   //import { files } from "$service-worker";
   //import { esbuildVersion } from "vite";
 
-  let scoops = $state();
-  if (
-    data != undefined &&
-    data.props != undefined &&
-    data.props.ckt != undefined
-  ) {
-    scoops = data.props.ckt;
-  }
-
+  let chosen = $state(data.props.ckt);
   let showup = $state(false);
-  if (scoops != undefined) {
-    openCircuit(data.props.port, data.props.wdir, scoops, showup);
+  if (chosen != undefined) {
+    openCircuit(data.props.port, data.props.wdir, chosen, showup);
   }
 
   async function switch_wdir(wdir) {
@@ -125,17 +122,7 @@
   }
   let alter_src = $state();
   let alter = $state([{}]);
-  let c = $state(),
-    e = $state();
-  /* run(() => {
-  if (alter_src != undefined) {
-    [c, e] = alter_src.split(":");
-    if (alter[0][alter_src] == undefined) {
-      alter[0][alter_src] = proj.elements[c][e];
-    }
-  }
-  }); */
-
+ 
   function add_alter() {}
 
   function check_alter() {
@@ -233,7 +220,7 @@
   {#if data.props != undefined}
     {#each data.props.files as file}
       <label class="box-item">
-        <input type="radio" name="scoops" value={file} bind:group={scoops} />
+        <input type="radio" name="chosen" value={file} bind:group={chosen} />
         {file}<br />
       </label>
     {/each}
@@ -242,7 +229,7 @@
 <div>
   <button
     onclick={() =>
-      openCircuit(data.props.port, data.props.wdir, scoops, showup)}
+      openCircuit(data.props.port, data.props.wdir, chosen, showup)}
     class="button-1"
     use:tooltip={() => msg("readin circuit checked above")}
   >

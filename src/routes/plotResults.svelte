@@ -90,7 +90,7 @@
             probes,
         )}&equation=${encodeURIComponent(equation)}`;
         let response = await fetch(
-            `http://localhost:${port}/api/ltspctl/results?${encoded_params}`,
+            `http://localhost:${port}/api/${proj.ctl_type}/results?${encoded_params}`,
             {},
         );
         let res2 = await response.json();
@@ -325,7 +325,7 @@
             $state.snapshot(ph_data),
         );
         const res = await fetch(
-            `http://localhost:${port}/api/ltspctl/measure?${encoded_params}`,
+            `http://localhost:${port}/api/${proj.ctl_type}/measure?${encoded_params}`,
             {
                 method: "POST",
                 headers: {
