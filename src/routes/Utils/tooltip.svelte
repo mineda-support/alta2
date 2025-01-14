@@ -6,11 +6,11 @@
             return tooltip.destroy;
         });
     }
-
+    import { proj, ckt, settings } from "../shared.svelte.js";
     const details = {
         'switch working directory': '\n回路データのあるワークディレクトリを絶対パスで指定する',
         'readin circuit checked above': '\選択された回路を読み込む',
-        'show up LTspice': '\nチェックしていれば、LTspiceが開きます。alta2の内部状態とは同期しないので注意！',
+        'show up schematic editor': `\nチェックしていれば、${proj.schematic_eitor}が開きます。alta2の内部状態とは同期しないので注意！`,
         'elements and control': '\n回路に含まれる素子と制御情報です',
         'variations on device parameters': '\n素子特性を調べるときに、変化させた素子値で一挙にシミュレーションする',
         'save settings in a working directory': '\n設定情報を、ワークディレクトリに保存する',
