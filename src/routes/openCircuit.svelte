@@ -235,7 +235,7 @@
   >
     Click here to read-in</button
   >
-  <label use:tooltip={() => msg("show up LTspice")}>
+  <label use:tooltip={() => msg('show up schematic editor')}>
     <input type="checkbox" bind:checked={showup} />
     show schematic
   </label>

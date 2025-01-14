@@ -81,7 +81,7 @@
     import { proj, ckt } from "./shared.svelte";
     import { tooltip, msg } from "./Utils/tooltip.svelte";
     export async function goLTspice() {
-        console.log('ckt=', ckt);
+        console.log('ckt=', $state.snapshot(ckt));
         if (ckt == undefined) {
             alert("Please read-in the circuit before simulation");
             return;
@@ -105,7 +105,7 @@
                 `&models_update=${encodeURIComponent(JSON.stringify(models_update))}`;
         }
         // dispatch("sim_start", { text: "LTspice simulation started!" });
-        on_sim_start("LTspice simulation started!");
+        on_sim_start("Simulation started!");
         let response = await fetch(
             `http://localhost:${port}/api/${proj.ctl_type}/simulate?${encoded_params}`,
             {},
@@ -119,10 +119,10 @@
         );
         res2 = await response.json();
         ckt.info = res2.info;
-        // console.log(ckt.info);
+        console.log(ckt.info);
         // ckt_store.set(ckt);
         //}
-        on_sim_end("LTspice simulation ended!");
+        on_sim_end("Simulation ended!");
 
         // plotdata = get_results();
         return res2;
@@ -139,7 +139,7 @@
 <button
     onclick={goLTspice}
     class="button-1"
-    use:tooltip={() => msg("run LTspice simulation")}
+    use:tooltip={() => msg("run simulation")}
 >
-    Click here to Start LTspice simulation</button
+    Click here to start {proj.simulator} simulation</button
 >

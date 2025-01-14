@@ -110,7 +110,7 @@ module Test
         work_dir, ckt_name = Utils::get_params(params)
         probes = params[:probes] 
         Dir.chdir(work_dir){
-          ckt = NgspiceControl.new(File.basename ckt_name)
+          ckt = NgspiceControl.new(File.basename(ckt_name), true, true)
           puts "models_update: #{params[:models_update]}"
           puts "variations: #{params[:variations]}"
           variations = params[:variations] ? eval(params[:variations].gsub('null', 'nil')) : {}
@@ -143,7 +143,7 @@ module Test
         #probes = params[:probes] ? URI.decode_www_form_component(params[:probes]): nil
         probes = params[:probes] 
         Dir.chdir(work_dir){
-          ckt = NgspiceControl.new(File.basename ckt_name)
+          ckt = NgspiceControl.new(File.basename(ckt_name), true, true)
           if probes && probes.strip != ''
             vars, traces = ckt.get_traces *(probes.split(','))
             if probes.start_with? 'frequency'
@@ -170,7 +170,7 @@ module Test
         updates = eval params[:updates]
         puts "updates: #{updates}"
         Dir.chdir(work_dir){
-          ckt = NgspiceControl.new(File.basename ckt_name)
+          ckt = NgspiceControl.new(File.basename(ckt_name), true, true)
           ckt.set updates
           {"elements" => ckt.elements, "info" => ckt.info}
         }
@@ -179,7 +179,7 @@ module Test
       get :info do
         work_dir, ckt_name = Utils::get_params(params)
         Dir.chdir(work_dir){
-          ckt = NgspiceControl.new(File.basename ckt_name)
+          ckt = NgspiceControl.new(File.basename(ckt_name), true, true)
           {"info" => ckt.info}
         }
       end   
