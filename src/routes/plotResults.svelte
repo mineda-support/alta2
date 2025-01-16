@@ -217,7 +217,7 @@
         return false;
     }
     async function plot_result_clicked() {
-        if (!check_probes_valid()) return;
+        if (proj.simulator == 'LTspice' && !check_probes_valid()) return;
         let result = await plot_result(
             port,
             proj.dir,
