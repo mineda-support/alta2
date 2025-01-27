@@ -235,7 +235,7 @@ module Test
       get :open do
         open{|ckt_name|
           ckt = LTspiceControl.new(File.basename(ckt_name), true)
-          ckt.open(File.basename(ckt_name), true, true) if params[:showup]
+          ckt.open(File.basename(ckt_name), true) if params[:showup]
           puts ckt.elements
           {"elements" => ckt.elements, "info" => ckt.info, "models" => ckt.models}
         }
