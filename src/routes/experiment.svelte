@@ -21,10 +21,10 @@
 		for (const [ckt_name, elms] of Object.entries(elements)) {
 			for (const [elm, props] of Object.entries(elms)) {
 				//console.log([elm, props]);
-				if (elm == "step" || elm == "dc") {
+				if (props != undefined && (elm == "step" || elm == "dc")) {
 					[sweep_name, src_values] = parse_step_command(
 						props.replace(
-							/\.dc +\S+ \S+ \S+ \S+ +/,
+							/^ *\.dc +\S+ \S+ \S+ \S+ +/,
 							".step param ",
 						),
 						/* props could be like '.dc v3 0 3 0.01 V2 0 3 0.5' */
@@ -165,7 +165,7 @@
 
 	async function goLTspice2(ckt) {
 		console.log(`openCircuit dir='${proj.dir}' file='${proj.file}'`);
-		update_elements(proj.dir, ckt, proj.elements);
+		update_elements(port, proj.dir, ckt, proj.elements, probes);
 		console.log("equation=", equation);
 		let encoded_params = `dir=${encodeURIComponent(
 			proj.dir,
@@ -311,7 +311,7 @@
 			//plot_data2.push({ ...result_trace });
 		}
 		console.log("proj.results_data=", $state.snapshot(proj.results_data));
-		console.log("proj.results_data[0]=", proj.results_data[0]);
+		// console.log("proj.results_data[0]=", $state.snapshot(proj.results_data[0]));
 	}
 	// plot_data = [{x:[1,2,3,4], y:[1,2,4,3]}];
 

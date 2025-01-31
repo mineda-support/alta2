@@ -1,5 +1,5 @@
 <script module>
-    export async function update_elements(dir, ckt, elements) {
+    export async function update_elements(port, dir, ckt, elements, probes) {
         for (const [ckt_name, elms] of Object.entries(ckt.elements)) {
             if (ckt_name[0] == ".") {
                 continue;
@@ -27,16 +27,19 @@
 
                 let encoded_params = `dir=${encodeURIComponent(
                     dir,
-                )}&file=${encodeURIComponent(file)}&probes=${encodeURIComponent(
-                    probes,
-                )}`;
+                )}&file=${encodeURIComponent(target)}`;
+
+                if (probes != undefined) {
+                  encoded_params = encoded_params + `&probes=${encodeURIComponent(
+                      probes,
+                  )}`;
+                };
 
                 const command = `http://localhost:${port}/api/${proj.ctl_type}/update?${encoded_params}&updates=${update_elms}`;
                 console.log(command);
                 let response = await fetch(command, {});
                 let ckt = await response.json(); // ckt = {elements}
                 console.log("ckt=", ckt);
-
                 for (const [elm, props] of Object.entries(ckt.elements)) {
                     if (elements[ckt_name][elm] != get_control(props)) {
                         console.log(
@@ -88,10 +91,10 @@
         }
         console.log(`openCircuit dir='${proj.dir}' file='${proj.file}'`);
         //dispatch("elm_update", { text: "Update elements" });
-        update_elements(proj.dir, ckt, proj.elements);
-        //const my_sleep = (ms) =>
-        //    new Promise((resolve) => setTimeout(resolve, ms));
-        //await my_sleep(3000);
+        update_elements(port, proj.dir, ckt, proj.elements, probes);
+        const my_sleep = (ms) =>
+        new Promise((resolve) => setTimeout(resolve, ms));
+        await my_sleep(500);
         console.log("variations", $state.snapshot(variations));
         let encoded_params = `dir=${encodeURIComponent(
             proj.dir,
@@ -119,7 +122,7 @@
         );
         res2 = await response.json();
         ckt.info = res2.info;
-        console.log(ckt.info);
+        console.log($state.snapshot(ckt.info));
         // ckt_store.set(ckt);
         //}
         on_sim_end("Simulation ended!");

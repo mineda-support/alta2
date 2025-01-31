@@ -2,7 +2,7 @@
   // import { goto } from "$app/navigation";
   export function get_control(props) {
     if (Array.isArray(props)) {
-      return props[0].control;
+      return props[0].control || '*' + props[0].comment;
     } else {
       return props.value;
     }
@@ -73,7 +73,7 @@
         }
         proj.elements[ckt_name] = {};
         for (const [elm, props] of Object.entries(elms)) {
-          //console.log([elm, props]);
+          // console.log([elm, props]);
           proj.elements[ckt_name][elm] = get_control(props);
         }
       }
