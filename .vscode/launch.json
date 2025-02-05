@@ -11,7 +11,7 @@
             "script": "${file}",
             "args": [],
             "askParameters": true,
-            "useTerminal": true
+            "useTerminal": false
         },
         {
             "type": "rdbg",
