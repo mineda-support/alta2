@@ -100,7 +100,10 @@
             proj.dir,
         )}&file=${encodeURIComponent(
             proj.file,
+        )}&probes=${encodeURIComponent(
+                probes,
         )}&variations=${encodeURIComponent(JSON.stringify(variations))}`;
+        
         const models_update = update_models(ckt, proj.models);
         if (models_update != {}) {
             encoded_params =

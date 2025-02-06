@@ -115,7 +115,7 @@ module Test
           puts "variations: #{params[:variations]}"
           variations = params[:variations] ? eval(params[:variations].gsub('null', 'nil')) : {}
           models_update = params[:models_update] ? eval(params[:models_update]) : {}
-          ckt.simulate models_update: models_update, variations: variations, probes: probes
+          ckt.simulate models_update: models_update, variations: variations, probes: probes.split(',')
           puts "probes=#{probes}"
           if probes
             vars, traces = ckt.get_traces *(probes.split(','))
