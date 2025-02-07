@@ -13,7 +13,7 @@
 		} else {
 			sweep_name = set_trace_names2(plotdata, elements, step_precision);
 		}
-		return [plotdata, db_data, ph_data, sweep_name, vars.slice(0, 2).join(', ')];
+		return [plotdata, db_data, ph_data, sweep_name, vars.slice(0, 2).join(',')];
 	}
 
 	function set_trace_names2(plotdata, elements, step_precision) {
