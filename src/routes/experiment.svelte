@@ -3,6 +3,7 @@
 		const plotdata = res2.traces;
 		const db_data = res2.db;
 		const ph_data = res2.phase;
+		const vars = res2.vars;
 		let sweep_name;
 		//console.log('probes in set_trace_names=', probes);
 		if (probes != null && probes.startsWith("frequency")) {
@@ -12,7 +13,7 @@
 		} else {
 			sweep_name = set_trace_names2(plotdata, elements, step_precision);
 		}
-		return [plotdata, db_data, ph_data, sweep_name];
+		return [plotdata, db_data, ph_data, sweep_name, vars.slice(0, 2).join(', ')];
 	}
 
 	function set_trace_names2(plotdata, elements, step_precision) {

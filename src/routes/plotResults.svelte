@@ -97,14 +97,14 @@
         console.log(res2);
         console.log("probes=", probes);
         if (probes != undefined && probes.trim().length > 0) {
-            [plotdata, db_data, ph_data, sweep_name] = set_trace_names(
+            [plotdata, db_data, ph_data, sweep_name, probes] = set_trace_names(
                 res2,
                 probes,
                 proj.elements,
                 step_precision,
             );
         }
-        return [plotdata, db_data, ph_data, sweep_name];
+        return [plotdata, db_data, ph_data, sweep_name, probes];
     }
 </script>
 
@@ -231,7 +231,7 @@
             step_precision,
             sweep_name,
         );
-        [plotdata, db_data, ph_data, sweep_name] = result;
+        [plotdata, db_data, ph_data, sweep_name, probes] = result;
     }
 
     step_precision = 3;
