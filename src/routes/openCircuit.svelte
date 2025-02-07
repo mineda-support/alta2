@@ -7,6 +7,22 @@
       return props.value;
     }
   }
+
+  export function ctl_info(info, proj) {
+    if (info == null) return null;
+    if (proj.ctl_type == 'ngspctl') {
+      return info[0].concat(info.slice(1).map(a => {
+        let m;
+        if (m=a.match(/(.+)#branch/)){
+          `I($m[1])`
+        } else {
+          `V($a)`
+        }
+      }))
+    } else {
+      return info
+    }
+  }
 </script>
 
 <script lang="ts">
@@ -27,7 +43,7 @@
     }
   }
 
-  async function openCircuit(port, dir, file, showup) {
+ async function openCircuit(port, dir, file, showup) {
     if (file == undefined) {
       alert("Please choose the circuit to open");
       return;
@@ -61,7 +77,7 @@
     }
     ckt.elements = res2.elements;
     ckt.models = res2.models;
-    ckt.info = res2.info;
+    ckt.info = ctl_info(res2.info, proj);
     //console.log("ckt=", $inspect(ckt));
     if (ckt != undefined) {
       proj.elements = {};

@@ -80,7 +80,7 @@
 </script>
 
 <script lang="ts">
-    import { get_control } from "./openCircuit.svelte";
+    import { get_control, ctl_info } from "./openCircuit.svelte";
     import { proj, ckt } from "./shared.svelte";
     import { tooltip, msg } from "./Utils/tooltip.svelte";
     export async function goLTspice() {
@@ -100,7 +100,10 @@
             proj.dir,
         )}&file=${encodeURIComponent(
             proj.file,
+        )}&probes=${encodeURIComponent(
+                probes,
         )}&variations=${encodeURIComponent(JSON.stringify(variations))}`;
+        
         const models_update = update_models(ckt, proj.models);
         if (models_update != {}) {
             encoded_params =
@@ -121,7 +124,7 @@
             {},
         );
         res2 = await response.json();
-        ckt.info = res2.info;
+        ckt.info = ctl_info(res2.info, proj);
         console.log($state.snapshot(ckt.info));
         // ckt_store.set(ckt);
         //}
