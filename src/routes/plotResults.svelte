@@ -344,7 +344,7 @@
         if (plotdata != undefined) {
             calculated_value = await result.calculated_value.slice(
                 0,
-                plotdb_datadata.length,
+                plotdata.length,
             );
             if (measdata.length > 0) {
                 alert(
