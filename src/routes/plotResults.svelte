@@ -401,7 +401,7 @@
         >
         <br />
         <label use:tooltip={() => msg("reverse traces in a graph")}
-            >Selection:<input />Reverse<input
+            >Reverse<input
                 type="checkbox"
                 bind:checked={reverse}
             /></label

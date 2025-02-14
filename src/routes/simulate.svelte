@@ -65,7 +65,6 @@
                 }
             }
             if (update_mdls[model_name] != undefined) {
-                let target = ckt_name + ".asc";
                 console.log(
                     "let me update model_name=",
                     model_name,
