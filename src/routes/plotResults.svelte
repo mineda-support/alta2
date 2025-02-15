@@ -540,9 +540,9 @@
         <label
             use:tooltip={() => msg("performance equations in an array format")}
             >Equation(s)
-            <input
+            <textarea
                 bind:value={equation}
-                style="border:darkgray solid 1px; width: 50%"
+                style="border:darkgray solid 1px; width: 50%; height: 20px; text-align: bottom"
             />
             <button
                 use:tooltip={() =>
