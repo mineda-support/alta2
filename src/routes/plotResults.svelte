@@ -344,7 +344,7 @@
         if (plotdata != undefined) {
             calculated_value = await result.calculated_value.slice(
                 0,
-                plotdb_datadata.length,
+                plotdata.length,
             );
             if (measdata.length > 0) {
                 alert(
@@ -401,7 +401,7 @@
         >
         <br />
         <label use:tooltip={() => msg("reverse traces in a graph")}
-            >Selection:<input />Reverse<input
+            >Reverse<input
                 type="checkbox"
                 bind:checked={reverse}
             /></label
@@ -540,9 +540,9 @@
         <label
             use:tooltip={() => msg("performance equations in an array format")}
             >Equation(s)
-            <input
+            <textarea
                 bind:value={equation}
-                style="border:darkgray solid 1px; width: 50%"
+                style="border:darkgray solid 1px; width: 50%; height: 20px; text-align: bottom"
             />
             <button
                 use:tooltip={() =>

@@ -2,25 +2,28 @@
   // import { goto } from "$app/navigation";
   export function get_control(props) {
     if (Array.isArray(props)) {
-      return props[0].control || '*' + props[0].comment;
+      return props[0].control || "*" + props[0].comment;
     } else {
       return props.value;
     }
   }
 
+  function translate(a) {
+    let m;
+    if ((m = a.match(/(.+)#branch/))) {
+      return `I(${m[1]})`;
+    } else {
+      return `V(${a})`;
+    }
+  }
+
   export function ctl_info(info, proj) {
     if (info == null) return null;
-    if (proj.ctl_type == 'ngspctl') {
-      return info[0].concat(info.slice(1).map(a => {
-        let m;
-        if (m=a.match(/(.+)#branch/)){
-          `I($m[1])`
-        } else {
-          `V($a)`
-        }
-      }))
+    if (proj.ctl_type == "ngspctl") {
+      //return .map(a => {
+      return [info[0]].concat(info.slice(1).map((a) => translate(a)));
     } else {
-      return info
+      return info;
     }
   }
 </script>
@@ -31,19 +34,19 @@
 
   function set_ctl_type(file) {
     if (file.match(/\.asc/)) {
-      console.log(`${file} type is ltspice`)
-      proj.ctl_type = 'ltspctl';
-      proj.simulator = 'LTspice';
-      proj.ckt_editor = 'LTspice';
+      console.log(`${file} type is ltspice`);
+      proj.ctl_type = "ltspctl";
+      proj.simulator = "LTspice";
+      proj.ckt_editor = "LTspice";
     } else if (file.match(/\.sch/)) {
-      console.log(`${file} type is ngspice`)
-      proj.ctl_type = 'ngspctl';
-      proj.simulator = 'Ngspice';
-      proj.ckt_editor = 'Xschem';
+      console.log(`${file} type is ngspice`);
+      proj.ctl_type = "ngspctl";
+      proj.simulator = "Ngspice";
+      proj.ckt_editor = "Xschem";
     }
   }
 
- async function openCircuit(port, dir, file, showup) {
+  async function openCircuit(port, dir, file, showup) {
     if (file == undefined) {
       alert("Please choose the circuit to open");
       return;
@@ -138,7 +141,7 @@
   }
   let alter_src = $state();
   let alter = $state([{}]);
- 
+
   function add_alter() {}
 
   function check_alter() {
@@ -251,7 +254,7 @@
   >
     Click here to read-in</button
   >
-  <label use:tooltip={() => msg('show up schematic editor')}>
+  <label use:tooltip={() => msg("show up schematic editor")}>
     <input type="checkbox" bind:checked={showup} />
     show schematic
   </label>

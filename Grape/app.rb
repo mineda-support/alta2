@@ -117,7 +117,7 @@ module Test
           models_update = params[:models_update] ? eval(params[:models_update]) : {}
           ckt.simulate models_update: models_update, variations: variations, probes: probes.split(',')
           puts "probes=#{probes}"
-          if probes
+          if probes && probes.strip != ''
             vars, traces = ckt.get_traces *(probes.split(','))
             if probes.start_with? 'frequency'
               db_traces = traces.map{|trace| {name: trace[:name], x: trace[:x], y: trace[:y].map{|a| 20.0*Math.log10(a.abs)}}}
@@ -252,7 +252,7 @@ module Test
           models_update = params[:models_update] ? eval(params[:models_update]) : {}
           ckt.simulate models_update: models_update, variations: variations
           puts "probes=#{probes}"
-          if probes
+          if probes && probes.strip != ''
             vars, traces = ckt.get_traces *(probes.split(','))
             if probes.start_with? 'frequency'
               db_traces = traces.map{|trace| {name: trace[:name], x: trace[:x], y: trace[:y].map{|a| 20.0*Math.log10(a.abs)}}}
@@ -359,9 +359,11 @@ module Test
         work_dir, ckt_name = Utils::get_params(params)
         results = []
         Dir.chdir(work_dir){
-          puts "equation for measurement: #{params[:equation]}"
+          equation = params[:equation]
+          equation = "[#{equation}]" unless equation.start_with? '['
+          puts "equation for measurement: #{equation}"
           ckt = LTspiceControl.new(File.basename ckt_name)
-          puts "plotdata: '#{params[:plotdata].inspect}', size=#{params[:plotdata].size}"
+          # puts "plotdata: '#{params[:plotdata].inspect}', size=#{params[:plotdata].size}"
           if params[:plotdata] && params[:plotdata].size > 0
             params[:plotdata].each{|plotdata|
               # debugger
@@ -370,7 +372,7 @@ module Test
               x = Array_with_interpolation.new plotdata[:x]
               y = Array_with_interpolation.new plotdata[:y]
               begin
-                results << eval(params[:equation])
+                results << eval(equation)
               rescue
                 results << nil
               end
@@ -386,7 +388,7 @@ module Test
                 ph = Array_with_interpolation.new ph_data[:y]
                 # puts "db=#{db}"
                 begin
-                  results << eval(params[:equation])
+                  results << eval(equation)
                   #puts "results === #{results}"
                 rescue
                   results << nil
