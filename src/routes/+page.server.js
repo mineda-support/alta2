@@ -3,12 +3,14 @@ import { globSync } from 'node:fs'
 import path from 'path';
 import getPort from 'get-port';
 import { exec } from 'node:child_process';
+
 //const { exec } = require('child_process');
 
 export async function load({ url }) {
     // const probes = cookies.get('probes')
     const home = process.env.HOME.replaceAll('\\', '/');
-    let wdir = url.searchParams.get('wdir') || home;
+    let wdir = url.searchParams.get('wdir'); 
+    fs.existsSync(wdir) || (wdir = home);
     let ckt = url.searchParams.get('ckt');
     console.log(`wdir: ${wdir}`);
     console.log('home=', home);
