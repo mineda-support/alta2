@@ -22,7 +22,7 @@
 		for (const [ckt_name, elms] of Object.entries(elements)) {
 			for (const [elm, props] of Object.entries(elms)) {
 				//console.log([elm, props]);
-				if (props != undefined && (elm == "step" || elm == "dc")) {
+				if (props != undefined && props[0] == '.' && (elm == "step" || elm == "dc")) {
 					[sweep_name, src_values] = parse_step_command(
 						props.replace(
 							/^ *\.dc +\S+ \S+ \S+ \S+ +/,
