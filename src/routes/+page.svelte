@@ -222,7 +222,8 @@
 </script>
 
 <main>
-	<ConvertSchematic port={data.props.port} dir={proj.dir} />
+	<ConvertSchematic port={data.props.port} dir={proj.dir} 
+	    bind:editor={proj.schema_editor}/>
 	<OpenCircuit
 		{data}
 		bind:probes={settings.probes[current_plot]}
