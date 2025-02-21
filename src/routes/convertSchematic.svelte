@@ -1,6 +1,7 @@
 <script lang="ts">
    import { enhance, applyAction } from "$app/forms";
    import { goto } from "$app/navigation";
+    import { proj } from "./shared.svelte";
    let { port, dir, editor=$bindable() } = $props();
 
     // function convertSchematic(selected) {
@@ -11,6 +12,7 @@
         console.log `selected = ${selected}`
         switch(selected){
             case "Xschem":
+                proj.schema_editor = 'Xschem';
                 return `
                 create_cdraw()
                 dir = Dir.pwd
@@ -18,6 +20,7 @@
                 `;
                 break;
             case "LTspice":
+                proj.schema_editor = 'LTspice'; 
                 return `
                 dir = Dir.pwd
                 xschem2cdraw dir, File.join(dir, '${selected}')

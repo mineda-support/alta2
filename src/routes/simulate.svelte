@@ -1,10 +1,22 @@
 <script module>
-    export async function update_elements(port, dir, ckt, elements, probes) {
+    export async function update_elements(port, dir, ckt, elements, probes, schema_editor) {
         for (const [ckt_name, elms] of Object.entries(ckt.elements)) {
             if (ckt_name[0] == ".") {
                 continue;
             }
-            let target = ckt_name + ".asc";
+            let target;
+            switch(schema_editor){
+                case 'LTspice':
+                    target = ckt_name + ".asc";
+                    break;
+                case 'Xschem':
+                    target = ckt_name + ".sch";
+                    break;
+                case 'EEschema':
+                    target = ckt_name + ".sch";
+                    break;
+                }
+            console.log('target=', target)
             console.log(
                 "update elements=",
                 $state.snapshot(elements),
@@ -90,7 +102,7 @@
         }
         console.log(`openCircuit dir='${proj.dir}' file='${proj.file}'`);
         //dispatch("elm_update", { text: "Update elements" });
-        update_elements(port, proj.dir, ckt, proj.elements, probes);
+        update_elements(port, proj.dir, ckt, proj.elements, probes, proj.schema_editor);
         const my_sleep = (ms) =>
         new Promise((resolve) => setTimeout(resolve, ms));
         await my_sleep(500);

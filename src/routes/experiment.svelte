@@ -166,7 +166,7 @@
 
 	async function goLTspice2(ckt) {
 		console.log(`openCircuit dir='${proj.dir}' file='${proj.file}'`);
-		update_elements(port, proj.dir, ckt, proj.elements, probes);
+		update_elements(port, proj.dir, ckt, proj.elements, probes, proj.schema_editor);
 		console.log("equation=", equation);
 		let encoded_params = `dir=${encodeURIComponent(
 			proj.dir,
