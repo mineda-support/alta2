@@ -216,6 +216,9 @@
         }
         return false;
     }
+    function plot_measured_data_only() {
+        plotdata = [];
+    }
     async function plot_result_clicked() {
         if (proj.simulator == 'LTspice' && !check_probes_valid()) return;
         let result = await plot_result(
@@ -440,6 +443,7 @@
                 >check all</button
             >
             <button onclick={clear_measdata} class="button-1">clear all</button>
+            <button onclick={plot_measured_data_only} class="button-1">plot</button>
         </div>
     {/if}
     <button
@@ -448,12 +452,12 @@
         onclick={plot_result_clicked}
         class="button-1">Plot with probes:</button
     >
-    <input bind:value={probes} style="border:darkgray solid 1px;" />
+    <input bind:value={probes} style="border:darkgray solid 1px;width:30%" />
     <label
         use:tooltip={() =>
             msg("set probes list (separated by comma) for a current plot")}
         >step precision:
-        <input bind:value={step_precision} />
+        <input bind:value={step_precision} style="width:5%"/>
     </label>
 
     {#if probes == undefined || !probes.startsWith("frequency")}
