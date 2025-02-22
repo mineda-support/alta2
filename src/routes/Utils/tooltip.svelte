@@ -21,7 +21,7 @@
         'plot measurement group with simulation': '\n測定グループのシミュレーション結果をプロットする',
         'clear measurement group': '\n測定グループの設定を解除する',
         'show or hide measurement group files list': '\n測定グループのファイルリストの表示をオン・オフする',
-        'push probe in probes for a current plot': '\nプローブをcurrentのプロットのプローブリストに追加する',
+        'push signal in probes for a current plot': '\n信号をcurrentのプロットのプローブリストに追加する',
         'show or hide plot settings': '\nプロットの設定の表示をオン・オフする',
         'make this plot current to push probes': '\nこのプロットをプローブを追加するためにcurrentにする',
         'get a measurement data file': '\n測定データファイルを絶対パスで指定する',
