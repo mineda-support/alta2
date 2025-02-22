@@ -98,16 +98,7 @@
 	import ResultsPlot from "./Utils/results_plot.svelte";
 	import { tooltip, msg } from "./Utils/tooltip.svelte";
 	import { proj, ckt, settings } from "./shared.svelte.js";
-	function get_sweep_values(plotdata) {
-		let values = [];
-		let sweep, value;
-		console.log("plotdata in get_sweep_values=", plotdata);
-		plotdata.forEach((trace) => {
-			[sweep, value] = trace.name.split("=");
-			values.push(Number(value));
-		});
-		return values;
-	}
+	import { get_sweep_values } from "./plotResults.svelte";
 
 	function get_performance(rows, index) {
 		let values = [];
