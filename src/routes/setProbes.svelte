@@ -13,12 +13,12 @@
 </script>
 
 {#if ckt != undefined}
-    [Probes list (clicked probe will be put in probes for a current plot)]
+    [Signals list (clicked signal will be put in probes for a current plot)]
     <div class="sample">
         {#each ckt.info as node}
             <button
                 use:tooltip={() =>
-                    msg("push probe in probes for a current plot")}
+                    msg("push signal in probes for a current plot")}
                 onclick={() => push_button(node)}
                 class="button-item">{node}</button
             >
