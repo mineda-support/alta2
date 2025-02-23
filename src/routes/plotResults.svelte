@@ -1,5 +1,5 @@
 <script module>
-    function get_sweep_values(plotdata) {
+    export function get_sweep_values(plotdata) {
         let values = [];
         let sweep, value;
         console.log("plotdata in get_sweep_values=", $state.snapshot(plotdata));
@@ -220,7 +220,7 @@
         plotdata = [];
     }
     async function plot_result_clicked() {
-        if (proj.simulator == 'LTspice' && !check_probes_valid()) return;
+        if (proj.simulator == "LTspice" && !check_probes_valid()) return;
         let result = await plot_result(
             port,
             proj.dir,
@@ -259,7 +259,7 @@
         console.log('plotdata', plotdata);
     } */
 
-   	proj.results_data[0] = {};
+    proj.results_data[0] = {};
 
     async function calculate_equation() {
         proj.results_data = [];
@@ -358,9 +358,55 @@
             calculated_value = await result.calculated_value.slice(0);
         }
         console.log("calculated_value=", $state.snapshot(calculated_value));
-        return calculated_value; 
+        return calculated_value;
     }
     equation = "x.where(y, 2.5){|x, y| x > 1e-6}";
+
+    function data2csv(csv_text, csv_data) {
+        for (let j = 0; j < csv_data[0].length; j++) {
+            for (let i = 0; i < csv_data.length; i++) {
+                csv_text = csv_text + csv_data[i][j] + ", ";
+            }
+            csv_text = csv_text + "\n";
+        }
+        return csv_text;
+    }
+    async function save_csv() {
+        let saveFileOptions = {
+            suggestedName: "xxxxxx.csv",
+            types: [
+                {
+                    description: "CSV Files",
+                    accept: {
+                        "application/csv": [".csv"],
+                    },
+                },
+            ],
+        };
+        let csv_data;
+        let x_data = undefined;
+        let csv_text = "";
+        plotdata.forEach((trace) => {
+            if (JSON.stringify(trace.x) === x_data) {
+                console.log("x_data is same");
+            } else {
+                if (csv_data != undefined) {
+                    csv_text = data2csv(csv_text, csv_data);
+                }
+                csv_data = [trace.x];
+                csv_text = csv_text + probes.split(/, */)[0]
+                x_data = JSON.stringify(trace.x);
+            }
+            csv_data.push(trace.y);
+            csv_text = csv_text + ', ' + trace.name ;
+        });
+        csv_text = csv_text + "\n";
+        csv_text = data2csv(csv_text, csv_data);
+        const handle = await window.showSaveFilePicker(saveFileOptions);
+        const ws = await handle.createWritable();
+        await ws.write(csv_text);
+        await ws.close();
+    }
 </script>
 
 <button
@@ -373,6 +419,11 @@
         use:tooltip={() => msg("make this plot current to push probes")}
         onclick={() => (current_plot = plot_number)}
         class="button-2">Make current</button
+    >
+    <button
+        use:tooltip={() => msg("save this plot as a CSV file")}
+        onclick={() => save_csv()}
+        class="button-2">Save as a CSV file</button
     >
     <div>
         <button
@@ -404,10 +455,7 @@
         >
         <br />
         <label use:tooltip={() => msg("reverse traces in a graph")}
-            >Reverse<input
-                type="checkbox"
-                bind:checked={reverse}
-            /></label
+            >Reverse<input type="checkbox" bind:checked={reverse} /></label
         >
         <label use:tooltip={() => msg("invert X data")}
             >InvertX<input type="checkbox" bind:checked={invert_x} /></label
@@ -443,7 +491,9 @@
                 >check all</button
             >
             <button onclick={clear_measdata} class="button-1">clear all</button>
-            <button onclick={plot_measured_data_only} class="button-1">plot</button>
+            <button onclick={plot_measured_data_only} class="button-1"
+                >plot</button
+            >
         </div>
     {/if}
     <button
@@ -457,7 +507,7 @@
         use:tooltip={() =>
             msg("set probes list (separated by comma) for a current plot")}
         >step precision:
-        <input bind:value={step_precision} style="width:5%"/>
+        <input bind:value={step_precision} style="width:5%" />
     </label>
 
     {#if probes == undefined || !probes.startsWith("frequency")}
