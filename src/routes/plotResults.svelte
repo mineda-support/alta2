@@ -185,7 +185,7 @@
             tracemode,
         );
         measdata = measdata;
-        console.log("measdata =", measdata);
+        console.log("measdata =", $state.snapshot(measdata));
     }
     function check_probes_valid() {
         console.log("probes=", probes);
@@ -450,7 +450,7 @@
                 msg("select two data columns to display in a graph")}
             >Selection:<input
                 bind:value={selection}
-                style="border:darkgray solid 1px; width:5%"
+                style="border:darkgray solid 1px; width:10%"
             /></label
         >
         <br />
