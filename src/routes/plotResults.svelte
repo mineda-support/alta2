@@ -407,6 +407,47 @@
         await ws.write(csv_text);
         await ws.close();
     }
+    async function save_json() {
+		console.log("plotdata =", $state.snapshot(plotdata));
+		let saveFileOptions = {
+			suggestedName: "xxxxxx.json",
+			types: [
+				{
+					description: "JSON Files",
+					accept: {
+						"application/json": [".json"],
+					},
+				},
+			],
+		};
+		const blob = JSON.stringify([settings, plotdata]);
+		const handle = await window.showSaveFilePicker(saveFileOptions);
+		const ws = await handle.createWritable();
+		await ws.write(blob);
+		await ws.close();
+	}
+    async function load_json() {
+		const pickerOpts = {
+			types: [
+				{ description: "JSON(.json)", accept: { "json/*": [".json"] } },
+			],
+			multiple: false,
+		};
+		let fileHandle;
+		[fileHandle] = await window.showOpenFilePicker(pickerOpts);
+		const file = await fileHandle.getFile();
+		let filedata = await file.text();
+		let tempsettings;
+		console.log(filedata);
+		//console.log("before:", plot_data);
+		[tempsettings, plotdata] = JSON.parse(filedata);
+        settings.title = tempsettings.title;
+        settings.title_x = tempsettings.title_x
+        settings.title_y = tempsettings.title_y
+        settings.xaxis_is_log = tempsettings.xaxis_is_log
+        settings.yaxis_is_log = tempsettings.yaxis_is_log
+		//console.log("after:", plot_data);
+	}
 </script>
 
 <button
@@ -425,10 +466,16 @@
         onclick={() => save_csv()}
         class="button-2">Save as a CSV file</button
     >
+    <button
+    use:tooltip={() => msg("save this plot as a CSV file")}
+    onclick={() => save_json()}
+    class="button-2">Save as a JSON file</button
+    >
     <div>
         <button
             use:tooltip={() => msg("get a measurement data file")}
             onclick={() =>
+                measfile == 'json' ? load_json() :
                 get_measurement_results(
                     port,
                     proj.dir,
