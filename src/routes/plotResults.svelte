@@ -394,11 +394,11 @@
                     csv_text = data2csv(csv_text, csv_data);
                 }
                 csv_data = [trace.x];
-                csv_text = csv_text + probes.split(/, */)[0]
+                csv_text = csv_text + probes.split(/, */)[0];
                 x_data = JSON.stringify(trace.x);
             }
             csv_data.push(trace.y);
-            csv_text = csv_text + ', ' + trace.name ;
+            csv_text = csv_text + ", " + trace.name;
         });
         csv_text = csv_text + "\n";
         csv_text = data2csv(csv_text, csv_data);
@@ -408,53 +408,59 @@
         await ws.close();
     }
     async function save_json() {
-		console.log("plotdata =", $state.snapshot(plotdata));
-		let saveFileOptions = {
-			suggestedName: "xxxxxx.json",
-			types: [
-				{
-					description: "JSON Files",
-					accept: {
-						"application/json": [".json"],
-					},
-				},
-			],
-		};
-		const blob = JSON.stringify([settings, {plotdata: plotdata, 
-            measdata: measdata, db_data: db_data, ph_data: ph_data}
+        console.log("plotdata =", $state.snapshot(plotdata));
+        let saveFileOptions = {
+            suggestedName: "xxxxxx.json",
+            types: [
+                {
+                    description: "JSON Files",
+                    accept: {
+                        "application/json": [".json"],
+                    },
+                },
+            ],
+        };
+        const blob = JSON.stringify([
+            settings,
+            {
+                plotdata: plotdata,
+                measdata: measdata,
+                db_data: db_data,
+                ph_data: ph_data,
+            },
         ]);
-		const handle = await window.showSaveFilePicker(saveFileOptions);
-		const ws = await handle.createWritable();
-		await ws.write(blob);
-		await ws.close();
-	}
+        const handle = await window.showSaveFilePicker(saveFileOptions);
+        const ws = await handle.createWritable();
+        await ws.write(blob);
+        await ws.close();
+    }
     async function load_json() {
-		const pickerOpts = {
-			types: [
-				{ description: "JSON(.json)", accept: { "json/*": [".json"] } },
-			],
-			multiple: false,
-		};
-		let fileHandle;
-		[fileHandle] = await window.showOpenFilePicker(pickerOpts);
-		const file = await fileHandle.getFile();
-		let filedata = await file.text();
-		let tempsettings;
-		console.log(filedata);
-		//console.log("before:", plot_data);
+        const pickerOpts = {
+            types: [
+                { description: "JSON(.json)", accept: { "json/*": [".json"] } },
+            ],
+            multiple: false,
+        };
+        let fileHandle;
+        [fileHandle] = await window.showOpenFilePicker(pickerOpts);
+        const file = await fileHandle.getFile();
+        let filedata = await file.text();
+        let tempsettings;
+        console.log(filedata);
+        //console.log("before:", plot_data);
         let data;
-		[tempsettings, data] = JSON.parse(filedata);
+        [tempsettings, data] = JSON.parse(filedata);
         plotdata = data.plotdata;
         measdata = data.measdata;
         db_data = data.db_data;
         ph_data = data.ph_data;
         settings.title = tempsettings.title;
-        settings.title_x = tempsettings.title_x
-        settings.title_y = tempsettings.title_y
-        settings.xaxis_is_log = tempsettings.xaxis_is_log
-        settings.yaxis_is_log = tempsettings.yaxis_is_log
-		//console.log("after:", plot_data);
-	}
+        settings.title_x = tempsettings.title_x;
+        settings.title_y = tempsettings.title_y;
+        settings.xaxis_is_log = tempsettings.xaxis_is_log;
+        settings.yaxis_is_log = tempsettings.yaxis_is_log;
+        //console.log("after:", plot_data);
+    }
 </script>
 
 <button
@@ -474,25 +480,26 @@
         class="button-2">Save as a CSV file</button
     >
     <button
-    use:tooltip={() => msg("save this plot as a CSV file")}
-    onclick={() => save_json()}
-    class="button-2">Save as a JSON file</button
+        use:tooltip={() => msg("save this plot as a JSON file")}
+        onclick={() => save_json()}
+        class="button-2">Save as a JSON file</button
     >
     <div>
         <button
             use:tooltip={() => msg("get a measurement data file")}
             onclick={() =>
-                measfile == undefined || measfile == 'json' ? load_json() :
-                get_measurement_results(
-                    port,
-                    proj.dir,
-                    measfile.trim().replace(/^"/, "").replace(/"$/, ""),
-                    selection,
-                    reverse,
-                    invert_x,
-                    invert_y,
-                    tracemode,
-                )}
+                measfile == undefined || measfile == "json"
+                    ? load_json()
+                    : get_measurement_results(
+                          port,
+                          proj.dir,
+                          measfile.trim().replace(/^"/, "").replace(/"$/, ""),
+                          selection,
+                          reverse,
+                          invert_x,
+                          invert_y,
+                          tracemode,
+                      )}
             class="button-1">Get measured data:</button
         >
         <input
@@ -501,7 +508,7 @@
         />
         <label
             use:tooltip={() =>
-                msg("select two data columns to display in a graph")}
+                msg("select two or more data columns to display in a graph")}
             >Selection:<input
                 bind:value={selection}
                 style="border:darkgray solid 1px; width:10%"
@@ -541,11 +548,17 @@
                     />
                 </label>
             {/each}
-            <button onclick={checkall_measdata} class="button-1"
-                >check all</button
+            <button
+                use:tooltip={() => msg("check all curves")}
+                onclick={checkall_measdata}
+                class="button-1">check all</button
             >
-            <button onclick={clear_measdata} class="button-1">clear all</button>
-            <button onclick={plot_measured_data_only} class="button-1"
+            <button 
+            use:tooltip={() => msg("clear all curves")}
+            onclick={clear_measdata} class="button-1">clear all</button>
+            <button 
+            use:tooltip={() => msg("plot all curves")}
+            onclick={plot_measured_data_only} class="button-1"
                 >plot</button
             >
         </div>
