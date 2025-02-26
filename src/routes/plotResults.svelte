@@ -420,7 +420,9 @@
 				},
 			],
 		};
-		const blob = JSON.stringify([settings, plotdata]);
+		const blob = JSON.stringify([settings, {plotdata: plotdata, 
+            measdata: measdata, db_data: db_data, ph_data: ph_data}
+        ]);
 		const handle = await window.showSaveFilePicker(saveFileOptions);
 		const ws = await handle.createWritable();
 		await ws.write(blob);
@@ -440,7 +442,12 @@
 		let tempsettings;
 		console.log(filedata);
 		//console.log("before:", plot_data);
-		[tempsettings, plotdata] = JSON.parse(filedata);
+        let data;
+		[tempsettings, data] = JSON.parse(filedata);
+        plotdata = data.plotdata;
+        measdata = data.measdata;
+        db_data = data.db_data;
+        ph_data = data.ph_data;
         settings.title = tempsettings.title;
         settings.title_x = tempsettings.title_x
         settings.title_y = tempsettings.title_y
@@ -475,7 +482,7 @@
         <button
             use:tooltip={() => msg("get a measurement data file")}
             onclick={() =>
-                measfile == 'json' ? load_json() :
+                measfile == undefined || measfile == 'json' ? load_json() :
                 get_measurement_results(
                     port,
                     proj.dir,
