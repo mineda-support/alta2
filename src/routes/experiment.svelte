@@ -22,7 +22,7 @@
 		for (const [ckt_name, elms] of Object.entries(elements)) {
 			for (const [elm, props] of Object.entries(elms)) {
 				//console.log([elm, props]);
-				if (props != undefined && (elm == "step" || elm == "dc")) {
+				if (props != undefined && props[0] == '.' && (elm == "step" || elm == "dc")) {
 					[sweep_name, src_values] = parse_step_command(
 						props.replace(
 							/^ *\.dc +\S+ \S+ \S+ \S+ +/,
@@ -98,16 +98,7 @@
 	import ResultsPlot from "./Utils/results_plot.svelte";
 	import { tooltip, msg } from "./Utils/tooltip.svelte";
 	import { proj, ckt, settings } from "./shared.svelte.js";
-	function get_sweep_values(plotdata) {
-		let values = [];
-		let sweep, value;
-		console.log("plotdata in get_sweep_values=", plotdata);
-		plotdata.forEach((trace) => {
-			[sweep, value] = trace.name.split("=");
-			values.push(Number(value));
-		});
-		return values;
-	}
+	import { get_sweep_values } from "./plotResults.svelte";
 
 	function get_performance(rows, index) {
 		let values = [];
@@ -166,7 +157,7 @@
 
 	async function goLTspice2(ckt) {
 		console.log(`openCircuit dir='${proj.dir}' file='${proj.file}'`);
-		update_elements(port, proj.dir, ckt, proj.elements, probes);
+		update_elements(port, proj.dir, ckt, proj.elements, probes, proj.schema_editor);
 		console.log("equation=", equation);
 		let encoded_params = `dir=${encodeURIComponent(
 			proj.dir,

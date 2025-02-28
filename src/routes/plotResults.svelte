@@ -1,5 +1,5 @@
 <script module>
-    function get_sweep_values(plotdata) {
+    export function get_sweep_values(plotdata) {
         let values = [];
         let sweep, value;
         console.log("plotdata in get_sweep_values=", $state.snapshot(plotdata));
@@ -185,7 +185,7 @@
             tracemode,
         );
         measdata = measdata;
-        console.log("measdata =", measdata);
+        console.log("measdata =", $state.snapshot(measdata));
     }
     function check_probes_valid() {
         console.log("probes=", probes);
@@ -216,8 +216,11 @@
         }
         return false;
     }
+    function plot_measured_data_only() {
+        plotdata = [];
+    }
     async function plot_result_clicked() {
-        if (proj.simulator == 'LTspice' && !check_probes_valid()) return;
+        if (proj.simulator == "LTspice" && !check_probes_valid()) return;
         let result = await plot_result(
             port,
             proj.dir,
@@ -256,7 +259,7 @@
         console.log('plotdata', plotdata);
     } */
 
-   	proj.results_data[0] = {};
+    proj.results_data[0] = {};
 
     async function calculate_equation() {
         proj.results_data = [];
@@ -355,9 +358,109 @@
             calculated_value = await result.calculated_value.slice(0);
         }
         console.log("calculated_value=", $state.snapshot(calculated_value));
-        return calculated_value; 
+        return calculated_value;
     }
     equation = "x.where(y, 2.5){|x, y| x > 1e-6}";
+
+    function data2csv(csv_text, csv_data) {
+        for (let j = 0; j < csv_data[0].length; j++) {
+            for (let i = 0; i < csv_data.length; i++) {
+                csv_text = csv_text + csv_data[i][j] + ", ";
+            }
+            csv_text = csv_text + "\n";
+        }
+        return csv_text;
+    }
+    async function save_csv() {
+        let saveFileOptions = {
+            suggestedName: "xxxxxx.csv",
+            types: [
+                {
+                    description: "CSV Files",
+                    accept: {
+                        "application/csv": [".csv"],
+                    },
+                },
+            ],
+        };
+        let csv_data;
+        let x_data = undefined;
+        let csv_text = "";
+        plotdata.forEach((trace) => {
+            if (JSON.stringify(trace.x) === x_data) {
+                console.log("x_data is same");
+            } else {
+                if (csv_data != undefined) {
+                    csv_text = data2csv(csv_text, csv_data);
+                }
+                csv_data = [trace.x];
+                csv_text = csv_text + probes.split(/, */)[0];
+                x_data = JSON.stringify(trace.x);
+            }
+            csv_data.push(trace.y);
+            csv_text = csv_text + ", " + trace.name;
+        });
+        csv_text = csv_text + "\n";
+        csv_text = data2csv(csv_text, csv_data);
+        const handle = await window.showSaveFilePicker(saveFileOptions);
+        const ws = await handle.createWritable();
+        await ws.write(csv_text);
+        await ws.close();
+    }
+    async function save_json() {
+        console.log("plotdata =", $state.snapshot(plotdata));
+        let saveFileOptions = {
+            suggestedName: "xxxxxx.json",
+            types: [
+                {
+                    description: "JSON Files",
+                    accept: {
+                        "application/json": [".json"],
+                    },
+                },
+            ],
+        };
+        const blob = JSON.stringify([
+            settings,
+            {
+                plotdata: plotdata,
+                measdata: measdata,
+                db_data: db_data,
+                ph_data: ph_data,
+            },
+        ]);
+        const handle = await window.showSaveFilePicker(saveFileOptions);
+        const ws = await handle.createWritable();
+        await ws.write(blob);
+        await ws.close();
+    }
+    async function load_json() {
+        const pickerOpts = {
+            types: [
+                { description: "JSON(.json)", accept: { "json/*": [".json"] } },
+            ],
+            multiple: false,
+        };
+        let fileHandle;
+        [fileHandle] = await window.showOpenFilePicker(pickerOpts);
+        const file = await fileHandle.getFile();
+        let filedata = await file.text();
+        let tempsettings;
+        console.log(filedata);
+        //console.log("before:", plot_data);
+        let data;
+        [tempsettings, data] = JSON.parse(filedata);
+        plotdata = data.plotdata;
+        measdata = data.measdata;
+        db_data = data.db_data;
+        ph_data = data.ph_data;
+        settings.title = tempsettings.title;
+        settings.title_x = tempsettings.title_x;
+        settings.title_y = tempsettings.title_y;
+        settings.xaxis_is_log = tempsettings.xaxis_is_log;
+        settings.yaxis_is_log = tempsettings.yaxis_is_log;
+        //console.log("after:", plot_data);
+    }
 </script>
 
 <button
@@ -371,20 +474,32 @@
         onclick={() => (current_plot = plot_number)}
         class="button-2">Make current</button
     >
+    <button
+        use:tooltip={() => msg("save this plot as a CSV file")}
+        onclick={() => save_csv()}
+        class="button-2">Save as a CSV file</button
+    >
+    <button
+        use:tooltip={() => msg("save this plot as a JSON file")}
+        onclick={() => save_json()}
+        class="button-2">Save as a JSON file</button
+    >
     <div>
         <button
             use:tooltip={() => msg("get a measurement data file")}
             onclick={() =>
-                get_measurement_results(
-                    port,
-                    proj.dir,
-                    measfile.trim().replace(/^"/, "").replace(/"$/, ""),
-                    selection,
-                    reverse,
-                    invert_x,
-                    invert_y,
-                    tracemode,
-                )}
+                measfile == undefined || measfile == "json"
+                    ? load_json()
+                    : get_measurement_results(
+                          port,
+                          proj.dir,
+                          measfile.trim().replace(/^"/, "").replace(/"$/, ""),
+                          selection,
+                          reverse,
+                          invert_x,
+                          invert_y,
+                          tracemode,
+                      )}
             class="button-1">Get measured data:</button
         >
         <input
@@ -393,18 +508,15 @@
         />
         <label
             use:tooltip={() =>
-                msg("select two data columns to display in a graph")}
+                msg("select two or more data columns to display in a graph")}
             >Selection:<input
                 bind:value={selection}
-                style="border:darkgray solid 1px; width:5%"
+                style="border:darkgray solid 1px; width:10%"
             /></label
         >
         <br />
         <label use:tooltip={() => msg("reverse traces in a graph")}
-            >Reverse<input
-                type="checkbox"
-                bind:checked={reverse}
-            /></label
+            >Reverse<input type="checkbox" bind:checked={reverse} /></label
         >
         <label use:tooltip={() => msg("invert X data")}
             >InvertX<input type="checkbox" bind:checked={invert_x} /></label
@@ -436,10 +548,19 @@
                     />
                 </label>
             {/each}
-            <button onclick={checkall_measdata} class="button-1"
-                >check all</button
+            <button
+                use:tooltip={() => msg("check all curves")}
+                onclick={checkall_measdata}
+                class="button-1">check all</button
             >
-            <button onclick={clear_measdata} class="button-1">clear all</button>
+            <button 
+            use:tooltip={() => msg("clear all curves")}
+            onclick={clear_measdata} class="button-1">clear all</button>
+            <button 
+            use:tooltip={() => msg("plot all curves")}
+            onclick={plot_measured_data_only} class="button-1"
+                >plot</button
+            >
         </div>
     {/if}
     <button
@@ -448,12 +569,12 @@
         onclick={plot_result_clicked}
         class="button-1">Plot with probes:</button
     >
-    <input bind:value={probes} style="border:darkgray solid 1px;" />
+    <input bind:value={probes} style="border:darkgray solid 1px;width:30%" />
     <label
         use:tooltip={() =>
             msg("set probes list (separated by comma) for a current plot")}
         >step precision:
-        <input bind:value={step_precision} />
+        <input bind:value={step_precision} style="width:5%" />
     </label>
 
     {#if probes == undefined || !probes.startsWith("frequency")}

@@ -201,7 +201,7 @@
                     use:tooltip={() =>
                         msg("set precision for source parameter numbers")}
                     >precision:
-                    <input bind:value={src_precision} />
+                    <input bind:value={src_precision} style="width:5%"/>
                 </label>
             </div>
         </div>
