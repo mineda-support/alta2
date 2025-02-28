@@ -34,7 +34,7 @@
         'select trace mode from, markers, lines, markers+lines': '\nトレースの表示を、マーカーだけ、線だけ、マーカーと線から選ぶ',
         'check all curves': '\nグラフのすべてのカーブを表示するようにチェックを入れる',
         'clear all curves': '\nグラフのすべてのカーブを削除する',
-        'plot all curves': '\nグラフのすべてのカーブをプロットする'
+        'plot all curves': '\nグラフのすべてのカーブをプロットする',
         'set probes list (separated by comma) for a current plot': '\nこのプロットに表示するトレースをプローブのリストで指定する',
         'precision for number display for a step analysis': '\nステップ解析で表示する数字の桁数',
         'X axis is log scale if checked': '\nチェックすれば、X軸がlog表示になる',
