@@ -386,6 +386,9 @@
         let csv_data;
         let x_data = undefined;
         let csv_text = "";
+        if (plotdata == undefined) {
+            alert("Plotdata is not available until 'Plot with probes' performed");
+        } 
         plotdata.forEach((trace) => {
             if (JSON.stringify(trace.x) === x_data) {
                 console.log("x_data is same");
@@ -409,6 +412,9 @@
     }
     async function save_json() {
         console.log("plotdata =", $state.snapshot(plotdata));
+        if (plotdata == undefined && measdata.length == 0) {
+            alert("Plotdata is not available until 'Plot with probes' performed");
+        } 
         let saveFileOptions = {
             suggestedName: "xxxxxx.json",
             types: [
