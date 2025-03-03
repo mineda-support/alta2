@@ -12,7 +12,6 @@
         console.log `selected = ${selected}`
         switch(selected){
             case "Xschem":
-                proj.schema_editor = 'Xschem';
                 return `
                 create_cdraw()
                 dir = Dir.pwd
@@ -20,7 +19,6 @@
                 `;
                 break;
             case "LTspice":
-                proj.schema_editor = 'LTspice'; 
                 return `
                 dir = Dir.pwd
                 xschem2cdraw dir, File.join(dir, '${selected}')
@@ -40,6 +38,7 @@
     method="POST"
     use:enhance={({ formElement, formData, action, cancel }) => {
         return async ({ result }) => {
+            proj.schema_editor = selected;
             console.log("result=", result);
             // `result` is an `ActionResult` object --- this is not true
             /* if (result.type === "redirect") {
