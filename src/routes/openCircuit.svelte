@@ -223,7 +223,7 @@
   Work directory:
   {#if data != undefined && data.props != undefined && data.props.wdir != undefined}
     <input
-      bind:value={data.props.wdir}
+      value={data.props.wdir}
       style="border:darkgray solid 1px;width: 50%;"
     />
   {/if}
