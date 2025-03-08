@@ -184,7 +184,6 @@
             invert_y,
             tracemode,
         );
-        measdata = measdata;
         console.log("measdata =", $state.snapshot(measdata));
     }
     function check_probes_valid() {
@@ -456,8 +455,16 @@
         //console.log("before:", plot_data);
         let data;
         [tempsettings, data] = JSON.parse(filedata);
-        plotdata = data.plotdata;
-        measdata = data.measdata;
+        if (data.plotdata != undefined) {
+            plotdata = data.plotdata;
+        }
+        if (data.measdata != undefined) {
+            measdata = data.measdata;
+            for (const trace of measdata) {
+                trace.checked = true;
+                trace.mode = tracemode;
+            }
+        }
         db_data = data.db_data;
         ph_data = data.ph_data;
         settings.title = tempsettings.title;
