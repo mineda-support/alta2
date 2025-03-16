@@ -61,6 +61,18 @@
         [fileHandle] = await window.showOpenFilePicker(pickerOpts);
         const file = await fileHandle.getFile();
         let edifdata = await file.text();
+        console.log('File name:', file.name, 'size=', edifdata.length);
+        const props = {};
+        props.wdir = dir;
+        props.edifdata = edifdata;
+        props.file_name = file.name;
+        const response = await fetch("", {
+            method: "POST",
+            body: JSON.stringify(props),
+            headers: {
+            "Content-Type": "application/json",
+            },
+        });
     }
 </script>
 
@@ -108,14 +120,13 @@
         <option value="Qucs">Qucs</option>
         <option value="Edif">Edif</option>
     </select>
-    {#if proj.schema_editor == 'LTspice'}
-    <button
-        use:tooltip={() => msg("Convert from Edif file")}
-        onclick={() => convert_edif()}
-        class="button-2">Convert from Edif file</button
-    >
-    {/if}
 </form>
-
+{#if proj.schema_editor == 'LTspice'}
+<button
+    use:tooltip={() => msg("Convert from Edif file")}
+    onclick={() => convert_edif()}
+    class="button-2">Convert from Edif file</button
+>
+{/if}
 <style>
 </style>
