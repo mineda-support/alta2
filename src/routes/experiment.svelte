@@ -22,7 +22,7 @@
 		for (const [ckt_name, elms] of Object.entries(elements)) {
 			for (const [elm, props] of Object.entries(elms)) {
 				//console.log([elm, props]);
-				if (props != undefined && props[0] == '.' && (elm == "step" || elm == "dc")) {
+				if (props != undefined && props[0] == '.' && (elm == "step" || (elms['step'] == undefined && elm == "dc"))) {
 					[sweep_name, src_values] = parse_step_command(
 						props.replace(
 							/^ *\.dc +\S+ \S+ \S+ \S+ +/,
@@ -71,14 +71,19 @@
 	}
 
 	function parse_step_command(props, precision) {
-		// like '.step param ccap 0.2p 2p 0.5p'
-		const items = props.split(/ +/);
+		// like '.step param ccap 0.2p 2p 0.5p' || '.step param l list 0.6u,0.8u,1.0u,1.4u, 2.0u'
+		const items = props.split((/ +|, */));
 		const name = items[2];
+		let src_values = [];
+		if(items[3] == 'list'){
+		  src_values = items.slice(4).map((v) => `${name}=${v}`)
+		  console.log("src_values in parse_step_command=", src_values);
+		  return [name, src_values];
+	    }
 		const start = eng2f(items[3]);
 		const stop = eng2f(items[4]);
 		const step = eng2f(items[5]);
 		//console.log("step=", [name, start, stop, step]);
-		let src_values = [];
 		for (let v = start; v < stop; v = v + step) {
 			console.log("precision=", precision);
 			src_values.push(`${name}=${v.toPrecision(precision)}`);
