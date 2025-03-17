@@ -45,11 +45,20 @@
       proj.ckt_editor = "Xschem";
     }
   }
+  function execute_convert_edif(chosen){
+
+  }
 
   async function openCircuit(port, dir, file, showup) {
     if (file == undefined) {
       alert("Please choose the circuit to open");
       return;
+    }
+    if (chosen.extname == ".edif") {
+      if (!alert(`Convert ${chosen.basename} to LTspice schematic`)) {
+        execute_convert_edif(chosen);
+        return;
+      }
     }
     proj.file = file;
     set_ctl_type(file);
@@ -121,6 +130,7 @@
     current_plot = $bindable(),
   } = $props();
   import { proj, ckt } from "./shared.svelte";
+  import { files } from "$service-worker";
   //import { files } from "$service-worker";
   //import { esbuildVersion } from "vite";
 
@@ -217,6 +227,7 @@
     proj.dir = data.props.wdir;
     console.log("*** dir=", proj.dir);
   }
+  let show_symbol_files = $state(false);
 </script>
 
 <p>
@@ -235,16 +246,32 @@
     class="button-1">Switch Wdir</button
   >
 </p>
-<div class="sample">
-  {#if data.props != undefined}
+{#if data.props != undefined}
+  <div class="sample">
     {#each data.props.files as file}
       <label class="box-item">
         <input type="radio" name="chosen" value={file} bind:group={chosen} />
         {file}<br />
       </label>
     {/each}
+  </div>
+  {#if data.props.symbol_files.length > 0}
+    <button
+      use:tooltip={() => msg("show or hide symbol files")}
+      onclick={() => (show_symbol_files = !show_symbol_files)}
+      >show/hide symbols</button
+    >
   {/if}
-</div>
+  {#if show_symbol_files}
+    <div class="sample">
+      {#each data.props.symbol_files as file}
+        <label class="box-item">
+          {file}<br />
+        </label>
+      {/each}
+    </div>
+  {/if}
+{/if}
 <div>
   <button
     onclick={() =>

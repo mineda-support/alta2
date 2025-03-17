@@ -24,7 +24,8 @@ export async function load({ url }) {
             });
         });
 
-        const files = globSync(wdir + '*.asc').concat(globSync(wdir + '*.sch'));
+        const files = globSync(wdir + '*.asc').concat(globSync(wdir + '*.sch')).concat(globSync(wdir + '*.edif'));
+        const symbol_files = globSync(wdir + '*.asy').concat(globSync(wdir + '*.sym'))
         files.forEach(file => {
             // console.log(file);
         });
@@ -34,6 +35,7 @@ export async function load({ url }) {
             props: {
                 home: home, port: await startGrape(), origin: url.origin,
                 wdir: wdir, ckt: ckt, files: files.map(a => path.basename(a)), //, probes: probes
+                symbol_files: symbol_files.map(a => path.basename(a)),
                 setting_names: setting_files.map(a => path.basename(a).replace('_settings.json', ''))
             }
         };
