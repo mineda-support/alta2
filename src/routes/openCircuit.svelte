@@ -130,8 +130,7 @@
     current_plot = $bindable(),
   } = $props();
   import { proj, ckt } from "./shared.svelte";
-  import { files } from "$service-worker";
-  //import { files } from "$service-worker";
+  //import { files } from "$service-worker"; ### this caused app.js:16 ReferenceError: ServiceWorkerGlobalScope is not defined
   //import { esbuildVersion } from "vite";
 
   let chosen = $state(data.props.ckt);
@@ -246,15 +245,15 @@
     class="button-1">Switch Wdir</button
   >
 </p>
-{#if data.props != undefined}
-  <div class="sample">
+{#if data.props != undefined} 
+  <div class="sample"> 
     {#each data.props.files as file}
       <label class="box-item">
         <input type="radio" name="chosen" value={file} bind:group={chosen} />
         {file}<br />
       </label>
     {/each}
-  </div>
+  </div> 
   {#if data.props.symbol_files.length > 0}
     <button
       use:tooltip={() => msg("show or hide symbol files")}
