@@ -240,6 +240,19 @@ module Test
           {"elements" => ckt.elements, "info" => ckt.info, "models" => ckt.models}
         }
       end
+
+      desc 'Convert EDIF to LTspice'
+      get :convert_edif do
+        require 'edif2cdraw'
+        work_dir, edif_file = Utils::get_params(params)
+        Dir.chdir(work_dir){
+          desc = SXP.read(File.read(edif_file).encode('UTF-8'))
+          $resistor_with_bulk = true
+          e = Edif_out.new desc
+          e.edif2cdraw
+        }
+      end
+
       desc 'Simulate'
       get :simulate do
         work_dir, ckt_name = Utils::get_params(params)

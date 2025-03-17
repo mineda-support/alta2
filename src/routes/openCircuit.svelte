@@ -45,8 +45,17 @@
       proj.ckt_editor = "Xschem";
     }
   }
-  function execute_convert_edif(chosen){
-
+  async function convert_edif(port, dir, chosen){
+    console.log(`convert_edif port=${port} dir='${dir}' chosen='${chosen}'`);
+    let encoded_params = `dir=${encodeURIComponent(
+        dir,
+      )}&file=${encodeURIComponent(chosen)}`
+    let response = await fetch(
+      `http://localhost:${port}/api/ltspctl/convert_edif?${encoded_params}`,
+      {},
+    );
+    let res2 = await response.json();
+    console.log(res2);
   }
 
   async function openCircuit(port, dir, file, showup) {
@@ -54,9 +63,9 @@
       alert("Please choose the circuit to open");
       return;
     }
-    if (chosen.extname == ".edif") {
-      if (!alert(`Convert ${chosen.basename} to LTspice schematic`)) {
-        execute_convert_edif(chosen);
+    if (file.match(/\.edif/)) {
+      if (!alert(`Convert ${file} to LTspice schematic`)) {
+        convert_edif(port, dir, file);
         return;
       }
     }
