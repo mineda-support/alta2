@@ -475,7 +475,9 @@
         settings.yaxis_is_log = tempsettings.yaxis_is_log;
         //console.log("after:", plot_data);
     }
-    let filename = $derived(measfile.replace(/.*[\/\\]/, '').replace(/"/, ''));
+    let filename = $derived.by(() => {
+        measfile == undefined ? '' : measfile.replace(/.*[\/\\]/, '').replace(/"/, '');
+    });
 </script>
 
 <button
