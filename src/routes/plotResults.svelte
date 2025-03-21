@@ -97,7 +97,7 @@
         console.log(res2);
         console.log("probes=", probes);
         if (probes != undefined && probes.trim().length > 0) {
-            [plotdata, db_data, ph_data, sweep_name, probes] = set_trace_names(
+            [plotdata, db_data, ph_data, sweep_name, ] = set_trace_names( // ignore weird probes change
                 res2,
                 probes,
                 proj.elements,
@@ -449,6 +449,7 @@
         let fileHandle;
         [fileHandle] = await window.showOpenFilePicker(pickerOpts);
         const file = await fileHandle.getFile();
+        filename = file.name;
         let filedata = await file.text();
         let tempsettings;
         console.log(filedata);
@@ -474,13 +475,14 @@
         settings.yaxis_is_log = tempsettings.yaxis_is_log;
         //console.log("after:", plot_data);
     }
+    let filename = $derived(measfile.replace(/.*[\/\\]/, '').replace(/"/, ''));
 </script>
 
 <button
     use:tooltip={() => msg("show or hide plot settings")}
     onclick={() => (plot_showhide = !plot_showhide)}
     class="button-2">Show/hide</button
->plot#{plot_number}
+>plot#{plot_number} {#if filename} {filename} {/if}
 {#if plot_showhide}
     <button
         use:tooltip={() => msg("make this plot current to push probes")}
@@ -500,10 +502,7 @@
     <div>
         <button
             use:tooltip={() => msg("get a measurement data file")}
-            onclick={() =>
-                measfile == undefined || measfile == "json"
-                    ? load_json()
-                    : get_measurement_results(
+            onclick={() => get_measurement_results(
                           port,
                           proj.dir,
                           measfile.trim().replace(/^"/, "").replace(/"$/, ""),
@@ -524,8 +523,13 @@
                 msg("select two or more data columns to display in a graph")}
             >Selection:<input
                 bind:value={selection}
-                style="border:darkgray solid 1px; width:10%"
+                style="border:darkgray solid 1px; width:5%"
             /></label
+        >
+        <button
+            use:tooltip={() => msg("get data from JSON file and plot")}
+            onclick={load_json}
+            class="button-1">Plot JSON data</button
         >
         <br />
         <label use:tooltip={() => msg("reverse traces in a graph")}
