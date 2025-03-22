@@ -1,3 +1,19 @@
+<script module>
+  import { switch_wdir } from "./openCircuit.svelte";
+  export async function edif2ltspice(port, dir, chosen){
+    console.log(`convert_edif port=${port} dir='${dir}' chosen='${chosen}'`);
+    let encoded_params = `dir=${encodeURIComponent(
+        dir,
+      )}&file=${encodeURIComponent(chosen)}`
+    let response = await fetch(
+      `http://localhost:${port}/api/ltspctl/convert_edif?${encoded_params}`,
+      {},
+    );
+    let res2 = await response.json();
+    console.log(res2);
+    switch_wdir(dir);
+  }
+</script>
 <script lang="ts">
     import { enhance, applyAction } from "$app/forms";
     import { goto } from "$app/navigation";
@@ -13,24 +29,6 @@
         console.log`selected = ${selected}`;
                 switch (selected) {
                     case "Xschem":
-                        return `
-                create_cdraw()
-                dir = Dir.pwd
-                cdraw2target 'xschem', File.join(dir,'cdraw'), File.join(dir, '${selected}')
-                `;
-                        break;
-                    case "LTspice":
-                        return `
-                dir = Dir.pwd
-                xschem2cdraw dir, File.join(dir, '${selected}')
-                `;
-                        break;
-        }
-    });
-    let from_program = $derived.by(() => {
-        console.log`selected = ${selected}`;
-                switch (selected) {
-                    case "Edif":
                         return `
                 create_cdraw()
                 dir = Dir.pwd
@@ -73,6 +71,7 @@
             "Content-Type": "application/json",
             },
         });
+        edif2ltspice(port, dir, file.name);
     }
 </script>
 

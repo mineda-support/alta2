@@ -250,6 +250,9 @@ module Test
           $resistor_with_bulk = true
           e = Edif_out.new desc
           e.edif2cdraw
+          [Dir.glob('pictures/**/*.asc') + Dir.glob('pictures/**/*.asy')].each{|file|
+            FileUtils.cp file, '.'
+          }
         }
       end
 

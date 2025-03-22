@@ -26,9 +26,20 @@
       return info;
     }
   }
+
+  export function switch_wdir(wdir) {
+    /* if (wdir == undefined) {
+      const handle = await window.showDirectoryPicker();
+      wdir = handle.name; //USELESS because does not return PATH
+    } */
+    console.log("wdir=", wdir);
+    //goto("?wdir=" + wdir.replace(/^"/, "").replace(/"$/, ""));
+    window.location = "?wdir=" + wdir.replace(/^"/, "").replace(/"$/, "");
+  }
 </script>
 
 <script lang="ts">
+  import { edif2ltspice } from "./convertSchematic.svelte";
   import { tooltip, msg } from "./Utils/tooltip.svelte";
   import InputWideValue from "./Utils/input_wide_value.svelte";
 
@@ -45,19 +56,6 @@
       proj.ckt_editor = "Xschem";
     }
   }
-  async function convert_edif(port, dir, chosen){
-    console.log(`convert_edif port=${port} dir='${dir}' chosen='${chosen}'`);
-    let encoded_params = `dir=${encodeURIComponent(
-        dir,
-      )}&file=${encodeURIComponent(chosen)}`
-    let response = await fetch(
-      `http://localhost:${port}/api/ltspctl/convert_edif?${encoded_params}`,
-      {},
-    );
-    let res2 = await response.json();
-    console.log(res2);
-  }
-
   async function openCircuit(port, dir, file, showup) {
     if (file == undefined) {
       alert("Please choose the circuit to open");
@@ -65,7 +63,7 @@
     }
     if (file.match(/\.edif/)) {
       if (!alert(`Convert ${file} to LTspice schematic`)) {
-        convert_edif(port, dir, file);
+        edif2ltspice(port, dir, file);
         return;
       }
     }
@@ -148,15 +146,6 @@
     openCircuit(data.props.port, data.props.wdir, chosen, showup);
   }
 
-  async function switch_wdir(wdir) {
-    /* if (wdir == undefined) {
-      const handle = await window.showDirectoryPicker();
-      wdir = handle.name; //USELESS because does not return PATH
-    } */
-    console.log("wdir=", wdir);
-    //goto("?wdir=" + wdir.replace(/^"/, "").replace(/"$/, ""));
-    window.location = "?wdir=" + wdir.replace(/^"/, "").replace(/"$/, "");
-  }
   let alter_src = $state();
   let alter = $state([{}]);
 
