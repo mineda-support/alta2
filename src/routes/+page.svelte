@@ -219,30 +219,62 @@
 	let nvar = $state(0);
 	let show_meas_group = $state(true);
 	console.log("settings=", $state.snapshot(settings));
+	let show_flow = $state(false);
+	let show_circuit = $state(true);
+
+	function bsim3_step1() {
+		alert("bsim3 step1");
+	}
 </script>
 
 <main>
-	<ConvertSchematic port={data.props.port} dir={proj.dir} 
-	    bind:editor={proj.schema_editor}/>
-	<OpenCircuit
-		{data}
-		bind:probes={settings.probes[current_plot]}
-		bind:variations
-		bind:nvar
-		bind:current_plot
-	/>
-	<!--	plot_on:open_end={plot_results} -->
-	<Settings {data} {ckt} bind:variations />
-	<div>
-		<Simulate
+	<button
+		use:tooltip={() => msg("show or hide flow control")}
+		onclick={() => {
+			if (show_flow){
+				show_flow = false;
+				show_circuit = true;
+			} else {
+				show_flow = true;
+				show_circuit = false;
+			}
+			
+		}} class="button-3">show/hide flow control</button
+	>
+	{#if show_flow}
+		<div>BSIM3 model parameter fitting</div>
+		<div><button onclick={() => bsim3_step1()}> BSIM3 Step1 </button></div>
+	{/if}
+	<button
+		use:tooltip={() => msg("show or hide circuit")}
+		onclick={() => (show_circuit = !show_circuit)}>show/hide circuit</button
+	>
+	{#if show_circuit}
+		<ConvertSchematic
 			port={data.props.port}
+			dir={proj.dir}
+			bind:editor={proj.schema_editor}
+		/>
+		<OpenCircuit
+			{data}
 			bind:probes={settings.probes[current_plot]}
 			bind:variations
-			on_sim_end={plot_measurement_group}
-			on_sim_start={clear_all_plots}
+			bind:nvar
+			bind:current_plot
 		/>
-		<!-- Testplot / -->
-	</div>
+		<!--	plot_on:open_end={plot_results} -->
+		<Settings {data} {ckt} bind:variations />
+		<div>
+			<Simulate
+				port={data.props.port}
+				bind:probes={settings.probes[current_plot]}
+				bind:variations
+				on_sim_end={plot_measurement_group}
+				on_sim_start={clear_all_plots}
+			/>
+			<!-- Testplot / -->
+		</div>
+	{/if}
 	<hr />
 	<div>
 		<button
@@ -283,7 +315,12 @@
 		{/if}
 	</div>
 	<!-- settings.plot_showhide = {settings.plot_showhide.length} -->
-	<SetProbes bind:probes={settings.probes[current_plot]} bind:current_plot />
+	{#if show_circuit}
+		<SetProbes
+			bind:probes={settings.probes[current_plot]}
+			bind:current_plot
+		/>
+	{/if}
 	{#each settings.plot_showhide as _, i}
 		<PlotResults
 			port={data.props.port}

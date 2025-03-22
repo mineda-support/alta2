@@ -17,6 +17,12 @@ label {
     border: 2px solid #ddd;
 }
 
+.button-3 {
+    background: lightgreen;
+    text-align: left;
+    border: 2px solid #ddd;
+}
+
 .td-button {
     padding: 0px 5px;
     background-color: #6fd89b;
