@@ -65,6 +65,11 @@ module Test
         load File.join(dir, file)
         {}
       end
+      desc 'Get models file'
+      get :get_models do
+        cm = CompactModel.new params[:file]
+        {'models' => cm.models}
+      end
       desc 'Get measured data'
       get :measured_data do
         measfile = params[:file]
