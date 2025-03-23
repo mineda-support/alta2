@@ -42,6 +42,7 @@
   import { edif2ltspice } from "./convertSchematic.svelte";
   import { tooltip, msg } from "./Utils/tooltip.svelte";
   import InputWideValue from "./Utils/input_wide_value.svelte";
+	import EditModels from "./Utils/edit_models.svelte";
 
   function set_ctl_type(file) {
     if (file.match(/\.asc/)) {
@@ -256,6 +257,7 @@
     <button
       use:tooltip={() => msg("show or hide symbol files")}
       onclick={() => (show_symbol_files = !show_symbol_files)}
+      class="button-3"
       >show/hide symbols</button
     >
   {/if}
@@ -325,6 +327,7 @@
     <input id="TAB-02" type="radio" name="TAB" class="tab-switch" />
     <label class="tab-label" for="TAB-02">SPICE models</label>
     <div class="tab-content" style="border:green solid 2px;">
+      <!-- EditModels bind:models={proj.models} />  - proj.models update is not passed! -->
       {#each Object.entries(proj.models) as [model_name, model_params]}
         [{model_name}]<br />
         {#each Object.entries(model_params) as [param]}
@@ -449,52 +452,4 @@
 {/if}
 -->
 <style>
-  .sample {
-    display: flex;
-    flex-wrap: wrap;
-    /* border: green solid 5px; */
-    height: 200px;
-    /* background:yellow; */
-    overflow: scroll;
-  }
-  .box-item {
-    width: 25%;
-    background: orange;
-    text-align: left;
-    padding: 5px 10px;
-    border: 5px solid #ddd;
-  }
-  .button-item {
-    /* width: 25%; */
-    background: lightblue;
-    text-align: left;
-    padding: 2px 3px;
-    border: 2px solid yellow;
-  }
-  .tab-wrap {
-    display: flex;
-    flex-wrap: wrap;
-  }
-  .tab-label {
-    color: White;
-    background: LightGray;
-    margin-right: 5px;
-    padding: 3px 12px;
-    order: -1;
-  }
-  .tab-content {
-    width: 100%;
-    display: none;
-  }
-  /* アクティブなタブ */
-  .tab-switch:checked + .tab-label {
-    background: DeepSkyBlue;
-  }
-  .tab-switch:checked + .tab-label + .tab-content {
-    display: block;
-  }
-  /* ラジオボタン非表示 */
-  .tab-switch {
-    display: none;
-  }
 </style>

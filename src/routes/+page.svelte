@@ -10,6 +10,7 @@
 		measurement_results,
 		plot_result,
 	} from "./plotResults.svelte";
+	import EditModels from "./Utils/edit_models.svelte";
 
 	import { proj, ckt, settings } from "./shared.svelte.js";
 
@@ -21,7 +22,7 @@
 		plot_result();
 	}
 
-	let current_plot = $state(); //  = 0;
+	let current_plot = $state(0); //  = 0;
 
 	/*
 	function plot_results() {
@@ -223,8 +224,25 @@
 	let show_circuit = $state(true);
 
 	function bsim3_step1() {
+		// console.log("ckt_data.plotdata=", $state.snapshot(ckt_data.plotdata));
 		alert("bsim3 step1");
 	}
+	let bsim3_models = $state({});
+    let bsim3_models_org = $state({});
+
+	export async function get_models(port, filename) {
+        let encoded_params = `file=${encodeURIComponent(filename)}`;
+        let response = await fetch(
+            `http://localhost:${port}/api/misc/get_models?${encoded_params}`,
+            {},
+        );
+		let res2 = await response.json();
+        let models = res2.models;
+        console.log("models=", models);
+		bsim3_models = models;
+        return models;
+    }
+	let filename;
 </script>
 
 <main>
@@ -241,13 +259,82 @@
 			
 		}} class="button-3">show/hide flow control</button
 	>
+	<button
+	use:tooltip={() => msg("Get models from a file")}
+	onclick={() => bsim3_models = get_models(
+				  data.props.port, filename.trim().replace(/^"/, "").replace(/"$/, ""),
+			  )}
+	class="button-1">Get models from file:</button>	
+	<input
+	bind:value={filename}
+	style="border:darkgray solid 1px; width:40%;"/>
 	{#if show_flow}
-		<div>BSIM3 model parameter fitting</div>
+		<div>BSIM3 model parameter fitting {#if ckt_data.plotdata[current_plot]} for {ckt_data.plotdata[current_plot].length} traces{/if}</div>
+		<div class="tab-wrap">
+			<input
+			  id="TAB-01"
+			  type="radio"
+			  name="TAB"
+			  class="tab-switch"
+			  checked="checked"
+			/>
+			<label
+			  class="tab-label"
+			  for="TAB-01"
+			  use:tooltip={() => msg("flow conditions")}
+			>
+			  Conditions</label
+			>
+			<div class="tab-content" style="border:red solid 2px;">
+		
+				<table>
+					<thead>
+						<tr>
+							{#each ['name', 'vbs', 'vgs', 'vds', 'vth', 'l', 'w'] as p}
+								<th>{p}</th>
+							{/each}
+						</tr>
+					</thead>
+					<tbody>
+						{#each ckt_data.plotdata[current_plot] as trace}
+							<tr> 
+								{#each ['name', 'vbs', 'vgs', 'vds', 'vth', 'l', 'w'] as p}
+									<td><input
+										style="border:darkgray solid 1px; width: 70%"
+										bind:value={trace[p]}
+									  /></td>
+								{/each}
+							</tr>
+						{/each}
+					</tbody>
+				</table>
+				
+			</div>
+			<input id="TAB-02" type="radio" name="TAB" class="tab-switch" />
+			<label class="tab-label" for="TAB-02">SPICE models</label>
+			<EditModels bind:models={bsim3_models} /> <!--
+			<div class="tab-content" style="border:green solid 2px;">
+				{#each Object.entries(bsim3_models) as [model_name, model_params]}
+					[{model_name}]<br />
+					{#each Object.entries(model_params) as [param]}
+						<label
+							>{param}:
+							<input
+								style="border:darkgray solid 1px;"
+								bind:value={bsim3_models[model_name][param]}
+							/><br /></label
+						>
+					{/each}
+				{/each}
+			</div> -->
+		  </div>		
+
+		
 		<div><button onclick={() => bsim3_step1()}> BSIM3 Step1 </button></div>
 	{/if}
 	<button
 		use:tooltip={() => msg("show or hide circuit")}
-		onclick={() => (show_circuit = !show_circuit)}>show/hide circuit</button
+		onclick={() => (show_circuit = !show_circuit)} class="button-3">show/hide circuit</button
 	>
 	{#if show_circuit}
 		<ConvertSchematic
@@ -305,6 +392,7 @@
 				use:tooltip={() =>
 					msg("show or hide measurement group files list")}
 				onclick={() => (show_meas_group = !show_meas_group)}
+				class="button-3"
 				>show/hide</button
 			>
 			{#if show_meas_group}
@@ -378,3 +466,14 @@
 		href="https://unpkg.com/tippy.js@6.3.2/dist/tippy.css"
 	/>
 </svelte:head>
+
+<style>
+	.sample {
+	  display: flex;
+	  flex-wrap: wrap;
+	  /* border: green solid 5px; */
+	  height: 200px;
+	  /* background:yellow; */
+	  overflow: scroll;
+	}
+</style>
