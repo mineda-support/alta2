@@ -6,18 +6,18 @@
 </script>
 
 <div class="tab-content" style="border:green solid 2px;">
-    {#each Object.entries(models) as [model_name, model_params]}
-        <div style="text-align:right;">
-            <label use:tooltip={() => msg("filter on/off")}>
-                Filter:<input value={filter} /><input
-                    type="checkbox"
-                    bind:checked={filter_on}
-                /></label
-            >
-        </div>
+    <div style="text-align:right;">
+        <label use:tooltip={() => msg("filter on/off")}>
+            Filter:<input bind:value={filter} /><input
+                type="checkbox"
+                bind:checked={filter_on}
+            /></label
+        >
+    </div>
+{#each Object.entries(models) as [model_name, model_params]}
         [{model_name}]<br />
         {#each Object.entries(model_params) as [param]}
-            {#if filter == undefined || filter == "" || param.match(/${filter}/)}
+            {#if filter == undefined || filter == "" || param.match(filter)}
                 <label
                     >{param}:
                     <input
