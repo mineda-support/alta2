@@ -226,6 +226,7 @@
     console.log("*** dir=", proj.dir);
   }
   let show_symbol_files = $state(false);
+  let filter = $state("");
 </script>
 
 <p>
@@ -247,7 +248,7 @@
 {#if data.props != undefined} 
   <div class="sample"> 
     {#each data.props.files as file}
-      <label class="box-item">
+      edg<label class="box-item">
         <input type="radio" name="chosen" value={file} bind:group={chosen} />
         {file}<br />
       </label>
@@ -326,21 +327,7 @@
     </div>
     <input id="TAB-02" type="radio" name="TAB" class="tab-switch" />
     <label class="tab-label" for="TAB-02">SPICE models</label>
-    <div class="tab-content" style="border:green solid 2px;">
-      <!-- EditModels bind:models={proj.models} />  - proj.models update is not passed! -->
-      {#each Object.entries(proj.models) as [model_name, model_params]}
-        [{model_name}]<br />
-        {#each Object.entries(model_params) as [param]}
-          <label
-            >{param}:
-            <input
-              style="border:darkgray solid 1px;"
-              bind:value={proj.models[model_name][param]}
-            /><br /></label
-          >
-        {/each}
-      {/each}
-    </div>
+    <EditModels bind:models={proj.models} {filter}/> 
     <input id="TAB-03" type="radio" name="TAB" class="tab-switch" />
     <label class="tab-label" for="TAB-03">Alter</label>
     <div class="tab-content" style="border:blue solid 2px;">

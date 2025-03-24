@@ -237,12 +237,18 @@
 			{},
 		);
 		let res2 = await response.json();
-		let models = res2.models;
-		console.log("models=", models);
-		bsim3_models = models;
-		return models;
+		bsim3_models = {};
+		for (const [model_name, model_params] of Object.entries(res2.models)) {
+			bsim3_models[model_name] = {};
+			for (const [par, value] of Object.entries(model_params[1])) {
+				bsim3_models[model_name][par] = value;
+			}
+		}
+		console.log("bsim3_models=", $state.snapshot(bsim3_models));
+		return bsim3_models; // returned value not used
 	}
 	let filename;
+	let filter = $state("");
 </script>
 
 <main>
@@ -319,22 +325,8 @@
 			</div>
 			<input id="TAB-02" type="radio" name="TAB" class="tab-switch" />
 			<label class="tab-label" for="TAB-02">SPICE models</label>
-			<EditModels bind:models={bsim3_models} />
-			<!--
-			<div class="tab-content" style="border:green solid 2px;">
-				{#each Object.entries(bsim3_models) as [model_name, model_params]}
-					[{model_name}]<br />
-					{#each Object.entries(model_params) as [param]}
-						<label
-							>{param}:
-							<input
-								style="border:darkgray solid 1px;"
-								bind:value={bsim3_models[model_name][param]}
-							/><br /></label
-						>
-					{/each}
-				{/each}
-			</div> -->
+
+			<EditModels bind:models={bsim3_models} {filter} />
 		</div>
 
 		<div><button onclick={() => bsim3_step1()}> BSIM3 Step1 </button></div>
