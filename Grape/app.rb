@@ -65,6 +65,27 @@ module Test
         load File.join(dir, file)
         {}
       end
+      desc 'Convert_circuit_data'
+      post :convert_circuit_data do
+        # puts params
+        # puts params.keys
+   
+        load 'ltspice.rb'
+        load 'qucs.rb'
+        load 'xschem.rb'
+        load 'eeschema.rb'
+        load 'alta.rb'
+        load 'ltspctl.rb'
+        load 'ngspice.rb'
+        load 'ngspctl.rb'
+        load 'qucsctl.rb'
+        work_dir, ckt_name = Utils::get_params(params)
+        Dir.chdir(work_dir){
+          puts 'execute under' + work_dir
+          puts params[:program]
+          eval params[:program]
+        }
+      end
       desc 'Get models file'
       get :get_models do
         cm = CompactModel.new params[:file]
@@ -337,27 +358,6 @@ module Test
         Dir.chdir(work_dir){
           ckt = LTspiceControl.new(File.basename ckt_name)
           {"info" => ckt.info}
-        }
-      end
-      desc 'Convert_from_LTspice'
-      post :convert_from_LTspice do
-        # puts params
-        # puts params.keys
-   
-        load 'ltspice.rb'
-        load 'qucs.rb'
-        load 'xschem.rb'
-        load 'eeschema.rb'
-        load 'alta.rb'
-        load 'ltspctl.rb'
-        load 'ngspice.rb'
-        load 'ngspctl.rb'
-        load 'qucsctl.rb'
-        work_dir, ckt_name = Utils::get_params(params)
-        Dir.chdir(work_dir){
-          puts 'execute under' + work_dir
-          puts params[:program]
-          eval params[:program]
         }
       end
       desc 'Execute program'

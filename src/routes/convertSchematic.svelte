@@ -30,14 +30,14 @@
                 switch (selected) {
                     case "Xschem":
                         return `
-                create_cdraw()
-                dir = Dir.pwd
+                create_cdraw();
+                dir = Dir.pwd;
                 cdraw2target 'xschem', File.join(dir,'cdraw'), File.join(dir, '${selected}')
                 `;
                         break;
                     case "LTspice":
                         return `
-                dir = Dir.pwd
+                dir = Dir.pwd;
                 xschem2cdraw dir, File.join(dir, '${selected}')
                 `;
                         break;
@@ -93,12 +93,12 @@
         };
     }}
     class="button-2"
-    action={`http://localhost:${port}/api/ltspctl/convert_to_${selected}?${encoded_params(
+        action={`http://localhost:${port}/api/misc/convert_circuit_data?${encoded_params(
         dir,
         to_program,
     )}`}
 >
-    <button>Convert schematic</button
+    <button>Convert circuit data</button
     >
     to
     <!--input name={selected} / -->

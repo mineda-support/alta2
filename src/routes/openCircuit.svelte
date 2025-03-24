@@ -248,7 +248,7 @@
 {#if data.props != undefined} 
   <div class="sample"> 
     {#each data.props.files as file}
-      edg<label class="box-item">
+      <label class="box-item">
         <input type="radio" name="chosen" value={file} bind:group={chosen} />
         {file}<br />
       </label>
