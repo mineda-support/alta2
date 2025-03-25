@@ -231,7 +231,8 @@
 	let bsim3_models_org = $state({});
 
 	export async function get_models(port, filename) {
-		let encoded_params = `file=${encodeURIComponent(filename)}`;
+		if (filename == undefined) {alert('Please set file path'); return;}
+		let encoded_params = `file=${encodeURIComponent(filename.trim().replace(/^"/, "").replace(/"$/, ""))}`;
 		let response = await fetch(
 			`http://localhost:${port}/api/misc/get_models?${encoded_params}`,
 			{},
@@ -275,7 +276,7 @@
 			onclick={() =>
 				(bsim3_models = get_models(
 					data.props.port,
-					filename.trim().replace(/^"/, "").replace(/"$/, ""),
+					filename,
 				))}
 			class="button-1">Get models from file:</button
 		>
