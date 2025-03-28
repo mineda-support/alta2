@@ -5,7 +5,8 @@ $:.unshift '.'
 puts "hello world from ruby"
 # puts $:
 require 'j_pack'
-require 'byebug'
+require 'bsim3_fit'
+#require 'byebug'
 require './csv_read'
 require './xls_read'
 
@@ -64,6 +65,22 @@ module Test
         dir, file = Utils::get_params(params)
         load File.join(dir, file)
         {}
+      end
+      desc 'execute procedure'      
+      post :exec_proc do
+        require 'json'
+        puts "model=#{params[:model]}"
+        mf = Bsim3Fit.new params[:model]
+        puts "mf=#{mf}.inspect"
+        mf.jtable = [params[:settings], params[:jtable]] 
+        puts 'jtable=', mf.jtable.inspect
+        debugger
+        puts "procedure: #{params[:procedure]}"
+        params[:procedure].each_line{|l|
+          puts "exec_proc: #{l}"
+          mf.send(l.chomp)
+        }
+        { 'plotdata' => mf.jtable[1] }
       end
       desc 'Convert_circuit_data'
       post :convert_circuit_data do
