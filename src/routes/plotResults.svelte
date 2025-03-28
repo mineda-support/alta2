@@ -483,7 +483,7 @@
 <button
     use:tooltip={() => msg("show or hide plot settings")}
     onclick={() => (plot_showhide = !plot_showhide)}
-    class="button-2">Show/hide</button
+    class="button-3">Show/hide</button
 >plot#{plot_number} {#if filename} {filename} {/if}
 {#if plot_showhide}
     <button
