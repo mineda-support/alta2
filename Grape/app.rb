@@ -5,10 +5,10 @@ $:.unshift '.'
 puts "hello world from ruby"
 # puts $:
 require 'j_pack'
-require 'bsim3_fit'
 #require 'byebug'
 require './csv_read'
 require './xls_read'
+require './exec_proc'
 
 def eval_equation plot_data, equation
   results = []
@@ -68,19 +68,20 @@ module Test
       end
       desc 'execute procedure'      
       post :exec_proc do
-        require 'json'
-        puts "model=#{params[:model]}"
-        mf = Bsim3Fit.new params[:model]
-        puts "mf=#{mf}.inspect"
-        mf.jtable = [params[:settings], params[:jtable]] 
-        puts 'jtable=', mf.jtable.inspect
-        debugger
-        puts "procedure: #{params[:procedure]}"
-        params[:procedure].each_line{|l|
-          puts "exec_proc: #{l}"
-          mf.send(l.chomp)
-        }
-        { 'plotdata' => mf.jtable[1] }
+        result = exec_proc params
+       end
+      desc 'read json file'
+      get :read_json do
+        dir, file = Utils::get_params(params)
+        json_file = File.join(dir, file)
+        if FileTest.exist?(json_file)
+          File.open(json_file,mode = "r") do |f|
+            table = JSON.load(f)
+          end
+          { json: table}
+        else
+          {}
+        end
       end
       desc 'Convert_circuit_data'
       post :convert_circuit_data do
