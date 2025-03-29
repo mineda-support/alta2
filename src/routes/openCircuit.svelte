@@ -27,14 +27,14 @@
     }
   }
 
-  export function switch_wdir(wdir) {
+  export function switch_wdir(wdir, show_flow) {
     /* if (wdir == undefined) {
       const handle = await window.showDirectoryPicker();
       wdir = handle.name; //USELESS because does not return PATH
     } */
     console.log("wdir=", wdir);
     //goto("?wdir=" + wdir.replace(/^"/, "").replace(/"$/, ""));
-    window.location = "?wdir=" + wdir.replace(/^"/, "").replace(/"$/, "");
+    window.location = "?show_flow=" + show_flow + "&wdir=" + wdir.replace(/^"/, "").replace(/"$/, "");
   }
 </script>
 
@@ -241,7 +241,7 @@
 
   <button
     use:tooltip={() => msg("switch working directory")}
-    onclick={() => switch_wdir(data.props.wdir)}
+    onclick={() => switch_wdir(data.props.wdir, false)}
     class="button-1">Switch Wdir</button
   >
 </p>

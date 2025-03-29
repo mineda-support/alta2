@@ -220,8 +220,8 @@
 	let nvar = $state(0);
 	let show_meas_group = $state(true);
 	console.log("settings=", $state.snapshot(settings));
-	let show_flow = $state(false);
-	let show_circuit = $state(true);
+	let show_flow = $state(data.props.show_flow);
+	let show_circuit = $state(!data.props.show_flow);
 </script>
 
 <main>
@@ -239,7 +239,7 @@
 		class="button-3">show/hide flow control</button
 	>
 	{#if show_flow}
-		<Bsim3fitting port={data.props.port} bind:ckt_data bind:current_plot />
+		<Bsim3fitting port={data.props.port} bind:ckt_data bind:current_plot bind:data bind:show_flow/>
 	{/if}
 	<button
 		use:tooltip={() => msg("show or hide circuit")}

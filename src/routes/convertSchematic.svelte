@@ -11,7 +11,7 @@
     );
     let res2 = await response.json();
     console.log(res2);
-    switch_wdir(dir);
+    switch_wdir(dir, false);
   }
 </script>
 <script lang="ts">

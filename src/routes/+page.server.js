@@ -10,9 +10,11 @@ export async function load({ url }) {
     // const probes = cookies.get('probes')
     const home = process.env.HOME.replaceAll('\\', '/');
     let wdir = url.searchParams.get('wdir'); 
+    let show_flow = url.searchParams.get('show_flow');
     fs.existsSync(wdir) || (wdir = home);
     let ckt = url.searchParams.get('ckt');
     console.log(`wdir: ${wdir}`);
+    console.log(`show_flow: ${show_flow}`)
     console.log('home=', home);
     console.log('href = ', url.href);
     console.log('origin = ', url.origin);
@@ -23,22 +25,37 @@ export async function load({ url }) {
                 // console.log(file);
             });
         });
-
-        const files = globSync(wdir + '*.asc').concat(globSync(wdir + '*.sch')).concat(globSync(wdir + '*.edif'));
-        const symbol_files = globSync(wdir + '*.asy').concat(globSync(wdir + '*.sym'))
-        files.forEach(file => {
-            // console.log(file);
-        });
-        const setting_files = globSync(wdir + '*_settings.json');
-        console.log(setting_files);
-        return {
-            props: {
-                home: home, port: await startGrape(), origin: url.origin,
-                wdir: wdir, ckt: ckt, files: files.map(a => path.basename(a)), //, probes: probes
-                symbol_files: symbol_files.map(a => path.basename(a)),
-                setting_names: setting_files.map(a => path.basename(a).replace('_settings.json', ''))
-            }
-        };
+        if (show_flow == 'true') {
+            const files = globSync(wdir + '*.json');
+            const json_files = globSync(wdir + 'json/*.json');
+            const setting_files = globSync(wdir + '*_settings.json');
+            console.log(setting_files);
+            return {
+                props: {
+                    home: home, port: await startGrape(), origin: url.origin, show_flow: true,
+                    wdir: wdir, ckt: ckt, 
+                    files: files.map(a => path.basename(a)).concat(json_files.map(a => `json/${path.basename(a)}`)), //, probes: probes
+                    symbol_files: [],
+                    setting_names: setting_files.map(a => path.basename(a).replace('_settings.json', ''))
+                }
+            };
+        } else {
+            const files = globSync(wdir + '*.asc').concat(globSync(wdir + '*.sch')).concat(globSync(wdir + '*.edif'));
+            const symbol_files = globSync(wdir + '*.asy').concat(globSync(wdir + '*.sym'))
+            files.forEach(file => {
+                // console.log(file);
+            });
+            const setting_files = globSync(wdir + '*_settings.json');
+            console.log(setting_files);
+            return {
+                props: {
+                    home: home, port: await startGrape(), origin: url.origin, show_flow: false,
+                    wdir: wdir, ckt: ckt, files: files.map(a => path.basename(a)), //, probes: probes
+                    symbol_files: symbol_files.map(a => path.basename(a)),
+                    setting_names: setting_files.map(a => path.basename(a).replace('_settings.json', ''))
+                }
+            };
+        }
     }
 }
 
@@ -52,23 +69,23 @@ async function startGrape() {
     console.log('process.env.GRAPE', port);
 
     if (port != undefined) {
-        return(port);
+        return (port);
     }
     port = await getPort();
     console.log('port=', port);
     const command = `rackup -p ${port}`
     process.chdir(current_dir + '/Grape');
     console.log('command:', command, 'dir=', process.cwd());
-    exec(command,  (error, stdout, stderr) => {
+    exec(command, (error, stdout, stderr) => {
         if (error) {
-          console.error(`error: ${error.message}`);
-          return;
+            console.error(`error: ${error.message}`);
+            return;
         }
         if (stderr) {
-          console.error(`stderr: ${stderr}`);
-          return;
+            console.error(`stderr: ${stderr}`);
+            return;
         }
         console.log(`stdout:\n${stdout}`);
-      });
-    return(port);
+    });
+    return (port);
 }
