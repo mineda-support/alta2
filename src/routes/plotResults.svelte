@@ -36,7 +36,7 @@
         //const file = await handle.getFile();
         //console.log(file);
         console.log("dir=", dir);
-        let encoded_params = `dir=${encodeURIComponent(dir)}&file=${encodeURIComponent(measfile)}&selection=${selection}`;
+    let encoded_params = `dir=${encodeURIComponent(dir)}&file=${encodeURIComponent(measfile)}&selection=${selection}`;
         if (invert_x != undefined) {
             encoded_params = encoded_params + `&invert_x=${invert_x}`;
         }
@@ -115,6 +115,7 @@
     import { proj, ckt, settings } from "./shared.svelte.js";
     import { tooltip, msg } from "./Utils/tooltip.svelte";
     let {
+        wdir,
         port,
         plot_number = $bindable(),
         current_plot = $bindable(),
@@ -141,6 +142,7 @@
         invert_x = $bindable(),
         invert_y = $bindable(),
         tracemode = $bindable(),
+        chosen = $bindable()
     } = $props();
 
     let sweep_name;
@@ -439,6 +441,28 @@
         await ws.write(blob);
         await ws.close();
     }
+
+    export async function read_json(port, dir, file) {
+        if (file == undefined) {
+            load_json();
+            return;
+        }
+        let encoded_params = `dir=${encodeURIComponent(
+            dir,
+        )}&file=${encodeURIComponent(file)}`;
+        let response = await fetch(
+            `http://localhost:${port}/api/misc/read_json?${encoded_params}`,
+            {},
+        );
+        let res = await response.json();
+        let tmpsettings;
+        let table;
+        [tmpsettings, table] = res.json;
+        plotdata = table.plotdata;
+        measdata = table.measdata;
+        // ckt_data.plotdata[current_plot] = plotdata;
+    }
+
     async function load_json() {
         const pickerOpts = {
             types: [
@@ -483,7 +507,7 @@
 <button
     use:tooltip={() => msg("show or hide plot settings")}
     onclick={() => (plot_showhide = !plot_showhide)}
-    class="button-3">Show/hide</button
+    class="button-2">Show/hide</button
 >plot#{plot_number} {#if filename} {filename} {/if}
 {#if plot_showhide}
     <button
@@ -530,7 +554,7 @@
         >
         <button
             use:tooltip={() => msg("get data from JSON file and plot")}
-            onclick={load_json}
+            onclick={() => read_json(port, wdir, chosen)}
             class="button-1">Plot JSON data</button
         >
         <br />

@@ -9,6 +9,7 @@
         current_plot = $bindable(),
         data = $bindable(),
         show_flow = $bindable(),
+        chosen = $bindable()
     } = $props();
     async function bsim3_step1() {
         // console.log("ckt_data.plotdata=", $state.snapshot(ckt_data.plotdata));
@@ -69,19 +70,9 @@
         console.log("bsim3_models=", $state.snapshot(bsim3_models));
         return bsim3_models; // returned value not used
     }
-
-    export async function read_json(port, dir, file) {
-        let encoded_params = `dir=${encodeURIComponent(
-            dir,
-        )}&file=${encodeURIComponent(file)}`;
-        let response = await fetch(
-            `http://localhost:${port}/api/misc/get_models?${encoded_params}`,
-            {},
-        );
-        let res = await response.json();
-        let settings;
-        let plotdata;
-        [settings, plotdata] = res.json;
+    function handle_switch_wdir() {
+        show_flow = true;
+        switch_wdir(data.props.wdir, true);
     }
     let filename;
     let model_org;
@@ -89,11 +80,6 @@
     let procedure = $state(
         "calculate_vth_vbs_relation\n" + "estimate_vth_k1_k2\n",
     );
-    function handle_switch_wdir() {
-        show_flow = true;
-        switch_wdir(data.props.wdir, true);
-    }
-    let chosen;
 </script>
 
 <p>
@@ -114,13 +100,13 @@
     <div class="sample">
         {#each data.props.files as file}
             <label class="box-item" style="background:lightblue;">
-                <input type="radio" name="chosen" value={file} />
+                <input type="radio" name="chosen" value={file} bind:group={chosen}/>
                 {file}<br />
             </label>
         {/each}
     </div>
 {/if}
-<div>
+<!-- div>
     <button
         onclick={() => read_json(data.props.port, data.props.wdir, chosen)}
         class="button-1"
@@ -128,7 +114,7 @@
     >
         Click here to read JSON file</button
     >
-</div>
+</div -->
 <div>
     BSIM3 model parameter fitting {#if ckt_data.plotdata[current_plot]}
         for {ckt_data.plotdata[current_plot].length} traces{/if}

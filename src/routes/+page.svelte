@@ -222,6 +222,7 @@
 	console.log("settings=", $state.snapshot(settings));
 	let show_flow = $state(data.props.show_flow);
 	let show_circuit = $state(!data.props.show_flow);
+	let chosen=$state();
 </script>
 
 <main>
@@ -239,7 +240,7 @@
 		class="button-3">show/hide flow control</button
 	>
 	{#if show_flow}
-		<Bsim3fitting port={data.props.port} bind:ckt_data bind:current_plot bind:data bind:show_flow/>
+		<Bsim3fitting port={data.props.port} bind:ckt_data bind:current_plot bind:data bind:show_flow bind:chosen/>
 	{/if}
 	<button
 		use:tooltip={() => msg("show or hide circuit")}
@@ -320,6 +321,7 @@
 	{/if}
 	{#each settings.plot_showhide as _, i}
 		<PlotResults
+		    wdir={data.props.wdir} 
 			port={data.props.port}
 			plot_number={i}
 			bind:current_plot
@@ -346,6 +348,7 @@
 			bind:invert_x={settings.invert_x[i]}
 			bind:invert_y={settings.invert_y[i]}
 			bind:tracemode={settings.tracemode[i]}
+			bind:chosen
 		></PlotResults>
 	{/each}
 
