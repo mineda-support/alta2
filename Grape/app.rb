@@ -72,12 +72,9 @@ module Test
        end
       desc 'read json file'
       get :read_json do
-        dir, file = Utils::get_params(params)
-        json_file = File.join(dir, file)
+        dir, json_file = Utils::get_params(params)
         if FileTest.exist?(json_file)
-          File.open(json_file,mode = "r") do |f|
-            table = JSON.load(f)
-          end
+          table = JSON.load(File.read(json_file));
           { json: table}
         else
           {}
