@@ -1,6 +1,6 @@
 #require 'bsim3_fit'
 #load '../j_pack/j_pack.rb'
-Dir.chdir '../../j_pack'
+Dir.chdir '../j_pack'
 load 'c:/Users/seiji/work/SvelteKit/new_alta/Grape/bsim3fit/bsim3_fit.rb'
 require 'debug'
 require 'json'
@@ -33,5 +33,7 @@ if $0 == __FILE__
   name: ["vbs=0.0","vbs=-0.5","vbs=-1.0","vbs=-1.5","vbs=-2.0"]
   mf.estimate_vth_k1_k2
   mf.step1_calc_vth_vbs
+  #  mf.plot_graph 'measdata' # "vthdata"
   mf.plot_graph "vthdata"
+  p
 end
