@@ -29,6 +29,7 @@ export async function load({ url }) {
             const files = globSync(wdir + '*.json');
             const json_files = globSync(wdir + 'json/*.json');
             const setting_files = globSync(wdir + '*_settings.json');
+            const flow_files = globSync(wdir + '*_flow.json');
             console.log(setting_files);
             return {
                 props: {
@@ -36,7 +37,8 @@ export async function load({ url }) {
                     wdir: wdir, ckt: ckt, 
                     files: files.map(a => path.basename(a)).concat(json_files.map(a => `json/${path.basename(a)}`)), //, probes: probes
                     symbol_files: [],
-                    setting_names: setting_files.map(a => path.basename(a).replace('_settings.json', ''))
+                    setting_names: setting_files.map(a => path.basename(a).replace('_settings.json', '')),
+                    flow_names: flow_files.map(a => path.basename(a).replace('_flow.json', ''))
                 }
             };
         } else {
@@ -47,12 +49,14 @@ export async function load({ url }) {
             });
             const setting_files = globSync(wdir + '*_settings.json');
             console.log(setting_files);
+            const flow_files = globSync(wdir + '*_flow.json');
             return {
                 props: {
                     home: home, port: await startGrape(), origin: url.origin, show_flow: false,
                     wdir: wdir, ckt: ckt, files: files.map(a => path.basename(a)), //, probes: probes
                     symbol_files: symbol_files.map(a => path.basename(a)),
-                    setting_names: setting_files.map(a => path.basename(a).replace('_settings.json', ''))
+                    setting_names: setting_files.map(a => path.basename(a).replace('_settings.json', '')),
+                    flow_names: flow_files.map(a => path.basename(a).replace('_flow.json', ''))
                 }
             };
         }
