@@ -36,7 +36,7 @@
         //const file = await handle.getFile();
         //console.log(file);
         console.log("dir=", dir);
-    let encoded_params = `dir=${encodeURIComponent(dir)}&file=${encodeURIComponent(measfile)}&selection=${selection}`;
+        let encoded_params = `dir=${encodeURIComponent(dir)}&file=${encodeURIComponent(measfile)}&selection=${selection}`;
         if (invert_x != undefined) {
             encoded_params = encoded_params + `&invert_x=${invert_x}`;
         }
@@ -97,7 +97,8 @@
         console.log(res2);
         console.log("probes=", probes);
         if (probes != undefined && probes.trim().length > 0) {
-            [plotdata, db_data, ph_data, sweep_name, ] = set_trace_names( // ignore weird probes change
+            [plotdata, db_data, ph_data, sweep_name] = set_trace_names(
+                // ignore weird probes change
                 res2,
                 probes,
                 proj.elements,
@@ -142,7 +143,7 @@
         invert_x = $bindable(),
         invert_y = $bindable(),
         tracemode = $bindable(),
-        chosen = $bindable()
+        chosen = $bindable(),
     } = $props();
 
     let sweep_name;
@@ -388,8 +389,10 @@
         let x_data = undefined;
         let csv_text = "";
         if (plotdata == undefined) {
-            alert("Plotdata is not available until 'Plot with probes' performed");
-        } 
+            alert(
+                "Plotdata is not available until 'Plot with probes' performed",
+            );
+        }
         plotdata.forEach((trace) => {
             if (JSON.stringify(trace.x) === x_data) {
                 console.log("x_data is same");
@@ -414,8 +417,10 @@
     async function save_json() {
         console.log("plotdata =", $state.snapshot(plotdata));
         if (plotdata == undefined && measdata.length == 0) {
-            alert("Plotdata is not available until 'Plot with probes' performed");
-        } 
+            alert(
+                "Plotdata is not available until 'Plot with probes' performed",
+            );
+        }
         let saveFileOptions = {
             suggestedName: "xxxxxx.json",
             types: [
@@ -480,8 +485,11 @@
         //console.log("before:", plot_data);
         let data;
         [tempsettings, data] = JSON.parse(filedata);
+        if (plotdata == undefined) {
+            plotdata = [];
+        }
         if (data.plotdata != undefined) {
-            plotdata = data.plotdata;
+            plotdata = plotdata.concat(data.plotdata);
         }
         if (data.measdata != undefined) {
             measdata = data.measdata;
@@ -500,7 +508,9 @@
         //console.log("after:", plot_data);
     }
     let filename = $derived.by(() => {
-        measfile == undefined ? '' : measfile.replace(/.*[\/\\]/, '').replace(/"/, '');
+        measfile == undefined
+            ? ""
+            : measfile.replace(/.*[\/\\]/, "").replace(/"/, "");
     });
 </script>
 
@@ -508,13 +518,16 @@
     use:tooltip={() => msg("show or hide plot settings")}
     onclick={() => (plot_showhide = !plot_showhide)}
     class="button-2">Show/hide</button
->plot#{plot_number} {#if filename} {filename} {/if}
+>plot#{plot_number}
+{#if filename}
+    {filename}
+{/if}
+<button
+    use:tooltip={() => msg("make this plot current to push probes")}
+    onclick={() => (current_plot = plot_number)}
+    class="button-2">Make current</button
+>
 {#if plot_showhide}
-    <button
-        use:tooltip={() => msg("make this plot current to push probes")}
-        onclick={() => (current_plot = plot_number)}
-        class="button-2">Make current</button
-    >
     <button
         use:tooltip={() => msg("save this plot as a CSV file")}
         onclick={() => save_csv()}
@@ -528,16 +541,17 @@
     <div>
         <button
             use:tooltip={() => msg("get a measurement data file")}
-            onclick={() => get_measurement_results(
-                          port,
-                          proj.dir,
-                          measfile.trim().replace(/^"/, "").replace(/"$/, ""),
-                          selection,
-                          reverse,
-                          invert_x,
-                          invert_y,
-                          tracemode,
-                      )}
+            onclick={() =>
+                get_measurement_results(
+                    port,
+                    proj.dir,
+                    measfile.trim().replace(/^"/, "").replace(/"$/, ""),
+                    selection,
+                    reverse,
+                    invert_x,
+                    invert_y,
+                    tracemode,
+                )}
             class="button-1">Get measured data:</button
         >
         <input
@@ -596,13 +610,15 @@
                 onclick={checkall_measdata}
                 class="button-1">check all</button
             >
-            <button 
-            use:tooltip={() => msg("clear all curves")}
-            onclick={clear_measdata} class="button-1">clear all</button>
-            <button 
-            use:tooltip={() => msg("plot all curves")}
-            onclick={plot_measured_data_only} class="button-1"
-                >plot</button
+            <button
+                use:tooltip={() => msg("clear all curves")}
+                onclick={clear_measdata}
+                class="button-1">clear all</button
+            >
+            <button
+                use:tooltip={() => msg("plot all curves")}
+                onclick={plot_measured_data_only}
+                class="button-1">plot</button
             >
         </div>
     {/if}

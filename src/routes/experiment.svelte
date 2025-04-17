@@ -73,16 +73,22 @@
 	function parse_step_command(props, precision) {
 		// like '.step param ccap 0.2p 2p 0.5p' || '.step param l list 0.6u,0.8u,1.0u,1.4u, 2.0u'
 		const items = props.split((/ +|, */));
-		const name = items[2];
+		let name = items[1];
+		let start_index = 3;
 		let src_values = [];
-		if(items[3] == 'list'){
-		  src_values = items.slice(4).map((v) => `${name}=${v}`)
-		  console.log("src_values in parse_step_command=", src_values);
-		  return [name, src_values];
-	    }
-		const start = eng2f(items[3]);
-		const stop = eng2f(items[4]);
-		const step = eng2f(items[5]);
+		if (name.downcase == 'param') {
+		  name == items[2];
+  		  if(items[3] == 'list'){
+		    src_values = items.slice(4).map((v) => `${name}=${v}`)
+		    console.log("src_values in parse_step_command=", src_values);
+		    return [name, src_values];
+	      }
+		} else {
+			start_index = 2;
+		}
+		const start = eng2f(items[start_index]);
+		const stop = eng2f(items[start_index + 1]);
+		const step = eng2f(items[start_index + 2]);
 		//console.log("step=", [name, start, stop, step]);
 		for (let v = start; v < stop; v = v + step) {
 			console.log("precision=", precision);

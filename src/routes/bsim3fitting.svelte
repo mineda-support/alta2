@@ -115,7 +115,7 @@
 	}
 
 async function save_flow_settings(flow_name) {
-    const response = await fetch("settings", {
+    const response = await fetch("settingit gs", {
       method: "POST",
       body: JSON.stringify([flow_title, flow_settings]),
       headers: {
