@@ -659,18 +659,18 @@
     <div>
         <label use:tooltip={() => msg("title for a graph")}
             >Title
-            <input bind:value={title} style="border:darkgray solid 1px;" />
+            <input bind:value={title} style="border:darkgray solid 1px; width: 50%;" />
         </label>
         <label use:tooltip={() => msg("X axis title")}
             >X title
-            <input bind:value={title_x} style="border:darkgray solid 1px;" />
+            <input bind:value={title_x} style="border:darkgray solid 1px; width: 15%;" />
         </label>
         {#if probes == undefined || !probes.startsWith("frequency")}
             <label use:tooltip={() => msg("Y axis title")}
                 >Y title
                 <input
                     bind:value={title_y}
-                    style="border:darkgray solid 1px;"
+                    style="border:darkgray solid 1px; width: 15%;"
                 />
             </label>
         {:else}
