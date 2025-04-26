@@ -206,10 +206,13 @@
         const sweep_var = probes.match(/\w+,/)[0].replace(",", "");
         if (probes.includes(sweep_var)) {
             // like 'frequency'
-            for (let match_string of probes.matchAll(/\w*\(\w+\)|\w+,|\w+$/g)) {
-                let node = match_string[0].replace(",", "").trim();
-                console.log("node=", node);
-                if (!ckt.info.includes(node)) {
+            let probes_test = JSON.parse(JSON.stringify(probes));
+            for (let node of ckt.info) {
+                probes_test = probes_test.replace(node, '');
+            }
+            let nodes = probes_test.split(/[ ,\*\+-\/\(\)]/)
+            for (let node of nodes) {
+                if (!node.match(/[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?/) && node.trim.length != 0) {
                     alert(`${node} is not a valid probe name`);
                     return false;
                 }
@@ -659,11 +662,17 @@
     <div>
         <label use:tooltip={() => msg("title for a graph")}
             >Title
-            <input bind:value={title} style="border:darkgray solid 1px; width: 50%;" />
+            <input
+                bind:value={title}
+                style="border:darkgray solid 1px; width: 50%;"
+            />
         </label>
         <label use:tooltip={() => msg("X axis title")}
             >X title
-            <input bind:value={title_x} style="border:darkgray solid 1px; width: 15%;" />
+            <input
+                bind:value={title_x}
+                style="border:darkgray solid 1px; width: 15%;"
+            />
         </label>
         {#if probes == undefined || !probes.startsWith("frequency")}
             <label use:tooltip={() => msg("Y axis title")}
