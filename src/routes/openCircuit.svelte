@@ -49,12 +49,12 @@
       console.log(`${file} type is ltspice`);
       proj.ctl_type = "ltspctl";
       proj.simulator = "LTspice";
-      proj.ckt_editor = "LTspice";
+      proj.schema_editor = "LTspice";
     } else if (file.match(/\.sch/)) {
       console.log(`${file} type is ngspice`);
       proj.ctl_type = "ngspctl";
       proj.simulator = "Ngspice";
-      proj.ckt_editor = "Xschem";
+      proj.schema_editor = "Xschem";
     }
   }
   async function openCircuit(port, dir, file, showup) {
