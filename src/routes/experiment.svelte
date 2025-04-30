@@ -23,14 +23,11 @@
 			for (const [elm, props] of Object.entries(elms)) {
 				//console.log([elm, props]);
 				if (props != undefined && props[0] == '.' && (elm == "step" || (elms['step'] == undefined && elm == "dc"))) {
-					[sweep_name, src_values] = parse_step_command(
-						props.replace(
-							/^ *\.dc +\S+ \S+ \S+ \S+ +/,
-							".step param ",
-						),
-						/* props could be like '.dc v3 0 3 0.01 V2 0 3 0.5' */
-						step_precision,
-					);
+					let props_replaced = props; /* props could be like '.dc v3 0 3 0.01 V2 0 3 0.5' */
+					if (props.match(/^ *\.dc +\S+ \S+ \S+ \S+ \S+/)) {
+						props_replaced = props.replace(/^ *\.dc +\S+ \S+ \S+ \S+ +/, ".step param ");
+					}
+					[sweep_name, src_values] = parse_step_command(props_replaced, step_precision,);
 					src_values.forEach(function (src_value, index) {
                         if (plotdata[index] != undefined) {
                             plotdata[index].name = src_value;
@@ -110,6 +107,7 @@
 	import { tooltip, msg } from "./Utils/tooltip.svelte";
 	import { proj, ckt, settings } from "./shared.svelte.js";
 	import { get_sweep_values } from "./plotResults.svelte";
+    import { process_params } from "express/lib/router";
 
 	function get_performance(rows, index) {
 		let values = [];
