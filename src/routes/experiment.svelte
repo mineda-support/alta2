@@ -28,6 +28,9 @@
 						props_replaced = props.replace(/^ *\.dc +\S+ \S+ \S+ \S+ +/, ".step param ");
 					}
 					[sweep_name, src_values] = parse_step_command(props_replaced, step_precision,);
+					if (props_replaced =~ /^ *\.dc/) {
+					    src_values = [];
+					}
 					src_values.forEach(function (src_value, index) {
                         if (plotdata[index] != undefined) {
                             plotdata[index].name = src_value;
@@ -94,7 +97,9 @@
 		if (stop > start + step * (src_values.length - 1)) {
 			src_values.push(`${name}=${stop.toPrecision(precision)}`);
 		}
-		console.log("src_values in parse_step_command=", src_values);
+		if (src_values.length < 20) {
+		    console.log("src_values in parse_step_command=", src_values);
+		}	
 		return [name, src_values];
 	}
 </script>
