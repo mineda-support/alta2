@@ -240,6 +240,7 @@
             sweep_name,
         );
         [plotdata, db_data, ph_data, sweep_name, probes] = result;
+        plot_showhide = false;
     }
 
     step_precision = 3;
@@ -450,6 +451,22 @@
         await ws.close();
     }
 
+    function modify_data(plotdata) {
+        console.log(
+            `reverse=${reverse}, invert_x=${invert_x}, invert_y=${invert_y}, tracemode: ${tracemode}`,
+        );
+        let new_data = reverse ? plotdata.reverse() : plotdata;
+        new_data.forEach((trace) => {
+            if (invert_x) {
+                trace.x = trace.x.map(a => -a)
+            }
+            if (invert_y) {
+                trace.y = trace.y.map(a => -a)
+            }
+        });
+        return new_data;
+    }
+
     export async function read_json(port, dir, file) {
         if (file == undefined) {
             load_json();
@@ -466,8 +483,8 @@
         let tmpsettings;
         let table;
         [tmpsettings, table] = res.json;
-        plotdata = table.plotdata;
-        measdata = table.measdata;
+        plotdata = modify_data(table.plotdata);
+        measdata = modify_data(table.measdata);
         // ckt_data.plotdata[current_plot] = plotdata;
     }
 
@@ -492,10 +509,10 @@
             plotdata = [];
         }
         if (data.plotdata != undefined) {
-            plotdata = plotdata.concat(data.plotdata);
+            plotdata = plotdata.concat(modify_data(data.plotdata));
         }
         if (data.measdata != undefined) {
-            measdata = data.measdata;
+            measdata = modify_data(data.measdata);
             for (const trace of measdata) {
                 trace.checked = true;
                 trace.mode = tracemode;
