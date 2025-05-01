@@ -168,7 +168,7 @@
 				settings.step_precision[i],
 				"",
 			);
-			settings.plot_showhide[i] = false;
+			settings.plot_showhide[i] = true;
 			[
 				ckt_data.plotdata[i],
 				ckt_data.db_data[i],
