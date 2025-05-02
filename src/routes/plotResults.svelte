@@ -206,7 +206,7 @@
         const sweep_var = probes.match(/\w+,/)[0].replace(",", "");
         if (probes.includes(sweep_var)) {
             // like 'frequency'
-            let probes_test = JSON.parse(JSON.stringify(probes));
+            let probes_test = probes // JSON.parse(JSON.stringify(probes)); note: [...probes] is for array
             for (let node of ckt.info) {
                 probes_test = probes_test.replace(node, '');
             }
