@@ -28,18 +28,25 @@
 						props_replaced = props.replace(/^ *\.dc +\S+ \S+ \S+ \S+ +/, ".step param ");
 					}
 					[sweep_name, src_values] = parse_step_command(props_replaced, step_precision,);
-					if (props_replaced =~ /^ *\.dc/) {
+					if (props_replaced.match(/^ *\.dc/)) {
 					    src_values = [];
 					}
-					src_values.forEach(function (src_value, index) {
-                        if (plotdata[index] != undefined) {
-                            plotdata[index].name = src_value;
+					const nn = plotdata.length/src_values.length;
+					for (let i = 0; i < src_values.length; i++){
+						for (let j = 0; j < nn; j++){
+							let index = i*nn + j;
+                            if (plotdata[index] != undefined) {
+		  					    plotdata[index].probe = plotdata[index].name;
+                                plotdata[index].step = src_values[i];
+							    plotdata[index].name = `${plotdata[index].name}@${src_values[i]}`;
+                            }
                         }
-                    });
+					}
 				}
 			}
 		}
 	}
+
 	function eng2f(str) {
 		const s = str.toLowerCase();
 		let i;
@@ -76,8 +83,8 @@
 		let name = items[1];
 		let start_index = 3;
 		let src_values = [];
-		if (name.downcase == 'param') {
-		  name == items[2];
+		if (name.toLowerCase().includes('param')) {
+		  name = items[2];
   		  if(items[3] == 'list'){
 		    src_values = items.slice(4).map((v) => `${name}=${v}`)
 		    console.log("src_values in parse_step_command=", src_values);
@@ -90,7 +97,7 @@
 		const stop = eng2f(items[start_index + 1]);
 		const step = eng2f(items[start_index + 2]);
 		//console.log("step=", [name, start, stop, step]);
-		for (let v = start; v < stop; v = v + step) {
+		for (let v = start; ((start < stop) && (v <= stop)) || ((start > stop) && (v >= stop)); v = v + step) {
 			console.log("precision=", precision);
 			src_values.push(`${name}=${v.toPrecision(precision)}`);
 		}
