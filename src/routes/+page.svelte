@@ -192,8 +192,47 @@
 		current_plot = 0;
 	}
 
-	function add_plot() {
+	function add_plot(ckt_data) {
 		settings.plot_showhide.push(true);
+		console.log(
+			"settings.plot_showhide=",
+			$state.snapshot(settings.plot_showhide),
+		);
+		// console.log('length=', settings.plot_showhide.length);
+		current_plot = settings.plot_showhide.length - 1;
+		console.log(
+			"settings.plot_showhide=",
+			$state.snapshot(settings.plot_showhide),
+			"current_plot=",
+			$state.snapshot(current_plot),
+		);
+	}
+
+	function duplicate_plot(ckt_data) {
+		settings.plot_showhide.push(true);
+		let new_plot = settings.plot_showhide.length - 1;
+		settings.title[new_plot ]= settings.title[current_plot];
+		settings.title_x[new_plot] = settings.title_x[current_plot];
+		settings.title_y[new_plot] = settings.title_y[current_plot];
+		settings.title_y1[new_plot] = settings.title_y1[current_plot];
+		settings.title_y2[new_plot] = settings.title_y2[current_plot];
+		settings.yaxis_is_log[new_plot] = settings.yaxis_is_log[current_plot];
+		settings.xaxis_is_log[new_plot] = settings.xaxis_is_log[current_plot];
+		settings.equation[new_plot] = settings.equation[current_plot];
+		settings.performance_names[new_plot] = settings.performance_names[current_plot];
+		settings.probes[new_plot] = settings.probes[current_plot];
+		ckt_data.plotdata[new_plot] = [...ckt_data.plotdata[current_plot]];
+		ckt_data.db_data[new_plot] = [...ckt_data.db_data[current_plot]];
+		ckt_data.ph_data[new_plot] = [...ckt_data.ph_data[current_plot]];
+		ckt_data.measdata[new_plot] = [...ckt_data.measdata[current_plot]];
+		ckt_data.calculated_value[new_plot] = [...ckt_data.calculated_value[current_plot]];
+		settings.selection[new_plot] = settings.selection[current_plot];
+		settings.reverse[new_plot] = settings.reverse[current_plot];
+		settings.invert_x[new_plot] = settings.invert_x[current_plot];
+		settings.invert_y[new_plot] = settings.invert_y[current_plot];
+		settings.tracemode[new_plot] = settings.tracemode[current_plot];
+
+		current_plot = new_plot;
 		console.log(
 			"settings.plot_showhide=",
 			$state.snapshot(settings.plot_showhide),
@@ -329,7 +368,7 @@
 	<div>
 		<button
 			use:tooltip={() => msg("add a new plot")}
-			onclick={add_plot}
+			onclick={() => add_plot(ckt_data)}
 			class="button-2">Add plot</button
 		>
 		<button
@@ -352,8 +391,8 @@
 			bind:title_y={settings.title_y[i]}
 			bind:title_y1={settings.title_y1[i]}
 			bind:title_y2={settings.title_y2[i]}
-			bind:yaxis_is_log={settings.yaxis_is_log}
-			bind:xaxis_is_log={settings.xaxis_is_log}
+			bind:yaxis_is_log={settings.yaxis_is_log[i]}
+			bind:xaxis_is_log={settings.xaxis_is_log[i]}
 			bind:equation={settings.equation[i]}
 			bind:performance_names={settings.performance_names[i]}
 			bind:probes={settings.probes[i]}
@@ -373,8 +412,13 @@
 
 	<button
 		use:tooltip={() => msg("add a new plot")}
-		onclick={add_plot}
+		onclick={() => add_plot(ckt_data)}
 		class="button-2">Add plot</button
+	>
+	<button
+		use:tooltip={() => msg("duplicate current plot")}
+		onclick={() => duplicate_plot(ckt_data)}
+		class="button-2">Duplicate plot</button
 	>
 	<button
 		use:tooltip={() => msg("delete this plot")}
