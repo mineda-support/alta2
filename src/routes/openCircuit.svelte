@@ -8,25 +8,6 @@
     }
   }
 
-  function translate(a) {
-    let m;
-    if ((m = a.match(/(.+)#branch/))) {
-      return `I(${m[1]})`;
-    } else {
-      return `V(${a})`;
-    }
-  }
-
-  export function ctl_info(info, proj) {
-    if (info == null) return null;
-    if (proj.ctl_type == "ngspctl") {
-      //return .map(a => {
-      return [info[0]].concat(info.slice(1).map((a) => translate(a)));
-    } else {
-      return info;
-    }
-  }
-
   export function switch_wdir(wdir, show_flow) {
     /* if (wdir == undefined) {
       const handle = await window.showDirectoryPicker();
@@ -43,7 +24,7 @@
   import { tooltip, msg } from "./Utils/tooltip.svelte";
   import InputWideValue from "./Utils/input_wide_value.svelte";
 	import EditModels from "./Utils/edit_models.svelte";
-
+  import { info_translated } from "./simulate.svelte"
   function set_ctl_type(file) {
     if (file.match(/\.asc/)) {
       console.log(`${file} type is ltspice`);
@@ -97,7 +78,7 @@
     }
     ckt.elements = res2.elements;
     ckt.models = res2.models;
-    ckt.info = ctl_info(res2.info, proj);
+    ckt.info = info_translated(res2.info, proj);
     //console.log("ckt=", $inspect(ckt));
     if (ckt != undefined) {
       proj.elements = {};
