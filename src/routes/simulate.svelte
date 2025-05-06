@@ -1,5 +1,5 @@
 <script module>
-    export async function update_elements(port, dir, ckt, elements, probes, schema_editor) {
+    export function update_elements(ckt, elements, schema_editor) {
         for (const [ckt_name, elms] of Object.entries(ckt.elements)) {
             if (ckt_name[0] == ".") {
                 continue;
@@ -16,12 +16,6 @@
                     target = ckt_name + ".sch";
                     break;
                 }
-            console.log('target=', target)
-            console.log(
-                "update elements=",
-                $state.snapshot(elements),
-                ` here @ dir= ${dir} file=${target}`,
-            );
             let update_elms = "";
             for (const [elm, props] of Object.entries(elms)) {
                 if (elements[ckt_name][elm] != get_control(props)) {
@@ -35,37 +29,11 @@
             }
             if (update_elms != "") {
                 console.log("let me update ", target, " with:", update_elms);
-                update_elms = encodeURIComponent(`{${update_elms}}`);
-
-                let encoded_params = `dir=${encodeURIComponent(
-                    dir,
-                )}&file=${encodeURIComponent(target)}`;
-
-                if (probes != undefined) {
-                  encoded_params = encoded_params + `&probes=${encodeURIComponent(
-                      probes,
-                  )}`;
-                };
-
-                const command = `http://localhost:${port}/api/${proj.ctl_type}/update?${encoded_params}&updates=${update_elms}`;
-                console.log(command);
-                let response = await fetch(command, {});
-                let ckt = await response.json(); // ckt = {elements}
-                console.log("ckt=", ckt);
-                for (const [elm, props] of Object.entries(ckt.elements)) {
-                    if (elements[ckt_name][elm] != get_control(props)) {
-                        console.log(
-                            `Update error! ${elm}: ${get_control(props)}vs.${
-                                elements[ckt_name][elm]
-                            }`,
-                        );
-                    }
-                }
+                return [update_elms, target];
             }
         }
-        // ckt_store.set(ckt);
-        // elements_store.set(elements);
-    }
+        return ['', null];
+    }  
 
     export function update_models(ckt, models) {
         let update_mdls = {};
@@ -88,13 +56,34 @@
         }
         return update_mdls;
     }
+    
+    export function info_translated(info, proj) {
+        if (info == null) return null;
+        if (proj.ctl_type == "ngspctl") {
+          //return .map(a => {
+        return [info[0]].concat(info.slice(1).map((a) => translate(a)));
+        } else {
+          return info;
+        }
+    }
+
+    function translate(a) {
+        let m;
+        if ((m = a.match(/(.+)#branch/))) {
+          return `I(${m[1]})`;
+        } else {
+          return `V(${a})`;
+        }
+    }
 </script>
 
 <script lang="ts">
-    import { get_control, ctl_info } from "./openCircuit.svelte";
+    import { get_control,  } from "./openCircuit.svelte";
     import { proj, ckt } from "./shared.svelte";
     import { tooltip, msg } from "./Utils/tooltip.svelte";
-    export async function goLTspice() {
+    //import { getJSONfromGrape } from "./plotResults.svelte";
+
+  export async function goLTspice() {
         console.log('ckt=', $state.snapshot(ckt));
         console.log('proj.elements=', $state.snapshot(proj.elements));
         if (ckt == undefined || Object.keys(proj.elements).length == 0 || proj.ckt == '') {
@@ -103,10 +92,8 @@
         }
         console.log(`openCircuit dir='${proj.dir}' file='${proj.file}'`);
         //dispatch("elm_update", { text: "Update elements" });
-        update_elements(port, proj.dir, ckt, proj.elements, probes, proj.schema_editor);
-        const my_sleep = (ms) =>
-        new Promise((resolve) => setTimeout(resolve, ms));
-        await my_sleep(500);
+        //update_elements(port, proj.dir, ckt, proj.elements, probes, proj.schema_editor);
+        
         console.log("variations", $state.snapshot(variations));
         let encoded_params = `dir=${encodeURIComponent(
             proj.dir,
@@ -115,7 +102,21 @@
         )}&probes=${encodeURIComponent(
                 probes,
         )}&variations=${encodeURIComponent(JSON.stringify(variations))}`;
-        
+        //let elements_update = undefined;
+        //let target = undefined;
+        const [elements_update, target] = update_elements(ckt, proj.elements, proj.schema_editor);
+
+        if (elements_update != '') {
+            console.log('target=', target)
+            console.log(
+                "update elements=",
+                $state.snapshot(proj.elements),
+                ` here @ proj.dir= ${proj.dir} file=${target}`,
+            );
+            encoded_params =
+                encoded_params +
+                `&elements_update=${encodeURIComponent(`{${elements_update}}`)}`;
+        }  
         const models_update = update_models(ckt, proj.models);
         if (models_update != {}) {
             encoded_params =
@@ -124,19 +125,30 @@
         }
         // dispatch("sim_start", { text: "LTspice simulation started!" });
         on_sim_start("Simulation started!");
-        let response = await fetch(
-            `http://localhost:${port}/api/${proj.ctl_type}/simulate?${encoded_params}`,
-            {},
-        );
+        const command = `http://localhost:${port}/api/${proj.ctl_type}/simulate?${encoded_params}`;
+		console.log(command);
+        let response = await fetch(command, {});
         let res2 = await response.json();
         console.log(res2);
-        //if (ckt.info == null) {
-        response = await fetch(
-            `http://localhost:${port}/api/${proj.ctl_type}/info?${encoded_params}`,
-            {},
-        );
-        res2 = await response.json();
-        ckt.info = ctl_info(res2.info, proj);
+        if (elements_update != ''){
+            let elements = res2.updates;
+            for (const [ckt_name, elms] of Object.entries(ckt.elements)) {
+                if (ckt_name[0] == ".") {
+                    continue;
+                }
+                for (const [elm, props] of Object.entries(ckt.elements)) {
+                    if (elements[ckt_name][elm] != get_control(props)) {
+                        console.log(
+                            `Update error! ${elm}: ${get_control(props)}vs.${
+                                elements[ckt_name][elm]
+                            }`,
+                        );
+                    }
+                }
+            }
+        }
+        //res2 = await getJSONfromGrape(`http://localhost:${port}/api/${proj.ctl_type}/info?${encoded_params}`);
+        ckt.info = info_translated(res2.info, proj);
         console.log($state.snapshot(ckt.info));
         // ckt_store.set(ckt);
         //}
