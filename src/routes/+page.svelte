@@ -168,17 +168,15 @@
 				settings.step_precision[i],
 				"",
 			);
-			settings.plot_showhide[i] = true;
-			[
-				ckt_data.plotdata[i],
-				ckt_data.db_data[i],
-				ckt_data.ph_data[i],
-				sweep_name,
-			] = await result;
-			// ckt_data.plotdata[i] = ckt_data.plotdata[i];
-			// *const my_sleep = (ms) =>  ### sleep is useless
-			//	new Promise((resolve) => setTimeout(resolve, ms));
-			//await my_sleep(3000);
+			if (settings.probes[i] != '') {
+			    settings.plot_showhide[i] = true;
+    			[
+				    ckt_data.plotdata[i],
+				    ckt_data.db_data[i],
+				    ckt_data.ph_data[i],
+				    sweep_name,
+			    ] = await result;
+			}
 		}
 		console.log("ckt_data=", $state.snapshot(ckt_data));
 		console.log("sweep_name", sweep_name);

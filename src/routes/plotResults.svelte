@@ -74,13 +74,16 @@
     ) {
         // cookies.et('probes', probes, { path: '/conditions'});
         console.log(
-            `Plot results@dir='${dir}' file='${file}' probes=${probes}`,
+            `Plot results@dir='${dir}' file='${file}' probes='${probes}'`,
         );
-        if (probes == undefined) {
-            alert("Simulation completed but probes for plot are not defined");
+        if (probes == undefined || probes.trim() == '') {
+            //if (ckt.info != undefined && ckt.info != []) {
+            //    alert("Simulation completed but probes for plot are not defined");
+            //} else {
+                alert("Please set probes");
+            //}    
             return;
-        }
-        if (probes != probes.trim()) {
+        } else if (probes != probes.trim()) {
             alert("probes have unwanted leading space(s)");
             return;
         }
@@ -107,6 +110,35 @@
         }
         return [plotdata, db_data, ph_data, sweep_name, probes];
     }
+
+	export async function getJSONfromGrape(url) {
+        const controller = new AbortController()
+        //const result = document.getElementById('result')
+        //result.textContent = 'loading...'
+        await setTimeout(() => controller.abort(), 3000)
+        try {
+          const res = await fetch(url, {
+            signal: controller.signal
+          })
+          const json = await res.json()
+          //await new Promise(p => setTimeout(p, 3000))
+          /*
+          if (res.ok) {
+            result.innerHTML = JSON.stringify(json, null, '  ')
+          } else {
+            result.textContent = json
+          } */
+          return json;
+        } catch(e) {
+          if (e.name === 'AbortError') {
+            //result.textContent = 'Timeout error'
+            console.log('Timeout error');
+          } else {
+            //result.textContent = 'Network error'
+            console.log('Network error');
+          }
+        }
+    }	    
 </script>
 
 <script lang="ts">
@@ -225,6 +257,10 @@
         plotdata = [];
     }
     async function plot_result_clicked() {
+        if (ckt.info == undefined) {
+            alert('Simulation results are not available');
+            return;
+        }
         if (proj.simulator == "LTspice" && !check_probes_valid()) return;
         let result = await plot_result(
             port,
@@ -239,8 +275,10 @@
             step_precision,
             sweep_name,
         );
-        [plotdata, db_data, ph_data, sweep_name, probes] = result;
-        plot_showhide = false;
+        if (result != undefined) {
+            [plotdata, db_data, ph_data, sweep_name, probes] = result;
+            plot_showhide = false;
+        }
     }
 
     step_precision = 3;

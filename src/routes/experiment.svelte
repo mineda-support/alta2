@@ -98,7 +98,7 @@
 		const step = eng2f(items[start_index + 2]);
 		//console.log("step=", [name, start, stop, step]);
 		for (let v = start; ((start < stop) && (v <= stop)) || ((start > stop) && (v >= stop)); v = v + step) {
-			console.log("precision=", precision);
+			//console.log("precision=", precision);
 			src_values.push(`${name}=${v.toPrecision(precision)}`);
 		}
 		if (stop > start + step * (src_values.length - 1)) {
