@@ -58,6 +58,7 @@ module Test
   end
   class API < Grape::API
     @@ngspice_ckt = {}
+    @@ngspice_mtime = {}
     format :json
     prefix :api
     resource :misc do
@@ -137,13 +138,21 @@ module Test
           yield ckt_name
         }              
       end
+      def ckt_is_latest file
+        return nil unless ckt = @@ngspice_ckt[file]
+        return nil unless File.exist(ckt)
+        mtime = File.mtime ckt
+        return nil if mtime > @@ngspice_mtime[file]
+        @@ngspice_mtime[file] = mtime
+        ckt
+      end
     end
     
     resource :ngspctl do
       desc 'Open Xschem'
       get :open do
         open{|ckt_name|
-        unless ckt = @@ngspice_ckt[ckt_name]
+        unless ckt = ckt_is_latest(ckt_name)
           ckt = NgspiceControl.new(File.basename(ckt_name), true, true)
           puts "ckt.file@:open = #{ckt.file}"
           @@ngspice_ckt[ckt_name] = ckt
