@@ -143,10 +143,12 @@ module Test
       desc 'Open Xschem'
       get :open do
         open{|ckt_name|
-
-
-        ckt = NgspiceControl.new(File.basename(ckt_name), true, true)
-          ckt.open(File.basename(ckt_name), true, true) if params[:showup]
+        unless ckt = @@ngspice_ckt[ckt_name]
+          ckt = NgspiceControl.new(File.basename(ckt_name), true, true)
+          puts "ckt.file@:open = #{ckt.file}"
+          @@ngspice_ckt[ckt_name] = ckt
+        end
+        ckt.open(File.basename(ckt_name), true, true) if params[:showup]
           {"elements" => ckt.elements, "info" => nil, "models" => ckt.models}
         }
       end
@@ -159,6 +161,7 @@ module Test
             ckt = NgspiceControl.new(File.basename(ckt_name), true, true)
             @@ngspice_ckt[ckt_name] = ckt
           end
+          puts "ckt.file@:simulate = #{ckt.file}"
           if params[:elements_update]
             updates = eval params[:elements_update]
             puts "updates: #{updates}"
@@ -197,6 +200,7 @@ module Test
         probes = params[:probes] 
         Dir.chdir(work_dir){
           ckt = @@ngspice_ckt[ckt_name]
+          puts "ckt.file@:results = #{ckt.file}"
           if probes && probes.strip != ''
             vars, traces = ckt.get_traces *(probes.split(','))
             if probes.start_with? 'frequency'
