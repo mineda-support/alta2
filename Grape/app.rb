@@ -140,7 +140,7 @@ module Test
       end
       def ckt_is_latest file
         return nil unless ckt = @@ngspice_ckt[file]
-        return nil unless File.exist(ckt)
+        return nil unless File.exist?(ckt)
         mtime = File.mtime ckt
         return nil if mtime > @@ngspice_mtime[file]
         @@ngspice_mtime[file] = mtime
