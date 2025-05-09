@@ -137,10 +137,12 @@
                     continue;
                 }
                 for (const [elm, props] of Object.entries(ckt.elements)) {
-                    if (elements[ckt_name][elm] != get_control(props)) {
+                    //if (elements[ckt_name][elm] != get_control(props)) {
+                    if (elements[elm] != get_control(props)) {
                         console.log(
                             `Update error! ${elm}: ${get_control(props)}vs.${
-                                elements[ckt_name][elm]
+                                //elements[ckt_name][elm]
+                                elements[elm]
                             }`,
                         );
                     }
