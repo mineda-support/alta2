@@ -178,13 +178,25 @@
 
 	async function goLTspice2(ckt) {
 		console.log(`openCircuit dir='${proj.dir}' file='${proj.file}'`);
-		update_elements(port, proj.dir, ckt, proj.elements, probes, proj.schema_editor);
 		console.log("equation=", equation);
 		let encoded_params = `dir=${encodeURIComponent(
 			proj.dir,
 		)}&file=${encodeURIComponent(proj.file)}&probes=${encodeURIComponent(
 			probes,
 		)}&equation=${encodeURIComponent(equation)}`;
+
+	    const [elements_update, target] = update_elements(ckt, proj.elements, proj.schema_editor);
+        if (elements_update != '') {
+            console.log('target=', target)
+            console.log(
+                "update elements=",
+                $state.snapshot(proj.elements),
+                ` here @ proj.dir= ${proj.dir} file=${target}`,
+            );
+            encoded_params =
+                encoded_params +
+                `&elements_update=${encodeURIComponent(`{${elements_update}}`)}`;
+        } 
 		const models_update = update_models(ckt, proj.models);
 		if (models_update != {}) {
 			encoded_params =
