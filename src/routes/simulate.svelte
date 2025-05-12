@@ -1,21 +1,26 @@
 <script module>
+    export function schema_file(ckt_name, schema_editor) {
+        let target;
+        switch(schema_editor){
+            case 'LTspice':
+                target = ckt_name + ".asc";
+                break;
+            case 'Xschem':
+                target = ckt_name + ".sch";
+                break;
+            case 'EEschema':
+                target = ckt_name + ".sch";
+                break;
+            }
+            return target;
+    }
+
     export function update_elements(ckt, elements, schema_editor) {
         for (const [ckt_name, elms] of Object.entries(ckt.elements)) {
             if (ckt_name[0] == ".") {
                 continue;
             }
-            let target;
-            switch(schema_editor){
-                case 'LTspice':
-                    target = ckt_name + ".asc";
-                    break;
-                case 'Xschem':
-                    target = ckt_name + ".sch";
-                    break;
-                case 'EEschema':
-                    target = ckt_name + ".sch";
-                    break;
-                }
+            let target = schema_file(ckt_name, schema_editor)
             let update_elms = "";
             for (const [elm, props] of Object.entries(elms)) {
                 if (elements[ckt_name][elm] != get_control(props)) {

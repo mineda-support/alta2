@@ -37,6 +37,9 @@
                 ) {
                     src_values.push(val.toPrecision(src_precision));
                 }
+                if (!src_values.includes(Number(stop_lin_val).toPrecision(src_precision))){
+                    src_values.push(Number(stop_lin_val).toPrecision(src_precision));
+                }
                 break;
             case "Decade":
                 console.log("Decade");

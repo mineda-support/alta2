@@ -113,7 +113,7 @@
 
 <script lang="ts">
 	import Plot from "svelte-plotly.js";
-	import { update_elements, update_models } from "./simulate.svelte";
+	import { schema_file, update_elements, update_models } from "./simulate.svelte";
 	import SweepSource from "./Utils/sweep_source.svelte";
 	import ResultsPlot from "./Utils/results_plot.svelte";
 	import { tooltip, msg } from "./Utils/tooltip.svelte";
@@ -289,7 +289,7 @@
 			return;
 		}
 		let updates, target;
-		for (const value2 of settings.src_values[0]) {
+		for await (const value2 of settings.src_values[0]) {
 			//src, par_name, src_plus) {
 			[updates, target] = updates_plus(
 				value2,
@@ -302,7 +302,7 @@
 			//plot_trace.name = trace_name;
 			//result_trace.name = trace_name;
 			//console.log("updates=", updates, `on ${dir}${target}.asc`);
-			await update_elms(proj.dir, target + ".asc", updates);
+			await update_elms(proj.dir, schema_file(target, proj.schema_editor), updates);
 			// dispatch("sim_start", { text: "LTspice simulation started!" });
 			on_sim_start("LTspice simulation started!");
 			let calculated_value, plotdata, db_data, ph_data;
@@ -372,7 +372,7 @@
 				settings.src[0].replace(/^.*:/, "") + ":" + value2;
 			//plot_trace.name = trace_name;
 			//result_trace.name = trace_name;
-			console.log("updates=", updates, `on ${dir}${target}.asc`);
+			console.log("updates=", updates, `on ${dir}${schema_file(target, proj.schema_editor)}`);
 			//await update_elms(dir, target + ".asc", updates);
 			//dispatch("sim_start", { text: "LTspice simulation started!" });
 			count = count + 1;
