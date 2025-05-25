@@ -142,8 +142,8 @@
 </script>
 
 <script lang="ts">
-    import BodePlot from "./utils/bode_plot.svelte";
-    import SinglePlot from "./utils/single_plot.svelte";
+    import BodePlot from "./Utils/bode_plot.svelte";
+    import SinglePlot from "./Utils/single_plot.svelte";
     import { set_trace_names } from "./experiment.svelte";
     import { proj, ckt, settings } from "./shared.svelte.js";
     import { tooltip, msg } from "./Utils/tooltip.svelte";
