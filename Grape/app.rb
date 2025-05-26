@@ -138,6 +138,7 @@ module Test
           yield ckt_name
         }              
       end
+
       def ckt_is_latest file
         return nil unless ckt = @@ngspice_ckt[file]
         return nil unless File.exist?(ckt)

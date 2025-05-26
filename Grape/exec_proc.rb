@@ -2,7 +2,7 @@
 #load '../j_pack/j_pack.rb'
 #Dir.chdir '../j_pack'
 #load 'c:/Users/seiji/work/SvelteKit/new_alta/Grape/bsim3fit/bsim3_fit.rb'
-require 'debug'
+#require 'debug'
 require 'json'
 def exec_proc params
   puts "model=#{params[:model]}"
