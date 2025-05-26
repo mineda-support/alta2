@@ -139,15 +139,12 @@ module Test
         }              
       end
 
-      def latest_ckt file, at = nil
-        ckt = @@ngspice_ckt[file]
-        mtime = File.mtime file
-        if ckt.nil? || mtime > @@ngspice_mtime[file]
-          ckt = NgspiceControl.new(File.basename(file), true, true)
-          puts "ckt.file@#{at} = #{ckt.file}"
-          @@ngspice_ckt[file] = ckt
-          @@ngspice_mtime[file] = mtime
-        end
+      def ckt_is_latest file
+        return nil unless ckt = @@ngspice_ckt[file]
+        return nil unless File.exist?(ckt)
+        mtime = File.mtime ckt
+        return nil if mtime > @@ngspice_mtime[file]
+        @@ngspice_mtime[file] = mtime
         ckt
       end
     end
@@ -156,8 +153,12 @@ module Test
       desc 'Open Xschem'
       get :open do
         open{|ckt_name|
-          ckt = latest_ckt(ckt_name, :open)
-          ckt.open(File.basename(ckt_name), true, true) if params[:showup]
+        unless ckt = ckt_is_latest(ckt_name)
+          ckt = NgspiceControl.new(File.basename(ckt_name), true, true)
+          puts "ckt.file@:open = #{ckt.file}"
+          @@ngspice_ckt[ckt_name] = ckt
+        end
+        ckt.open(File.basename(ckt_name), true, true) if params[:showup]
           {"elements" => ckt.elements, "info" => nil, "models" => ckt.models}
         }
       end
@@ -166,7 +167,11 @@ module Test
         work_dir, ckt_name = Utils::get_params(params)
         probes = params[:probes] 
         Dir.chdir(work_dir){
-          ckt = latest_ckt(ckt_name, :simulate)
+          unless ckt = @@ngspice_ckt[ckt_name]
+            ckt = NgspiceControl.new(File.basename(ckt_name), true, true)
+            @@ngspice_ckt[ckt_name] = ckt
+          end
+          puts "ckt.file@:simulate = #{ckt.file}"
           if params[:elements_update]
             updates = eval params[:elements_update]
             puts "updates: #{updates}"
@@ -204,7 +209,8 @@ module Test
         #probes = params[:probes] ? URI.decode_www_form_component(params[:probes]): nil
         probes = params[:probes] 
         Dir.chdir(work_dir){
-          ckt = latest_ckt(ckt_name, :results)
+          ckt = @@ngspice_ckt[ckt_name]
+          puts "ckt.file@:results = #{ckt.file}"
           if probes && probes.strip != ''
             vars, traces = ckt.get_traces *(probes.split(','))
             if probes.start_with? 'frequency'
@@ -231,7 +237,7 @@ module Test
         updates = eval params[:updates]
         puts "updates: #{updates}"
         Dir.chdir(work_dir){
-          ckt = latest_ckt(ckt_name)
+          ckt = @@ngspice[ckt_name]
           ckt.set updates
           {"elements" => ckt.elements, "info" => ckt.info}
         }
@@ -240,7 +246,7 @@ module Test
       get :info do
         work_dir, ckt_name = Utils::get_params(params)
         Dir.chdir(work_dir){
-          ckt = latest_ckt(ckt_name)
+          ckt = @@ngspice[ckt_name]
           {"info" => ckt.info}
         }
       end   
@@ -253,7 +259,7 @@ module Test
         results = []
         Dir.chdir(work_dir){
           puts "equation for measurement: #{params[:equation]}"
-          ckt = latest_ckt(ckt_name)
+          ckt = @@ngspice_ckt[ckt_name]
           puts "plotdata: '#{params[:plotdata].inspect}', size=#{params[:plotdata].size}"
           if params[:plotdata] && params[:plotdata].size > 0
             params[:plotdata].each{|plotdata|
