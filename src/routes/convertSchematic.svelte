@@ -19,7 +19,7 @@
     import { goto } from "$app/navigation";
     import { proj } from "./shared.svelte";
     import { tooltip, msg } from "./Utils/tooltip.svelte";
-    let { port, dir, editor = $bindable() } = $props();
+    let { port, dir, editor = $bindable(), chosen } = $props();
 
     // function convertSchematic(selected) {
     //    alert("conversion to " + selected);
@@ -48,7 +48,11 @@
         console.log(`program=${program}`);
         return `dir=${encodeURIComponent(dir)}&program=${program}`;
     }
-    async function convert_edif() {
+    async function convert_edif(chosen) {
+        if (chosen != undefined ) {
+            edif2ltspice(port, dir, chosen); // I don't know where 'dir' comes from
+            return;
+        }
         const pickerOpts = {
             types: [
                 { description: "EDIF(.edif)", accept: { "edif/*": [".edif"] } },
@@ -123,7 +127,7 @@
 {#if proj.schema_editor == 'LTspice'}
 <button
     use:tooltip={() => msg("Convert from Edif file")}
-    onclick={() => convert_edif()}
+    onclick={() => convert_edif(chosen)}
     class="button-2">Convert from Edif file</button
 >
 {/if}

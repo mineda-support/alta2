@@ -294,8 +294,9 @@
 	{#if show_circuit}
 		<ConvertSchematic
 			port={data.props.port}
-			dir={proj.dir}
+			dir={data.props.wdir}
 			bind:editor={proj.schema_editor}
+			{chosen}
 		/>
 		<OpenCircuit
 			{data}
@@ -303,6 +304,7 @@
 			bind:variations
 			bind:nvar
 			bind:current_plot
+			bind:chosen
 		/>
 		<!--	plot_on:open_end={plot_results} -->
 		<Settings {data} {ckt} bind:variations />

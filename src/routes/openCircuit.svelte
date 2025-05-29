@@ -117,12 +117,13 @@
     variations = $bindable({}),
     nvar = $bindable(),
     current_plot = $bindable(),
+    chosen = $bindable(),
   } = $props();
   import { proj, ckt } from "./shared.svelte";
   //import { files } from "$service-worker"; ### this caused app.js:16 ReferenceError: ServiceWorkerGlobalScope is not defined
   //import { esbuildVersion } from "vite";
 
-  let chosen = $state(data.props.ckt);
+  // let chosen = $state(data.props.ckt);
   let showup = $state(false);
   if (chosen != undefined) {
     openCircuit(data.props.port, data.props.wdir, chosen, showup);
