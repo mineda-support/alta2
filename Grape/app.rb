@@ -316,6 +316,7 @@ module Test
           desc = SXP.read(File.read(edif_file).encode('UTF-8'))
           $resistor_with_bulk = true
           e = Edif_out.new desc
+          FileUtils.rm_rf 'pictures/*'
           e.edif2cdraw
           [Dir.glob('pictures/**/*.asc') + Dir.glob('pictures/**/*.asy')].each{|file|
             FileUtils.cp file, '.'
