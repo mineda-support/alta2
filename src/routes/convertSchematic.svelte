@@ -55,7 +55,7 @@
         }
         const pickerOpts = {
             types: [
-                { description: "EDIF(.edif)", accept: { "edif/*": [".edif"] } },
+                { description: "EDIF(.edif/out)", accept: { "edif/*": [".edif", ".out"] } },
             ],
             multiple: false,
         };

@@ -42,7 +42,9 @@ export async function load({ url }) {
                 }
             };
         } else {
-            const files = globSync(wdir + '*.asc').concat(globSync(wdir + '*.sch')).concat(globSync(wdir + '*.edif'));
+            const files = globSync(wdir + '*.asc').concat(globSync(wdir + '*.sch'))
+                                                  .concat(globSync(wdir + '*.edif'))
+                                                  .concat(globSync(wdir + '*.out'));
             const symbol_files = globSync(wdir + '*.asy').concat(globSync(wdir + '*.sym'))
             files.forEach(file => {
                 // console.log(file);
