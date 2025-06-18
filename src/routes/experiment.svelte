@@ -113,7 +113,7 @@
 
 <script lang="ts">
 	import Plot from "svelte-plotly.js";
-	import { update_elements, update_models } from "./simulate.svelte";
+	import { schema_file, update_elements, update_models } from "./simulate.svelte";
 	import SweepSource from "./Utils/sweep_source.svelte";
 	import ResultsPlot from "./Utils/results_plot.svelte";
 	import { tooltip, msg } from "./Utils/tooltip.svelte";
@@ -178,13 +178,25 @@
 
 	async function goLTspice2(ckt) {
 		console.log(`openCircuit dir='${proj.dir}' file='${proj.file}'`);
-		update_elements(port, proj.dir, ckt, proj.elements, probes, proj.schema_editor);
 		console.log("equation=", equation);
 		let encoded_params = `dir=${encodeURIComponent(
 			proj.dir,
 		)}&file=${encodeURIComponent(proj.file)}&probes=${encodeURIComponent(
 			probes,
 		)}&equation=${encodeURIComponent(equation)}`;
+
+	    const [elements_update, target] = update_elements(ckt, proj.elements, proj.schema_editor);
+        if (elements_update != '') {
+            console.log('target=', target)
+            console.log(
+                "update elements=",
+                $state.snapshot(proj.elements),
+                ` here @ proj.dir= ${proj.dir} file=${target}`,
+            );
+            encoded_params =
+                encoded_params +
+                `&elements_update=${encodeURIComponent(`{${elements_update}}`)}`;
+        } 
 		const models_update = update_models(ckt, proj.models);
 		if (models_update != {}) {
 			encoded_params =
@@ -277,7 +289,7 @@
 			return;
 		}
 		let updates, target;
-		for (const value2 of settings.src_values[0]) {
+		for await (const value2 of settings.src_values[0]) {
 			//src, par_name, src_plus) {
 			[updates, target] = updates_plus(
 				value2,
@@ -290,7 +302,7 @@
 			//plot_trace.name = trace_name;
 			//result_trace.name = trace_name;
 			//console.log("updates=", updates, `on ${dir}${target}.asc`);
-			await update_elms(proj.dir, target + ".asc", updates);
+			await update_elms(proj.dir, schema_file(target, proj.schema_editor), updates);
 			// dispatch("sim_start", { text: "LTspice simulation started!" });
 			on_sim_start("LTspice simulation started!");
 			let calculated_value, plotdata, db_data, ph_data;
@@ -360,7 +372,7 @@
 				settings.src[0].replace(/^.*:/, "") + ":" + value2;
 			//plot_trace.name = trace_name;
 			//result_trace.name = trace_name;
-			console.log("updates=", updates, `on ${dir}${target}.asc`);
+			console.log("updates=", updates, `on ${dir}${schema_file(target, proj.schema_editor)}`);
 			//await update_elms(dir, target + ".asc", updates);
 			//dispatch("sim_start", { text: "LTspice simulation started!" });
 			count = count + 1;

@@ -57,6 +57,8 @@ module Test
     end
   end
   class API < Grape::API
+    @@ngspice_ckt = {}
+    @@ngspice_mtime = {}
     format :json
     prefix :api
     resource :misc do
@@ -131,6 +133,7 @@ module Test
     helpers do 
       def open
         work_dir, ckt_name = Utils::get_params(params)
+
         Dir.chdir(work_dir){
           begin
             yield ckt_name
@@ -140,14 +143,27 @@ module Test
           end
         }              
       end
+
+      def ckt_is_latest file
+        return nil unless ckt = @@ngspice_ckt[file]
+        return nil unless File.exist?(ckt)
+        mtime = File.mtime ckt
+        return nil if mtime > @@ngspice_mtime[file]
+        @@ngspice_mtime[file] = mtime
+        ckt
+      end
     end
     
     resource :ngspctl do
       desc 'Open Xschem'
       get :open do
         open{|ckt_name|
+        unless ckt = ckt_is_latest(ckt_name)
           ckt = NgspiceControl.new(File.basename(ckt_name), true, true)
-          ckt.open(File.basename(ckt_name), true, true) if params[:showup]
+          puts "ckt.file@:open = #{ckt.file}"
+          @@ngspice_ckt[ckt_name] = ckt
+        end
+        ckt.open(File.basename(ckt_name), true, true) if params[:showup]
           {"elements" => ckt.elements, "info" => nil, "models" => ckt.models}
         }
       end
@@ -156,7 +172,11 @@ module Test
         work_dir, ckt_name = Utils::get_params(params)
         probes = params[:probes] 
         Dir.chdir(work_dir){
-          ckt = NgspiceControl.new(File.basename(ckt_name), true, true)
+          unless ckt = @@ngspice_ckt[ckt_name]
+            ckt = NgspiceControl.new(File.basename(ckt_name), true, true)
+            @@ngspice_ckt[ckt_name] = ckt
+          end
+          puts "ckt.file@:simulate = #{ckt.file}"
           if params[:elements_update]
             updates = eval params[:elements_update]
             puts "updates: #{updates}"
@@ -185,7 +205,7 @@ module Test
             end 
           else
             {"log" => ckt.sim_log, "updates" => ckt.elements, "info" => ckt.info}          
-            end
+          end
           }
         end
       desc 'Results'
@@ -193,12 +213,11 @@ module Test
         work_dir, ckt_name = Utils::get_params(params)
         #probes = params[:probes] ? URI.decode_www_form_component(params[:probes]): nil
         probes = params[:probes] 
-        puts "ngspctl results: probes = #{probes}"
         Dir.chdir(work_dir){
-          ckt = NgspiceControl.new(File.basename(ckt_name), true, true)
+          ckt = @@ngspice_ckt[ckt_name]
+          puts "ckt.file@:results = #{ckt.file}"
           if probes && probes.strip != ''
             vars, traces = ckt.get_traces *(probes.split(','))
-            puts "ngspctl results: traces[0][:x].length = #{traces[0][:x].length}"
             if probes.start_with? 'frequency'
               db_traces = traces.map{|trace| {name: trace[:name], x: trace[:x], y: trace[:y].map{|a| 20.0*Math.log10(a.abs)}}}
               phase_traces = traces.map{|trace| {name: trace[:name], x: trace[:x], y: trace[:y].map{|a| Utils::shift360(a.phase*(180.0/Math::PI))}}}
@@ -223,7 +242,7 @@ module Test
         updates = eval params[:updates]
         puts "updates: #{updates}"
         Dir.chdir(work_dir){
-          ckt = NgspiceControl.new(File.basename(ckt_name), true, false) # recursive read does not work for update
+          ckt = @@ngspice[ckt_name]
           ckt.set updates
           {"elements" => ckt.elements, "info" => ckt.info}
         }
@@ -232,7 +251,7 @@ module Test
       get :info do
         work_dir, ckt_name = Utils::get_params(params)
         Dir.chdir(work_dir){
-          ckt = NgspiceControl.new(File.basename(ckt_name), true, true)
+          ckt = @@ngspice[ckt_name]
           {"info" => ckt.info}
         }
       end   
@@ -245,7 +264,7 @@ module Test
         results = []
         Dir.chdir(work_dir){
           puts "equation for measurement: #{params[:equation]}"
-          ckt = LTspiceControl.new(File.basename ckt_name)
+          ckt = @@ngspice_ckt[ckt_name]
           puts "plotdata: '#{params[:plotdata].inspect}', size=#{params[:plotdata].size}"
           if params[:plotdata] && params[:plotdata].size > 0
             params[:plotdata].each{|plotdata|
@@ -301,7 +320,8 @@ module Test
         Dir.chdir(work_dir){
           desc = SXP.read(File.read(edif_file).encode('UTF-8'))
           $resistor_with_bulk = true
-          e = Edif_out.new desc
+          e = Edif_in.new desc
+          FileUtils.rm_rf 'pictures/*'
           e.edif2cdraw
           [Dir.glob('pictures/**/*.asc') + Dir.glob('pictures/**/*.asy')].each{|file|
             FileUtils.cp file, '.'
