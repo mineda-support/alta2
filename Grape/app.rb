@@ -132,7 +132,12 @@ module Test
       def open
         work_dir, ckt_name = Utils::get_params(params)
         Dir.chdir(work_dir){
-          yield ckt_name
+          begin
+            yield ckt_name
+          rescue => error
+            puts "Error at open: #{error}"
+            error!(error, 404)
+          end
         }              
       end
     end

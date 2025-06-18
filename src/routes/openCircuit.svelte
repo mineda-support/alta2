@@ -70,6 +70,7 @@
     );
     let res2 = await response.json();
     console.log(res2);
+    res2.error && alert(res2.error);
     console.log("probes:", probes);
     if (probes != undefined) {
       // goLTspice();
