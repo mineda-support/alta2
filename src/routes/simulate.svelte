@@ -134,6 +134,10 @@
 		console.log(command);
         let response = await fetch(command, {});
         let res2 = await response.json();
+        if (res2.error) {
+          alert(res2.error);
+          return;
+        }
         console.log(res2);
         if (elements_update != ''){
             let elements = res2.updates;
