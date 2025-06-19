@@ -139,6 +139,7 @@ module Test
             yield ckt_name
           rescue => error
             puts "Error at open: #{error}"
+            puts error.backtrace.join("\n")
             error!(error, 404)
           end
         }              
@@ -148,7 +149,7 @@ module Test
         return nil unless ckt = @@ngspice_ckt[file]
         return nil unless File.exist?(file)
         mtime = File.mtime file
-        return nil if mtime > @@ngspice_mtime[file]
+        return nil if @@ngspice_mtime[file] && (mtime > @@ngspice_mtime[file])
         @@ngspice_mtime[file] = mtime
         ckt
       end
@@ -186,7 +187,13 @@ module Test
           puts "variations: #{params[:variations]}"
           variations = params[:variations] ? eval(params[:variations].gsub('null', 'nil')) : {}
           models_update = params[:models_update] ? eval(params[:models_update]) : {}
-          ckt.simulate models_update: models_update, variations: variations, probes: probes.split(',')
+          begin
+            ckt.simulate models_update: models_update, variations: variations, probes: probes.split(',')
+          rescue => error
+            puts "Error at simulate: #{error}"
+            puts error.backtrace.join("\n")
+            error!(error, 500)
+          end
           puts "probes=#{probes}"
           if probes && probes.strip != ''
             vars, traces = ckt.get_traces *(probes.split(','))
@@ -242,7 +249,11 @@ module Test
         updates = eval params[:updates]
         puts "updates: #{updates}"
         Dir.chdir(work_dir){
-          ckt = @@ngspice[ckt_name]
+          ckt = @@ngspice_ckt[ckt_name]
+          #unless ckt = @@ngspice_ckt[ckt_name]
+          #  ckt = NgspiceControl.new(File.basename(ckt_name), true, true)
+          #  @@ngspice_ckt[ckt_name] = ckt
+          #end          
           ckt.set updates
           {"elements" => ckt.elements, "info" => ckt.info}
         }
@@ -251,7 +262,7 @@ module Test
       get :info do
         work_dir, ckt_name = Utils::get_params(params)
         Dir.chdir(work_dir){
-          ckt = @@ngspice[ckt_name]
+          ckt = @@ngspice_ckt[ckt_name]
           {"info" => ckt.info}
         }
       end   
