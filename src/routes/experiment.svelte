@@ -186,6 +186,7 @@
 		)}&equation=${encodeURIComponent(equation)}`;
 
 	    const [elements_update, target] = update_elements(ckt, proj.elements, proj.schema_editor);
+		console.log("elements_update:", elements_update);
         if (elements_update != '') {
             console.log('target=', target)
             console.log(
@@ -198,17 +199,24 @@
                 `&elements_update=${encodeURIComponent(`{${elements_update}}`)}`;
         } 
 		const models_update = update_models(ckt, proj.models);
+		console.log("models_update: ", models_update);
 		if (models_update != {}) {
 			encoded_params =
 				encoded_params +
 				`&models_update=${encodeURIComponent(JSON.stringify(models_update))}`;
 		}
 		// dispatch("sim_start", { text: "LTspice simulation started!" });
+		console.log("execute: ", `http://localhost:${port}/api/${proj.ctl_type}/simulate?${encoded_params}`)
 		let response = await fetch(
 			`http://localhost:${port}/api/${proj.ctl_type}/simulate?${encoded_params}`,
 			{},
 		);
+		console.log('response', response);
 		let res2 = await response.json();
+		if (res2.error) {
+          alert(res2.error);
+          return;
+        }
 		console.log("res2=", res2);
 		// plotdata = res2.traces;
 		let plotdata, db_data, ph_data;
