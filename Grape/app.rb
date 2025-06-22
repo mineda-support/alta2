@@ -203,6 +203,7 @@ module Test
               if equation = params[:equation]
                 results = eval_db_ph_equation db_traces, phase_traces, equation
               end
+              puts "calculated_value: #{results}"
               {"vars" => vars, "db" => db_traces, "phase" => phase_traces, "calculated_value" => results, "updates" => ckt.elements, "info" => ckt.info}
             else
               if equation = params[:equation]

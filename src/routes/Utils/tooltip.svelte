@@ -10,11 +10,11 @@
     const details = {
         'switch working directory': '\n回路データのあるワークディレクトリを絶対パスで指定する',
         'readin circuit checked above': '\選択された回路を読み込む',
-        'show up schematic editor': `\nチェックしていれば、${proj.schematic_eitor}が開きます。alta2の内部状態とは同期しないので注意！`,
+        'show up schematic editor': `\nチェックしていれば、${proj.schema_editor}が開きます。alta2の内部状態とは同期しないので注意！`,
         'elements and control': '\n回路に含まれる素子と制御情報です',
         'variations on device parameters': '\n素子特性を調べるときに、変化させた素子値で一挙にシミュレーションする',
         'save settings in a working directory': '\n設定情報を、ワークディレクトリに保存する',
-        'load settings from a file': '\nワークディレクトリふファイルから、設定情報をロードします。',
+        'load settings from a file': '\nワークディレクトリファイルから、設定情報をロードします。',
         'run LTspice simulation': '\nシミュレーションを実行します。表示中のプロットはクリアされ、プローブを設定したプロットを表示する',
         'load measurement group': '\n測定データファイルと測定条件を測定グループとして、所定の形式のcsvファイルで指定する',
         'setup simulation for measurement group': '\n測定グループのシミュレーション条件を設定する',
