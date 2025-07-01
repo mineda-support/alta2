@@ -9,9 +9,15 @@
 		if (probes != null && probes.startsWith("frequency")) {
 			sweep_name = set_trace_names2(db_data, elements, step_precision);
 			sweep_name = set_trace_names2(ph_data, elements, step_precision);
+			if (sweep_name == undefined) {
+				sweep_name = db_data[0].name.replace(/=.*$/, '');
+			}
 			//console.log("db_data in set_trace_names=", db_data);
 		} else {
 			sweep_name = set_trace_names2(plotdata, elements, step_precision);
+			if (sweep_name == undefined) {
+				sweep_name = plotdata[0].name.replace(/=.*$/, '');
+			}
 		}
 		return [plotdata, db_data, ph_data, sweep_name, vars.slice(0, -1).join(',')];
 	}
@@ -45,6 +51,7 @@
 				}
 			}
 		}
+		return sweep_name;
 	}
 
 	function eng2f(str) {
@@ -316,6 +323,7 @@
 			let calculated_value, plotdata, db_data, ph_data;
 			[calculated_value, plotdata, db_data, ph_data, sweep_name] =
 				await goLTspice2(ckt);
+			settings.sweep_title[0] = sweep_name;
 			performances.forEach(function (perf, index) {
 				if (proj.results_data[0][perf] == undefined) {
 					proj.results_data[0][perf] = [];
