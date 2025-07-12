@@ -196,14 +196,19 @@ module Test
           end
           puts "probes=#{probes}"
           if probes && probes.strip != ''
-            vars, traces = ckt.get_traces *(probes.split(','))
+            begin
+              vars, traces = ckt.get_traces *(probes.split(','))
+            rescue => error
+              puts "Error at get_traces: #{error}"
+              puts error.backtrace.join("\n")
+              error!(error, 500)
+            end
             if probes.start_with? 'frequency'
               db_traces = traces.map{|trace| {name: trace[:name], x: trace[:x], y: trace[:y].map{|a| 20.0*Math.log10(a.abs)}}}
               phase_traces = traces.map{|trace| {name: trace[:name], x: trace[:x], y: trace[:y].map{|a| Utils::shift360(a.phase*(180.0/Math::PI))}}}
               if equation = params[:equation]
                 results = eval_db_ph_equation db_traces, phase_traces, equation
               end
-              puts "calculated_value: #{results}"
               {"vars" => vars, "db" => db_traces, "phase" => phase_traces, "calculated_value" => results, "updates" => ckt.elements, "info" => ckt.info}
             else
               if equation = params[:equation]
@@ -359,7 +364,13 @@ module Test
           ckt.simulate models_update: models_update, variations: variations
           puts "probes=#{probes}"
           if probes && probes.strip != ''
-            vars, traces = ckt.get_traces *(probes.split(','))
+            begin
+              vars, traces = ckt.get_traces *(probes.split(','))
+            rescue => error
+              puts "Error at get_traces: #{error}"
+              puts error.backtrace.join("\n")
+              error!(error, 500)
+            end
             if probes.start_with? 'frequency'
               db_traces = traces.map{|trace| {name: trace[:name], x: trace[:x], y: trace[:y].map{|a| 20.0*Math.log10(a.abs)}}}
               phase_traces = traces.map{|trace| {name: trace[:name], x: trace[:x], y: trace[:y].map{|a| Utils::shift360(a.phase*(180.0/Math::PI))}}}
