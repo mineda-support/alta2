@@ -24,6 +24,8 @@
 
 	let current_plot = $state(0); //  = 0;
 
+	let show_details = $state(false);
+
 	/*
 	function plot_results() {
 		if (variations == {}) {
@@ -168,14 +170,14 @@
 				settings.step_precision[i],
 				"",
 			);
-			if (settings.probes[i] != '') {
-			    settings.plot_showhide[i] = true;
-    			[
-				    ckt_data.plotdata[i],
-				    ckt_data.db_data[i],
-				    ckt_data.ph_data[i],
-				    sweep_name,
-			    ] = await result;
+			if (settings.probes[i] != "") {
+				settings.plot_showhide[i] = show_details;
+				[
+					ckt_data.plotdata[i],
+					ckt_data.db_data[i],
+					ckt_data.ph_data[i],
+					sweep_name,
+				] = await result;
 			}
 		}
 		console.log("ckt_data=", $state.snapshot(ckt_data));
@@ -209,7 +211,7 @@
 	function duplicate_plot(ckt_data) {
 		settings.plot_showhide.push(true);
 		let new_plot = settings.plot_showhide.length - 1;
-		settings.title[new_plot ]= settings.title[current_plot];
+		settings.title[new_plot] = settings.title[current_plot];
 		settings.title_x[new_plot] = settings.title_x[current_plot];
 		settings.title_y[new_plot] = settings.title_y[current_plot];
 		settings.title_y1[new_plot] = settings.title_y1[current_plot];
@@ -217,13 +219,16 @@
 		settings.yaxis_is_log[new_plot] = settings.yaxis_is_log[current_plot];
 		settings.xaxis_is_log[new_plot] = settings.xaxis_is_log[current_plot];
 		settings.equation[new_plot] = settings.equation[current_plot];
-		settings.performance_names[new_plot] = settings.performance_names[current_plot];
+		settings.performance_names[new_plot] =
+			settings.performance_names[current_plot];
 		settings.probes[new_plot] = settings.probes[current_plot];
 		ckt_data.plotdata[new_plot] = [...ckt_data.plotdata[current_plot]];
 		ckt_data.db_data[new_plot] = [...ckt_data.db_data[current_plot]];
 		ckt_data.ph_data[new_plot] = [...ckt_data.ph_data[current_plot]];
 		ckt_data.measdata[new_plot] = [...ckt_data.measdata[current_plot]];
-		ckt_data.calculated_value[new_plot] = [...ckt_data.calculated_value[current_plot]];
+		ckt_data.calculated_value[new_plot] = [
+			...ckt_data.calculated_value[current_plot],
+		];
 		settings.selection[new_plot] = settings.selection[current_plot];
 		settings.reverse[new_plot] = settings.reverse[current_plot];
 		settings.invert_x[new_plot] = settings.invert_x[current_plot];
@@ -340,6 +345,11 @@
 				onclick={plot_measurement_group}
 				class="button-2">Plot measurement group</button
 			>
+			<label use:tooltip={() => msg("show plot details")}>
+				<input type="checkbox" bind:checked={show_details} />
+				show details
+			</label>
+
 			<button
 				use:tooltip={() => msg("clear measurement group")}
 				onclick={clear_measurement_group}
