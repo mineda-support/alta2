@@ -46,6 +46,7 @@ module Test
   class Utils
     def self.get_params params
       work_dir = params[:dir] || ENV['HOMEPATH'] + '/Seafile/PTS06_2022_8/BGR_TEG/'
+      work_dir.sub!('%HOMEPATH%', ENV['HOMEPATH'] || ENV['HOME'])
       ckt_name = File.join(work_dir, params[:file] || 'tsd_TEG_tb.asc')
       [work_dir, ckt_name] 
     end
