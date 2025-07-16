@@ -362,7 +362,11 @@ module Test
           puts "variations: #{params[:variations]}"
           variations = params[:variations] ? eval(params[:variations].gsub('null', 'nil')) : {}
           models_update = params[:models_update] ? eval(params[:models_update]) : {}
-          ckt.simulate models_update: models_update, variations: variations
+          begin => error
+            ckt.simulate models_update: models_update, variations: variations
+          rescue
+            error!(error, 500)
+          end
           puts "probes=#{probes}"
           if probes && probes.strip != ''
             begin
