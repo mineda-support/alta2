@@ -362,9 +362,9 @@ module Test
           puts "variations: #{params[:variations]}"
           variations = params[:variations] ? eval(params[:variations].gsub('null', 'nil')) : {}
           models_update = params[:models_update] ? eval(params[:models_update]) : {}
-          begin => error
+          begin
             ckt.simulate models_update: models_update, variations: variations
-          rescue
+          rescue  => error
             error!(error, 500)
           end
           puts "probes=#{probes}"
