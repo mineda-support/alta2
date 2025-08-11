@@ -5,6 +5,7 @@
 		const ph_data = res2.phase;
 		const vars = res2.vars;
 		let sweep_name;
+		let sweep_value;
 		//console.log('probes in set_trace_names=', probes);
 		if (probes != null && probes.startsWith("frequency")) {
 			sweep_name = set_trace_names2(db_data, elements, step_precision);
@@ -17,6 +18,12 @@
 			sweep_name = set_trace_names2(plotdata, elements, step_precision);
 			if (sweep_name == undefined) {
 				sweep_name = plotdata[0].name.replace(/=.*$/, '');
+
+				for (let i = 0; i < plotdata.length; i++){
+                  sweep_value = plotdata[i].name.replace(/.*=/, '');
+				  sweep_value = Number(sweep_value).toPrecision(step_precision);
+				  plotdata[i].name = `${plotdata[i].name.replace(/=.*$/, '')}=${sweep_value}`;
+				}
 			}
 		}
 		return [plotdata, db_data, ph_data, sweep_name, vars.slice(0, -1).join(',')];
