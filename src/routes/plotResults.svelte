@@ -305,7 +305,7 @@
 
     proj.results_data[0] = {};
 
-    async function calculate_equation() {
+    async function calculate_equation(probes) {
         proj.results_data = [];
         proj.results_data[0] = {};
         calculated_value = await submit_equation(
@@ -319,6 +319,7 @@
             measdata == undefined
                 ? []
                 : measdata.filter((trace) => trace.checked),
+            probes
         );
         console.log(
             "calculated_value in calculate_equation:",
@@ -358,10 +359,12 @@
         db_data,
         ph_data,
         measdata,
+        probes
     ) {
         const encoded_params = `dir=${encodeURIComponent(
             dir,
-        )}&file=${encodeURIComponent(file)}`;
+        )}&file=${encodeURIComponent(file)}&probes=${encodeURIComponent(
+            probes)}`;
         console.log(`equation to send: ${equation}`);
         console.log(
             "plotdata:",
@@ -386,6 +389,10 @@
                 }),
             },
         );
+		//if (res.error) {
+        //  alert(res.error);
+        //  return;
+        //}
         let result = await res.json();
         //console.log('result in submit_equation:', result);
         if (plotdata != undefined) {
@@ -791,7 +798,7 @@
             <button
                 use:tooltip={() =>
                     msg("calculate equations for a current plot")}
-                onclick={() => calculate_equation()}
+                onclick={() => calculate_equation(probes)}
                 class="button-1"
             >
                 Calculate</button
@@ -803,7 +810,7 @@
                             {#each performances as perf}
                                 <th>{perf}</th>
                             {/each}
-                            <th>Sweep parameter</th>
+                            <th>Sweep src/parameter</th>
                         </tr>
                     </thead>
                     <tbody>
