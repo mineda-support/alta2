@@ -1,11 +1,13 @@
 <script module>
-    export function get_sweep_values(plotdata) {
+    export function get_sweep_values(plotdata, nv=1) {
         let values = [];
         let sweep, value;
         console.log("plotdata in get_sweep_values=", $state.snapshot(plotdata));
-        plotdata.forEach((trace) => {
-            [sweep, value] = trace.name.split("=");
-            values.push(Number(value));
+        plotdata.forEach(function(trace, index){
+            if(index % nv == 0) {
+              [sweep, value] = trace.name.split("=");
+              values.push(Number(value));
+            }
         });
         return values;
     }
@@ -341,7 +343,7 @@
             if (calculated_value != undefined) {
                 proj.results_data[0][perf].push({
                     x: get_sweep_values(
-                        plotdata != undefined ? plotdata : db_data,
+                        plotdata != undefined ? plotdata : db_data, probes.split(',').length - 1
                     ),
                     y: get_performance(calculated_value, index),
                     // name: equation_array[index],
@@ -389,10 +391,10 @@
                 }),
             },
         );
-		//if (res.error) {
-        //  alert(res.error);
-        //  return;
-        //}
+		if (res.error) {
+          alert(res.error);
+          return;
+        }
         let result = await res.json();
         //console.log('result in submit_equation:', result);
         if (plotdata != undefined) {
@@ -821,8 +823,8 @@
                                 {/each}
                                 <td
                                     >{plotdata == undefined
-                                        ? db_data[i].name
-                                        : plotdata[i].name}</td
+                                        ? db_data[i*(probes.split(',').length-1)].name
+                                        : plotdata[i*(probes.split(',').length-1)].name.replace(/.*@/, '')}</td
                                 >
                             </tr>
                         {/each}
