@@ -1,14 +1,17 @@
 require 'grape'
 #$:.unshift File.join(ENV['HOME'].gsub(/\\/, '/'), '/work/alb2/lib')
 $:.unshift File.join('..', '..', 'j_pack')
+$:.unshift File.join('..', '..', '..', 'j_pack')
+$:.unshift '..'
 $:.unshift '.'
 puts "hello world from ruby"
-# puts $:
+puts Dir.pwd
+puts $:
 require 'j_pack'
 #require 'byebug'
-require './csv_read'
-require './xls_read'
-require './exec_proc'
+require 'csv_read'
+require 'xls_read'
+require 'exec_proc'
 
 def coordinates probe
   offset = @vars.index(probe)
