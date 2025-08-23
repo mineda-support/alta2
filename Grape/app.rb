@@ -23,7 +23,7 @@ def coordinates probe
 end
 
 def eval_equation vars, plot_data, equation
-  puts "vars=#{vars} at eval_equation"
+  puts "vars=#{vars} at eval_equation for equation", equation, '----' 
   @vars = vars
   @plot_data = plot_data
   # if plot_data && plot_data.size > 0
@@ -35,6 +35,7 @@ def eval_equation vars, plot_data, equation
       puts "vars=#{vars} i=#{i} @index=#{@index} results: #{results}"
     end
   else 
+    $stderr.puts "plot_data.size = #{plot_data.size}"
     plot_data.each{|plotdata|
       x = Array_with_interpolation.new plotdata[:x]
       y = Array_with_interpolation.new plotdata[:y]
@@ -163,9 +164,9 @@ module Test
           begin
             yield ckt_name
           rescue => error
-            puts "Error at open: #{error}"
-            puts error.backtrace.join("\n")
-            error!(error, 404)
+            $stderr.puts "Error at open: #{error}"
+            $stderr.puts error.backtrace.join("\n")
+            error!("#{error}\n\n#{error.backtrace.join("\n")}", 404)
           end
         }              
       end
@@ -213,37 +214,37 @@ module Test
           variations = params[:variations] ? eval(params[:variations].gsub('null', 'nil')) : {}
           models_update = params[:models_update] ? eval(params[:models_update]) : {}
           begin
-            ckt.simulate models_update: models_update, variations: variations, probes: probes.split(',')
+            keys, results = ckt.simulate models_update: models_update, variations: variations, probes: probes.split(',')
           rescue => error
-            puts "Error at simulate: #{error}"
-            puts error.backtrace.join("\n")
-            error!(error, 500)
+            $stderr.puts "Error at simulate: #{error}"
+            $stderr.puts error.backtrace.join("\n")
+            error!("#{error}\n\n#{error.backtrace.join("\n")}", 500)
           end
           puts "probes=#{probes}"
           if probes && probes.strip != ''
             begin
               vars, traces = ckt.get_traces *(probes.split(','))
             rescue => error
-              puts "Error at get_traces: #{error}"
-              puts error.backtrace.join("\n")
-              error!(error, 500)
+              $stderr.puts "Error at get_traces: #{error}"
+              $stderr.puts error.backtrace.join("\n")
+              error!("#{error}\n\n#{error.backtrace.join("\n")}", 500)
             end
             begin
               if probes.start_with? 'frequency'
                 db_traces = traces.map{|trace| {name: trace[:name], x: trace[:x], y: trace[:y].map{|a| 20.0*Math.log10(a.abs)}}}
                 phase_traces = traces.map{|trace| {name: trace[:name], x: trace[:x], y: trace[:y].map{|a| Utils::shift360(a.phase*(180.0/Math::PI))}}}
-                if equation = params[:equation]
+                if (equation = params[:equation]) != ''
                   results = eval_db_ph_equation db_traces, phase_traces, equation
                 end
                 {"vars" => vars, "db" => db_traces, "phase" => phase_traces, "calculated_value" => results, "updates" => ckt.elements, "info" => ckt.info}
               else
-                if equation = params[:equation]
+                if (equation = params[:equation]) != ''
                   results = eval_equation vars, traces, equation
-                end
-                {"vars" => vars, "traces" => traces, "calculated_value" => results, "updates" => ckt.elements, "info" => ckt.info}
+                end # note: keys and calculated_value are not used in simulate.svelte
+                {"vars" => vars, "traces" => traces, "keys" => keys, "calculated_value" => results, "updates" => ckt.elements, "info" => ckt.info}
               end 
             rescue => error
-              error!(error, 500)
+              error!("#{error}\n\n#{error.backtrace.join("\n")}", 500)
             end 
           else
             {"log" => ckt.sim_log, "updates" => ckt.elements, "info" => ckt.info}          
@@ -255,8 +256,13 @@ module Test
         work_dir, ckt_name = Utils::get_params(params)
         #probes = params[:probes] ? URI.decode_www_form_component(params[:probes]): nil
         probes = params[:probes] 
+        # require 'debug'
+        # debugger
         Dir.chdir(work_dir){
-          ckt = @@ngspice_ckt[ckt_name]
+          unless ckt = @@ngspice_ckt[ckt_name]
+            ckt = NgspiceControl.new(File.basename(ckt_name), true, true)
+            @@ngspice_ckt[ckt_name] = ckt
+          end
           puts "ckt.file@:results = #{ckt.file}"
           if probes && probes.strip != ''
             vars, traces = ckt.get_traces *(probes.split(','))
@@ -264,18 +270,24 @@ module Test
               if probes.start_with? 'frequency'
                 db_traces = traces.map{|trace| {name: trace[:name], x: trace[:x], y: trace[:y].map{|a| 20.0*Math.log10(a.abs)}}}
                 phase_traces = traces.map{|trace| {name: trace[:name], x: trace[:x], y: trace[:y].map{|a| Utils::shift360(a.phase*(180.0/Math::PI))}}}
-                if equation = params[:equation]
+                if (equation = params[:equation]) != ''
                   results = eval_db_ph_equation db_traces, phase_traces, equation
                 end
                 {"vars" => vars, "db" => db_traces, "phase" => phase_traces, "calculated_value" => results}
               else
-                if equation = params[:equation]
+                # $stderr.puts "params[:equation]=#{params[:equation].inspect}"
+                if (equation = params[:equation]) != ''
                   results = eval_equation vars, traces, equation
+                  {"vars" => vars, "traces" => traces, "calculated_value" => results}
+                else
+                  {"vars" => vars, "traces" => traces, "keys" => ckt.step_results[3], "calculated_value" => ckt.step_results[2]}
                 end
-                {"vars" => vars, "traces" => traces, "calculated_value" => results}
+                
               end 
             rescue => error
-              error!(error, 500)
+              $stderr.puts "Error at simulate: #{error}"
+              $stderr.puts error.backtrace.join("\n")
+              error!("#{error}\n\n#{error.backtrace.join("\n")}", 500)
             end
           else
             {"log" => ckt.sim_log}
@@ -321,7 +333,9 @@ module Test
             begin
               results = eval_equation vars, params[:plotdata], params[:equation]
             rescue => error
-              error!(error, 500)
+              $stderr.puts "Error at measure: #{error}"
+              $stderr.puts error.backtrace.join("\n")
+              error!("#{error}\n\n#{error.backtrace.join("\n")}", 500)
             end
           else # db and phase
             puts params[:db_data].size
@@ -391,33 +405,37 @@ module Test
           begin
             ckt.simulate models_update: models_update, variations: variations
           rescue  => error
-            error!(error, 500)
+              $stderr.puts "Error at simulate: #{error}"
+              $stderr.puts error.backtrace.join("\n")
+              error!("#{error}\n\n#{error.backtrace.join("\n")}", 500)
           end
           puts "probes=#{probes}"
           if probes && probes.strip != ''
             begin
               vars, traces = ckt.get_traces *(probes.split(','))
             rescue => error
-              puts "Error at get_traces: #{error}"
-              puts error.backtrace.join("\n")
-              error!(error, 500)
+              $stderr.puts "Error at get_traces: #{error}"
+              $stderr.puts error.backtrace.join("\n")
+              error!("#{error}\n\n#{error.backtrace.join("\n")}", 500)
             end
             begin
               if probes.start_with? 'frequency'
                 db_traces = traces.map{|trace| {name: trace[:name], x: trace[:x], y: trace[:y].map{|a| 20.0*Math.log10(a.abs)}}}
                 phase_traces = traces.map{|trace| {name: trace[:name], x: trace[:x], y: trace[:y].map{|a| Utils::shift360(a.phase*(180.0/Math::PI))}}}
-                if equation = params[:equation]
+                if (equation = params[:equation]) != ''
                   results = eval_db_ph_equation db_traces, phase_traces, equation
                 end
                 {"vars" => vars, "db" => db_traces, "phase" => phase_traces, "calculated_value" => results, "updates" => ckt.elements, "info" => ckt.info}
               else
-                if equation = params[:equation]
+                if (equation = params[:equation]) != ''
                   results = eval_equation vars, traces, equation
                 end
                 {"vars" => vars, "traces" => traces, "calculated_value" => results, "updates" => ckt.elements, "info" => ckt.info}
               end
             rescue => error
-              error!(error, 500)
+              $stderr.puts "Error at simulate: #{error}"
+              $stderr.puts error.backtrace.join("\n")
+              error!("#{error}\n\n#{error.backtrace.join("\n")}", 500)
             end 
           else
             {"log" => ckt.sim_log, "updates" => ckt.elements, "info" => ckt.info}
@@ -448,7 +466,9 @@ module Test
                 {"vars" => vars, "traces" => traces, "calculated_value" => results}
               end 
             rescue => error
-              error!(error, 500)
+              $stderr.puts "Error at results: #{error}"
+              $stderr.puts error.backtrace.join("\n")
+              error!("#{error}\n\n#{error.backtrace.join("\n")}", 500)
             end 
           else
             {"log" => ckt.sim_log}

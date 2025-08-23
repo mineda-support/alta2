@@ -67,6 +67,7 @@
         file,
         probes,
         equation,
+        calculated_value,
         plotdata,
         db_data,
         ph_data,
@@ -100,8 +101,12 @@
         );
         let res2 = await response.json();
         console.log(res2);
+		if (res2.error) {
+          alert(res2.error);
+        }
         console.log("probes=", probes);
         if (probes != undefined && probes.trim().length > 0) {
+            step_precision = 3; // step_precision = '' is weird!
             [plotdata, db_data, ph_data, sweep_name] = set_trace_names(
                 // ignore weird probes change
                 res2,
@@ -109,6 +114,20 @@
                 proj.elements,
                 step_precision,
             );
+        }
+        if (res2.keys != '') {
+          let performances = res2.keys;
+          performance.names = performances.join(',');
+          calculated_value = res2.calculated_value;
+          performances.forEach(function (perf, index) {
+            proj.results_data[0][perf] = [];
+            proj.results_data[0][perf].push({
+                x: get_sweep_values(
+                        plotdata != undefined ? plotdata : db_data, probes.split(',').length - 1
+                    ),
+                y: get_performance(calculated_value, index),
+                });
+            });
         }
         return [plotdata, db_data, ph_data, sweep_name, probes];
     }
@@ -258,7 +277,7 @@
     function plot_measured_data_only() {
         plotdata = [];
     }
-    async function plot_result_clicked() {
+    async function plot_result_clicked(step_precision) {
         if (ckt.info == undefined) {
             alert('Simulation results are not available');
             return;
@@ -270,6 +289,7 @@
             proj.file,
             probes,
             equation,
+            calculated_value,
             plotdata,
             db_data,
             ph_data,
@@ -692,7 +712,7 @@
     <button
         use:tooltip={() =>
             msg("set probes list (separated by comma) for a current plot")}
-        onclick={plot_result_clicked}
+        onclick={() => plot_result_clicked(step_precision)}
         class="button-1">Plot with probes:</button
     >
     <input bind:value={probes} style="border:darkgray solid 1px;width:30%" />
@@ -781,7 +801,7 @@
 
 {#if plot_showhide}
     <div>
-        <label use:tooltip={() => msg("performance names separated by commaa")}>
+        <label use:tooltip={() => msg("performance names separated by comma")}>
             Performance name(s)
             <input
                 bind:value={performance_names}

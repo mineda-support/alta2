@@ -11,8 +11,14 @@ class APITest < Minitest::Test
 
     def test_simulate_ngspice
       puts 'simulate_ngspice!'
-      get '/api/ngspctl/simulate?dir=C%3A%5CUsers%5Cseiji%5CSeafile%5CLSI_devel%5CLR_homework%5CLR_hokari%2F&file=NOR2.sch&probes=time%2C%20V(in1)%2C%20V(out)&variations=%7B%7D&models_update=%7B%7D'
-      assert_equal [], JSON.parse(last_response.body)
+      #get '/api/ngspctl/simulate?dir=C%3A%5CUsers%5Cseiji%5CSeafile%5CLSI_devel%5CLR_homework%5Clr_noda%2F&file=NAND.sch&probes=time&variations=%7B%7D&elements_update=%7Btran%3A%27.tran%20100p%202.5u%27%2C%7D&models_update=%7B%7D'
+      #get '/api/ngspctl/simulate?dir=C%3A%5CUsers%5Cseiji%5CSeafile%5CLSI_devel%5CLR_homework%5Clr_noda%2F&file=NAND.sch&probes=&variations=%7B%7D&models_update=%7B%7D'
+      get 'api/ngspctl/results?dir=C%3A%5CUsers%5Cseiji%5CSeafile%5CLSI_devel%5CLR_homework%5Clr_noda%2F&file=NAND.sch&probes=time%2C%20V(a)%2C%20V(b)%2C%20V(y)&equation=x.where(y%2C%202.5)%7B%7Cx%2C%20y%7C%20x%20%3E%201e-6%7D'
+      
+      #get '/api/ngspctl/simulate?dir=C%3A%5CUsers%5Cseiji%5CSeafile%5CLSI_devel%5CLR_homework%5CLR_hokari%2F&file=NOR2.sch&probes=time%2C%20V(in1)%2C%20V(out)&variations=%7B%7D&models_update=%7B%7D'
+      #assert_equal [], JSON.parse(last_response.body)['calculated_value']
+      result = JSON.parse(last_response.body)#['keys']
+      assert_equal [], result # [result['keys'], result['calculated_value']]
     end
 
     def test_ruby2
