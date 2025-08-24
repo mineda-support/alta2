@@ -16,7 +16,7 @@
 			//console.log("db_data in set_trace_names=", db_data);
 		} else {
 			sweep_name = set_trace_names2(plotdata, elements, step_precision);
-			if (sweep_name == undefined) {
+			if (sweep_name == undefined && plotdata[0].name.match(/=.*$/)) {
 				sweep_name = plotdata[0].name.replace(/=.*$/, '');
 
 				for (let i = 0; i < plotdata.length; i++){

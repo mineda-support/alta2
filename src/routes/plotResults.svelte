@@ -74,6 +74,7 @@
         elements,
         step_precision,
         sweep_name,
+        performance_names,
     ) {
         // cookies.et('probes', probes, { path: '/conditions'});
         console.log(
@@ -115,9 +116,9 @@
                 step_precision,
             );
         }
-        if (res2.keys != '') {
+        if (res2.keys != undefined && res2.keys != '') {
           let performances = res2.keys;
-          performance.names = performances.join(',');
+          performance_names = performances.join(',');
           calculated_value = res2.calculated_value;
           performances.forEach(function (perf, index) {
             proj.results_data[0][perf] = [];
@@ -129,7 +130,7 @@
                 });
             });
         }
-        return [plotdata, db_data, ph_data, sweep_name, probes];
+        return [plotdata, db_data, ph_data, sweep_name, probes, performance_names, calculated_value];
     }
 
 	export async function getJSONfromGrape(url) {
@@ -278,10 +279,10 @@
         plotdata = [];
     }
     async function plot_result_clicked(step_precision) {
-        if (ckt.info == undefined) {
+        /* if (ckt.info == undefined) {
             alert('Simulation results are not available');
             return;
-        }
+        } */
         if (proj.simulator == "LTspice" && !check_probes_valid()) return;
         let result = await plot_result(
             port,
@@ -296,9 +297,10 @@
             proj.elements,
             step_precision,
             sweep_name,
+            performance_names,
         );
         if (result != undefined) {
-            [plotdata, db_data, ph_data, sweep_name, probes] = result;
+            [plotdata, db_data, ph_data, sweep_name, probes, performance_names, calculated_value] = result;
             plot_showhide = false;
         }
     }
@@ -825,35 +827,39 @@
             >
                 Calculate</button
             >
-            {#if Array.isArray(calculated_value)}
-                <table>
-                    <thead>
-                        <tr>
-                            {#each performances as perf}
-                                <th>{perf}</th>
-                            {/each}
-                            <th>Sweep src/parameter</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {#each calculated_value as vals, i}
-                            <tr>
-                                {#each vals as val}
-                                    <td>{val}</td>
-                                {/each}
-                                <td
-                                    >{plotdata == undefined
-                                        ? db_data[i*(probes.split(',').length-1)].name
-                                        : plotdata[i*(probes.split(',').length-1)].name.replace(/.*@/, '')}</td
-                                >
-                            </tr>
-                        {/each}
-                    </tbody>
-                </table>
-            {/if}
         </label>
     </div>
     <hr />
+{/if}
+{#if Array.isArray(calculated_value)}
+    <table border="1" style="border-collapse: collapse; font-size:75%">
+        <thead>
+            <tr>
+                {#each performances as perf}
+                    <th>{perf}</th>
+                {/each}
+                {#if calculated_value.length > 1}
+                <th>Sweep src/parameter</th>
+                {/if}
+            </tr>
+        </thead>
+        <tbody>
+            {#each calculated_value as vals, i}
+                <tr>
+                    {#each vals as val}
+                        <td>{val}</td>
+                    {/each}
+                    {#if calculated_value.length > 1}
+                    <td
+                        >{plotdata == undefined
+                            ? db_data[i*(probes.split(',').length-1)].name
+                            : plotdata[i*(probes.split(',').length-1)].name.replace(/.*@/, '')}</td
+                    >
+                    {/if}
+                </tr>
+            {/each}
+        </tbody>
+    </table>
 {/if}
 
 <style>

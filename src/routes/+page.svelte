@@ -169,6 +169,7 @@
 				proj.elements,
 				settings.step_precision[i],
 				"",
+				settings.performance_names[i]
 			);
 			if (settings.probes[i] != "") {
 				settings.plot_showhide[i] = show_details;
@@ -177,6 +178,9 @@
 					ckt_data.db_data[i],
 					ckt_data.ph_data[i],
 					sweep_name,
+					settings.probes[i],
+					settings.performance_names[i],
+					ckt_data.calculated_value[i]
 				] = await result;
 			}
 		}
