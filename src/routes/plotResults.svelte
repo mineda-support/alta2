@@ -435,7 +435,7 @@
         console.log("calculated_value=", $state.snapshot(calculated_value));
         return calculated_value;
     }
-    equation = "x.where(y, 2.5){|x, y| x > 1e-6}";
+    equation = '' /* "x.where(y, 2.5){|x, y| x > 1e-6}"; */
 
     function data2csv(csv_text, csv_data) {
         for (let j = 0; j < csv_data[0].length; j++) {
