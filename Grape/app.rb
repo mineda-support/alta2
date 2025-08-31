@@ -398,7 +398,7 @@ module Test
           variations = params[:variations] ? eval(params[:variations].gsub('null', 'nil')) : {}
           models_update = params[:models_update] ? eval(params[:models_update]) : {}
           begin
-            ckt.simulate models_update: models_update, variations: variations
+            keys, results = ckt.simulate models_update: models_update, variations: variations
           rescue  => error
               $stderr.puts "Error at simulate: #{error}"
               $stderr.puts error.backtrace.join("\n")
@@ -414,21 +414,9 @@ module Test
               error!("#{error}\n\n#{error.backtrace.join("\n")}", 500)
             end
             begin
-              if probes.start_with? 'frequency'
-                db_traces = traces.map{|trace| {name: trace[:name], x: trace[:x], y: trace[:y].map{|a| 20.0*Math.log10(a.abs)}}}
-                phase_traces = traces.map{|trace| {name: trace[:name], x: trace[:x], y: trace[:y].map{|a| Utils::shift360(a.phase*(180.0/Math::PI))}}}
-                if (equation = params[:equation]) != ''
-                  results = eval_db_ph_equation db_traces, phase_traces, equation
-                end
-                {"vars" => vars, "db" => db_traces, "phase" => phase_traces, "calculated_value" => results, "updates" => ckt.elements, "info" => ckt.info}
-              else
-                if (equation = params[:equation]) != ''
-                  results = eval_equation vars, traces, equation
-                end
-                {"vars" => vars, "traces" => traces, "calculated_value" => results, "updates" => ckt.elements, "info" => ckt.info}
-              end
+              return_results probes, traces, params, vars, keys, results
             rescue => error
-              $stderr.puts "Error at simulate: #{error}"
+              $stderr.puts "Error at 'get :simulate': #{error}"
               $stderr.puts error.backtrace.join("\n")
               error!("#{error}\n\n#{error.backtrace.join("\n")}", 500)
             end 
@@ -447,24 +435,12 @@ module Test
           if probes && probes.strip != ''
             vars, traces = ckt.get_traces *(probes.split(','))
             begin
-              if probes.start_with? 'frequency'
-                db_traces = traces.map{|trace| {name: trace[:name], x: trace[:x], y: trace[:y].map{|a| 20.0*Math.log10(a.abs)}}}
-                phase_traces = traces.map{|trace| {name: trace[:name], x: trace[:x], y: trace[:y].map{|a| Utils::shift360(a.phase*(180.0/Math::PI))}}}
-                if equation = params[:equation]
-                  results = eval_db_ph_equation db_traces, phase_traces, equation
-                end
-                {"vars" => vars, "db" => db_traces, "phase" => phase_traces, "calculated_value" => results}
-              else
-                if equation = params[:equation]
-                  results = eval_equation vars, traces, equation
-                end
-                {"vars" => vars, "traces" => traces, "calculated_value" => results}
-              end 
+              return_results probes, traces, params, vars, ckt.step_results[3], ckt.step_results[2]
             rescue => error
-              $stderr.puts "Error at results: #{error}"
+              $stderr.puts "Error at 'get :results': #{error}"
               $stderr.puts error.backtrace.join("\n")
               error!("#{error}\n\n#{error.backtrace.join("\n")}", 500)
-            end 
+            end
           else
             {"log" => ckt.sim_log}
           end
@@ -515,18 +491,14 @@ module Test
           ckt = LTspiceControl.new(File.basename ckt_name)
           # puts "plotdata: '#{params[:plotdata].inspect}', size=#{params[:plotdata].size}"
           if params[:plotdata] && params[:plotdata].size > 0
-            params[:plotdata].each{|plotdata|
-              # debugger
-              # puts plotdata[:x]
-              # puts plotdata[:y]
-              x = Array_with_interpolation.new plotdata[:x]
-              y = Array_with_interpolation.new plotdata[:y]
-              begin
-                results << eval(equation)
-              rescue
-                results << nil
-              end
-            }
+            vars = params[:probes].split(',')[1..-1].map{|a| a.strip}
+            begin
+              results = eval_equation vars, params[:plotdata], params[:equation]
+            rescue => error
+              $stderr.puts "Error at measure: #{error}"
+              $stderr.puts error.backtrace.join("\n")
+              error!("#{error}\n\n#{error.backtrace.join("\n")}", 500)
+            end
           else # db and phase
             puts params[:db_data].size
             if params[:db_data] && params[:db_data].size > 0
