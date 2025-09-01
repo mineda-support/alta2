@@ -8,7 +8,7 @@ puts "hello world from ruby"
 puts Dir.pwd
 #puts $:
 require 'j_pack'
-#require 'byebug'
+require 'debug'
 require 'csv_read'
 require 'xls_read'
 require 'exec_proc'
@@ -79,7 +79,8 @@ def return_results probes, traces, params, vars, keys, results
     end
   else
     # $stderr.puts "params[:equation]=#{params[:equation].inspect}"
-    if (equation = params[:equation]) != ''
+    equation = params[:equation]
+    if equation && equation != ''
       results = eval_equation vars, traces, equation
       {"vars" => vars, "traces" => traces, "calculated_value" => results}
     else
@@ -434,8 +435,9 @@ module Test
           ckt = LTspiceControl.new(File.basename ckt_name)
           if probes && probes.strip != ''
             vars, traces = ckt.get_traces *(probes.split(','))
+            keys, results = ckt.get_meas_results(ckt.sim_log)
             begin
-              return_results probes, traces, params, vars, ckt.step_results[3], ckt.step_results[2]
+              return_results probes, traces, params, vars, keys, results
             rescue => error
               $stderr.puts "Error at 'get :results': #{error}"
               $stderr.puts error.backtrace.join("\n")
