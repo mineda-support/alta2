@@ -132,16 +132,8 @@
 	import ResultsPlot from "./Utils/results_plot.svelte";
 	import { tooltip, msg } from "./Utils/tooltip.svelte";
 	import { proj, ckt, settings } from "./shared.svelte.js";
-	import { get_sweep_values } from "./plotResults.svelte";
+	import { get_sweep_values, get_performance } from "./plotResults.svelte";
     //import { process_params } from "express/lib/router";
-
-	function get_performance(rows, index) {
-		let values = [];
-		rows.forEach((row) => {
-			values.push(row[index]);
-		});
-		return values;
-	}
 
 	async function submit_program(program, dir, file) {
 		const encoded_params = `dir=${encodeURIComponent(

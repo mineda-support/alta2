@@ -12,7 +12,7 @@
         return values;
     }
 
-    function get_performance(rows, index) {
+    export function get_performance(rows, index) {
         let values = [];
         rows.forEach((row) => {
             values.push(row[index]);
@@ -120,6 +120,7 @@
           let performances = res2.keys;
           performance_names = performances.join(',');
           calculated_value = res2.calculated_value;
+
           performances.forEach(function (perf, index) {
             proj.results_data[0][perf] = [];
             proj.results_data[0][perf].push({
@@ -844,7 +845,7 @@
             </tr>
         </thead>
         <tbody>
-            {#each calculated_value as vals, i}
+            {#each calculated_value[0].map((col, i) => calculated_value.map(row => row[i])) as vals, i}
                 <tr>
                     {#each vals as val}
                         <td>{val}</td>

@@ -140,7 +140,7 @@
         }
         console.log(res2);
         if (res2.keys != '') {
-            performances = res2.keys;
+            let performances = res2.keys;
         }
         if (elements_update != ''){
             let elements = res2.updates;
