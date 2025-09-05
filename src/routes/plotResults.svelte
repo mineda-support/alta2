@@ -845,7 +845,16 @@
             </tr>
         </thead>
         <tbody>
-            {#each calculated_value[0].map((col, i) => calculated_value.map(row => row[i])) as vals, i}
+            {#if calculated_value.length <= 1}
+                {#each calculated_value as vals, i}
+                <tr>
+                    {#each vals as val}
+                        <td>{val}</td>
+                    {/each}
+                </tr>
+                {/each}
+            {:else}
+               {#each calculated_value[0].map((col, i) => calculated_value.map(row => row[i])) as vals, i}
                 <tr>
                     {#each vals as val}
                         <td>{val}</td>
@@ -858,7 +867,8 @@
                     >
                     {/if}
                 </tr>
-            {/each}
+                {/each}
+            {/if}
         </tbody>
     </table>
 {/if}
