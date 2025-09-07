@@ -1,0 +1,151 @@
+*********************************************************************
+*  dfault model parameters for nmos
+*  Date                 : 2025/03/02
+*  File name            : default_nmos.lib
+*  Model Ver.           : Ver.1.01
+*  name			: Chikau Takahashi
+*  Simulator            : LTspice
+*  Model call name      : nch_ori
+*                       : for ModelParameter Extruction
+*  TNOM                 : 25 degree
+*********************************************************************
+*
+* VERSION HISTORY
+*
+* 11/23/2018 : Ver.1.00
+* 2025/03/02 : Ver.1.01 Chikau Takahashi
+* 2025/03/06 : Ver.1.02 TAB -> CR separated change
+* 
+* 
+*
+*
+* 
+*
+*********************************************************************
+
+.MODEL nch_extracted NMOS
++ LEVEL = 49
++ VERSION = 3.3
++ PARAMCHK = 1
++ BINUNIT = 1
++ MOBMOD = 1
++ CAPMOD = 3
++ NQSMOD = 0
++ ACNQSMOD = 0
++ NOIMOD = 1
++ TOX = 1.35E-008
++ XJ = 1.5E-007
++ NCH = 1.6E+017
++ NSUB = 6E+016
++ XT = 1.55E-007
++ VTH0 = 0.60799
++ K1 = 0.80173
++ K2 = 0.02236
++ K3 = 80
++ K3B = 0.0
++ W0 = 2.5E-006
++ NLX = 1.74E-007
++ VBM = -3
++ DVT0 = 2.2
++ DVT1 = 0.53
++ DVT2 = -0.032
++ DVT0W = 0
++ DVT1W = 5.3E+06
++ DVT2W = -0.032
++ U0 = 0.0385809
++ UA = -6.8625e-10
++ UB = 2.78778e-18
++ UC = 4.59489e-11
++ VSAT = 8.0E+004
++ A0 = 1.0
++ AGS = 0.0
++ B0 = 0.0
++ B1 = 0.0
++ KETA = -0.047
++ A1 = 0
++ A2 = 1
++ RDSW = 0.0
++ PRWG = 0
++ PRWB = 0
++ WR = 1.0
++ WINT = 0.0
++ LINT = 0.0
++ DWG = 0
++ DWB = 0
++ VOFF = -0.08
++ NFACTOR = 1
++ ETA0 = 0.08
++ ETAB = -0.07
++ PCLM = 1.3
++ PDIBLC1 = 0.39
++ PDIBLC2 = 0.0086
++ PDIBLCB = 0
++ DROUT = 0.56
++ PSCBE1 = 4.24E+008
++ PSCBE2 = 1.0E-005
++ PVAG = 0
++ DELTA = 0.01
++ NGATE = 0
++ DSUB = 0.56
++ CIT = 0
++ CDSC = 2.4E-004
++ CDSCD = 0
++ CDSCB = 0
++ XPART = 0
++ CGSO = 1.5E-008
++ CGDO = 1.5E-008
++ CGBO = 0
++ CGSL = 0
++ CGDL = 0
++ CKAPPA = 0.6
++ CF = 0
++ CLC = 1E-007
++ CLE = 0.6
++ DLC = 1.5E-006
++ DWC = 0
++ VFBCV = -1
++ NOFF = 1.0
++ VOFFCV = 0.0
++ ACDE = 1.0
++ MOIN = 15.0
++ RSH = 0
++ JS = 1.0E-004
++ JSSW = 0
++ NJ = 1
++ IJTH = 0.1
++ CJ = 5.0E-004
++ MJ = 0.5
++ PB = 1
++ CJSW = 5E-010
++ MJSW = 0.33
++ PBSW = 1
++ CJSWG = 5E-010
++ MJSWG = 0.33
++ PBSWG = 1
++ ALPHA0 = 0ALPHA1 =
++ 0BETA0 = 30
++ TNOM = 27
++ PRT = 0
++ KT1 = -0.11
++ KT1L = 0
++ KT2 = 0.022
++ UTE = -1.5
++ UA1 = 4.31E-009
++ UB1 = -7.61E-018
++ UC1 = -5.6E-011
++ AT = 3.3E+004
++ XTI = 3
++ TCJ = 0
++ TCJSW = 0
++ TCJSWG = 0
++ TPB = 0
++ TPBSW = 0
++ TPBSWG = 0
++ AF = 1
++ EF = 1
++ EM = 4.1E+007
++ KF = 0
++ NOIA = 9.9E+18
++ NOIB = 2.4E+003
++ NOIC = 1.4E-012 
+ELM = 5 )
