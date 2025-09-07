@@ -128,6 +128,7 @@
     chosen = $bindable(),
   } = $props();
   import { proj, ckt } from "./shared.svelte";
+    import { disableScrollHandling } from "$app/navigation";
   //import { files } from "$service-worker"; ### this caused app.js:16 ReferenceError: ServiceWorkerGlobalScope is not defined
   //import { esbuildVersion } from "vite";
 
@@ -237,6 +238,14 @@
 </p>
 {#if data.props != undefined} 
   <div class="sample"> 
+    {#each ['..'].concat(data.props.sub_directories) as subdir}
+      <button
+         use:tooltip={() =>
+            msg("select directory to switch")}
+         onclick={() => switch_wdir(data.props.wdir + subdir, false)}
+         class="box-item2">{subdir}</button
+      > 
+    {/each}
     {#each data.props.files as file}
       <label class="box-item">
         <input type="radio" name="chosen" value={file} bind:group={chosen} />

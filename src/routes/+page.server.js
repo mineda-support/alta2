@@ -18,6 +18,8 @@ export async function load({ url }) {
     console.log('home=', home);
     console.log('href = ', url.href);
     console.log('origin = ', url.origin);
+    process.chdir(wdir);
+    wdir = process.cwd();
     if (!wdir.endsWith('/')) wdir = wdir + '/';
     if (fs.existsSync(wdir)) {
         fs.readdir(wdir, (err, files) => {
@@ -25,6 +27,7 @@ export async function load({ url }) {
                 // console.log(file);
             });
         });
+        const subdirs = globSync('*/');
         if (show_flow == 'true') {
             const files = globSync(wdir + '*.json');
             const json_files = globSync(wdir + 'json/*.json');
@@ -36,7 +39,7 @@ export async function load({ url }) {
                     home: home, port: await startGrape(), origin: url.origin, show_flow: true,
                     wdir: wdir, ckt: ckt, 
                     files: files.map(a => path.basename(a)).concat(json_files.map(a => `json/${path.basename(a)}`)), //, probes: probes
-                    symbol_files: [],
+                    symbol_files: [], sub_directories: subdirs.map(a => path.basename(a)),
                     setting_names: setting_files.map(a => path.basename(a).replace('_settings.json', '')),
                     flow_names: flow_files.map(a => path.basename(a).replace('_flow.json', ''))
                 }
@@ -57,6 +60,7 @@ export async function load({ url }) {
                     home: home, port: await startGrape(), origin: url.origin, show_flow: false,
                     wdir: wdir, ckt: ckt, files: files.map(a => path.basename(a)), //, probes: probes
                     symbol_files: symbol_files.map(a => path.basename(a)),
+                    sub_directories: subdirs.map(a => path.basename(a)),
                     setting_names: setting_files.map(a => path.basename(a).replace('_settings.json', '')),
                     flow_names: flow_files.map(a => path.basename(a).replace('_flow.json', ''))
                 }
