@@ -9,8 +9,14 @@
             "name": "Debug current file",
             "request": "launch",
             "script": "${file}",
+            "args": [],
             "askParameters": true,
             "useTerminal": true
         },
+        {
+                        "type": "rdbg",
+                        "name": "Attach with rdbg",
+                        "request": "attach"
+        }
     ]
 }

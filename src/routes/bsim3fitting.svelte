@@ -9,7 +9,7 @@
         current_plot = $bindable(),
         data = $bindable(),
         show_flow = $bindable(),
-        chosen = $bindable()
+        chosen = $bindable(),
     } = $props();
     async function bsim3_step1() {
         // console.log("ckt_data.plotdata=", $state.snapshot(ckt_data.plotdata));
@@ -85,67 +85,66 @@
         flow_number: 0,
         showhide: [],
         title: [],
-        procedure: []
+        procedure: [],
     });
     let current_flow_step = $state(0);
-    let flow_title = $state('Bsim3 fitting');
-	function add_flow_step() {
-		flow_settings.showhide.push(true);
-		console.log(
-			"flow_settings.showhide=",
-			$state.snapshot(flow_settings.showhide),
-		);
-		// console.log('length=', settings.plot_showhide.length);
-		current_flow_step = flow_settings.showhide.length - 1;
-		console.log(
-			"flow_settings.showhide=",
-			$state.snapshot(flow_settings.showhide),
-			"current_flow_step=",
-			$state.snapshot(current_flow_step),
-		);
-	}
-
-	function delete_flow_step() {
-		console.log("current_flow_step to delete=", current_flow_step);
-		for (const [obj] of Object.entries(flow_settings)) {
-			if (Array.isArray(flow_settings[obj])) {
-				flow_settings[obj].splice(current_flow_step, 1);
-			}
-		}
-	}
-
-async function save_flow_settings(flow_name) {
-    const response = await fetch("settingit gs", {
-      method: "POST",
-      body: JSON.stringify([flow_title, flow_settings]),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-    const flow_names = await response.json();
-    console.log("flow names:", flow_names);
-    if (flow_names.includes(flow_name)) {
-      alert(`${flow_name} saved`);
+    let flow_title = $state("Bsim3 fitting");
+    function add_flow_step() {
+        flow_settings.showhide.push(true);
+        console.log(
+            "flow_settings.showhide=",
+            $state.snapshot(flow_settings.showhide),
+        );
+        // console.log('length=', settings.plot_showhide.length);
+        current_flow_step = flow_settings.showhide.length - 1;
+        console.log(
+            "flow_settings.showhide=",
+            $state.snapshot(flow_settings.showhide),
+            "current_flow_step=",
+            $state.snapshot(current_flow_step),
+        );
     }
-  }
 
-  async function load_flow_settings(flow_name, dir) {
-    const response = await fetch(
-      `settings?dir=${encodeURIComponent(dir)}&settings_name=${flow_name}`,
-    );
-    // const result = await response.json();
-    let props = await response.json();
-    //[flow_title, flow_settings] = props;
-    flow_title = props.flow_title;
-    flow_settings = props.flow_settings;
+    function delete_flow_step() {
+        console.log("current_flow_step to delete=", current_flow_step);
+        for (const [obj] of Object.entries(flow_settings)) {
+            if (Array.isArray(flow_settings[obj])) {
+                flow_settings[obj].splice(current_flow_step, 1);
+            }
+        }
+    }
 
-    // probes_name.set(probes);
-    console.log("props=", props);
-  }
-  //console.log("settings=", settings);
-  let flow_name = $state("default"); 
+    async function save_flow_settings(flow_name) {
+        const response = await fetch("settingit gs", {
+            method: "POST",
+            body: JSON.stringify([flow_title, flow_settings]),
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
+        const flow_names = await response.json();
+        console.log("flow names:", flow_names);
+        if (flow_names.includes(flow_name)) {
+            alert(`${flow_name} saved`);
+        }
+    }
 
-    </script>
+    async function load_flow_settings(flow_name, dir) {
+        const response = await fetch(
+            `settings?dir=${encodeURIComponent(dir)}&settings_name=${flow_name}`,
+        );
+        // const result = await response.json();
+        let props = await response.json();
+        //[flow_title, flow_settings] = props;
+        flow_title = props.flow_title;
+        flow_settings = props.flow_settings;
+
+        // probes_name.set(probes);
+        console.log("props=", props);
+    }
+    //console.log("settings=", settings);
+    let flow_name = $state("default");
+</script>
 
 <p>
     Flow directory:
@@ -163,9 +162,21 @@ async function save_flow_settings(flow_name) {
 </p>
 {#if data.props != undefined}
     <div class="sample">
+        {#each [".."].concat(data.props.sub_directories) as subdir}
+            <button
+                use:tooltip={() => msg("select directory to switch")}
+                onclick={() => switch_wdir(data.props.wdir + subdir, false)}
+                class="box-item2">{subdir}</button
+            >
+        {/each}
         {#each data.props.files as file}
             <label class="box-item" style="background:lightblue;">
-                <input type="radio" name="chosen" value={file} bind:group={chosen}/>
+                <input
+                    type="radio"
+                    name="chosen"
+                    value={file}
+                    bind:group={chosen}
+                />
                 {file}<br />
             </label>
         {/each}
@@ -249,65 +260,63 @@ async function save_flow_settings(flow_name) {
 </div>
 
 {#each flow_settings.showhide as _, i}
-<div>
-    <label use:tooltip={() => msg("procedures in Step")}
-        >
-        <button onclick={() => bsim3_step1()}> BSIM3 Step#{i + 1} </button>
-        <textarea
-            bind:value={flow_settings.procedure[i]}
-            style="border:darkgray solid 1px; width: 50%; height: 20px; text-align: bottom"
-        />
-    </label>
-</div>
-
+    <div>
+        <label use:tooltip={() => msg("procedures in Step")}>
+            <button onclick={() => bsim3_step1()}> BSIM3 Step#{i + 1} </button>
+            <textarea
+                bind:value={flow_settings.procedure[i]}
+                style="border:darkgray solid 1px; width: 50%; height: 20px; text-align: bottom"
+            />
+        </label>
+    </div>
 {/each}
 
 <button
-use:tooltip={() => msg("add a flow step")}
-onclick={add_flow_step}
-class="button-2">Add flow step</button
+    use:tooltip={() => msg("add a flow step")}
+    onclick={add_flow_step}
+    class="button-2">Add flow step</button
 >
 <button
-use:tooltip={() => msg("delete this flow step")}
-onclick={delete_flow_step}
-class="button-2">Delete flow step</button
+    use:tooltip={() => msg("delete this flow step")}
+    onclick={delete_flow_step}
+    class="button-2">Delete flow step</button
 >
 <div>
     <button
-      onclick={() => save_flow_settings(flow_name)}
-      class="button-1"
-      use:tooltip={() => msg("save settings in a working directory")}
+        onclick={() => save_flow_settings(flow_name)}
+        class="button-1"
+        use:tooltip={() => msg("save settings in a working directory")}
     >
-      Save settings in:</button
+        Save settings in:</button
     >
     <label>
-      <input
-        type="text"
-        autocomplete="off"
-        onkeydown={async (e) => {
-          if (e.key == "Enter") {
-            save_flow_settings(flow_name);
-          }
-        }}
-        bind:value={flow_name}
-        style="border:darkgray solid 1px;"
-      />
+        <input
+            type="text"
+            autocomplete="off"
+            onkeydown={async (e) => {
+                if (e.key == "Enter") {
+                    save_flow_settings(flow_name);
+                }
+            }}
+            bind:value={flow_name}
+            style="border:darkgray solid 1px;"
+        />
     </label>
     <button
-      onclick={() => load_flow_settings(flow_name, data.props.wdir)}
-      class="button-1"
-      use:tooltip={() => msg("load settings from a file")}
-      >Load settings from:
+        onclick={() => load_flow_settings(flow_name, data.props.wdir)}
+        class="button-1"
+        use:tooltip={() => msg("load settings from a file")}
+        >Load settings from:
     </button>
     <select
-      bind:value={flow_name}
-      style="border:darkgray solid 1px;"
-      onchange={() => load_flow_settings(flow_name, data.props.wdir)}
+        bind:value={flow_name}
+        style="border:darkgray solid 1px;"
+        onchange={() => load_flow_settings(flow_name, data.props.wdir)}
     >
-      {#if data.props != undefined}
-        {#each data.props.flow_names as setting}
-          <option value={setting}>{setting}</option>
-        {/each}
-      {/if}
+        {#if data.props != undefined}
+            {#each data.props.flow_names as setting}
+                <option value={setting}>{setting}</option>
+            {/each}
+        {/if}
     </select>
-  </div>
+</div>
