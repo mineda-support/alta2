@@ -82,24 +82,24 @@ module Test
       p
     end
 
-    def self.return_results probes, traces, params, vars, keys, results
+    def self.return_results probes, traces, params, vars, keys, results, elements=nil 
       if probes.start_with? 'frequency'
         db_traces = traces.map{|trace| {name: trace[:name], x: trace[:x], y: trace[:y].map{|a| 20.0*Math.log10(a.abs)}}}
         phase_traces = traces.map{|trace| {name: trace[:name], x: trace[:x], y: trace[:y].map{|a| Utils::shift360(a.phase*(180.0/Math::PI))}}}
         if (equation = params[:equation]) != ''
           results = eval_db_ph_equation db_traces, phase_traces, equation
-          {"vars" => vars, "db" => db_traces, "phase" => phase_traces, "calculated_value" => results}
+          {"vars" => vars, "db" => db_traces, "phase" => phase_traces, "calculated_value" => results, "updates" => elements}
         else
-          {"vars" => vars, "db" => db_traces, "phase" => phase_traces, "keys" => keys, "calculated_value" => results}
+          {"vars" => vars, "db" => db_traces, "phase" => phase_traces, "keys" => keys, "calculated_value" => results, "updates" => elements}
         end
       else
         # $stderr.puts "params[:equation]=#{params[:equation].inspect}"
         equation = params[:equation]
         if equation && equation != ''
           results = eval_equation vars, traces, equation
-          {"vars" => vars, "traces" => traces, "calculated_value" => results}
+          {"vars" => vars, "traces" => traces, "calculated_value" => results, "updates" => elements}
         else
-          {"vars" => vars, "traces" => traces, "keys" => keys, "calculated_value" => results}
+          {"vars" => vars, "traces" => traces, "keys" => keys, "calculated_value" => results, "updates" => elements}
         end
       end 
     end
@@ -252,7 +252,7 @@ module Test
               error!("#{error}\n\n#{error.backtrace.join("\n")}", 500)
             end
             begin
-              Utils::return_results probes, traces, params, vars, keys, results
+              Utils::return_results probes, traces, params, vars, keys, results, ckt.elements
             rescue => error
               $stderr.puts "Error at 'get :simulate': #{error}"
               $stderr.puts error.backtrace.join("\n")
@@ -279,7 +279,7 @@ module Test
           if probes && probes.strip != ''
             vars, traces = ckt.get_traces *(probes.split(','))
             begin
-              Utils::return_results probes, traces, params, vars, ckt.step_results[3], ckt.step_results[2]
+              Utils::return_results probes, traces, params, vars, ckt.step_results[3], ckt.step_results[2], ckt.elements
             rescue => error
               $stderr.puts "Error at 'get :results': #{error}"
               $stderr.puts error.backtrace.join("\n")
@@ -419,7 +419,7 @@ module Test
               error!("#{error}\n\n#{error.backtrace.join("\n")}", 500)
             end
             begin
-              Utils::return_results probes, traces, params, vars, keys, results
+              Utils::return_results probes, traces, params, vars, keys, results, ckt.elements
             rescue => error
               $stderr.puts "Error at 'get :simulate': #{error}"
               $stderr.puts error.backtrace.join("\n")
