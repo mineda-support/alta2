@@ -538,7 +538,7 @@
     }
 
     export async function read_json(port, dir, file) {
-        if (file == undefined) {
+        if (file == undefined || !file.match(/\.json/)) {
             load_json();
             return;
         }
