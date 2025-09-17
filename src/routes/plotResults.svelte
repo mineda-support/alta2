@@ -127,7 +127,7 @@
                 x: get_sweep_values(
                         plotdata != undefined ? plotdata : db_data, probes.split(',').length - 1
                     ),
-                y: get_performance(calculated_value, index),
+                y: get_performance(calculated_value[0].map((col, i) => calculated_value.map(row => row[i])), index),
                 });
             });
         }
@@ -262,8 +262,10 @@
         if (probes.includes(sweep_var)) {
             // like 'frequency'
             let probes_test = probes // JSON.parse(JSON.stringify(probes)); note: [...probes] is for array
-            for (let node of ckt.info) {
-                probes_test = probes_test.replace(node, '');
+            if (ckt.info) {
+                for (let node of ckt.info) {
+                  probes_test = probes_test.replace(node, '');
+                }
             }
             let nodes = probes_test.split(/[ ,\*\+-\/\(\)]/)
             for (let node of nodes) {
