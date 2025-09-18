@@ -332,7 +332,7 @@
 						x: get_sweep_values(
 							plotdata != undefined ? plotdata : db_data,
 						),
-						y: get_performance(calculated_value, index),
+						y: get_performance(calculated_value[0].map((col, i) => calculated_value.map(row => row[i])), index),
 						name: trace_name,
 					};
 					console.log("result=", result);
@@ -461,7 +461,7 @@
 		)}&file=${encodeURIComponent(target)}`;
 		const my_sleep = (ms) =>
 			new Promise((resolve) => setTimeout(resolve, ms));
-		await my_sleep(1000);
+		await my_sleep(3000);
 		const command = `http://localhost:${port}/api/${proj.ctl_type}/update?${encoded_params}&updates=${update_elms}`;
 		console.log(command);
 		let response = await fetch(command, {});
