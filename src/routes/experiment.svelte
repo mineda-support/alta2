@@ -234,7 +234,7 @@
 		);
 		//dispatch("sim_end", { text: "LTspice simulation ended!" });
 		// plotdata = get_results();
-		const calculated_value = await res2.calculated_value;
+		const calculated_value = await res2.calculated_value;   // calculated_value needs to be transposed as below
 		return [calculated_value, plotdata, db_data, ph_data, sweep_name];
 	}
 
@@ -332,7 +332,7 @@
 						x: get_sweep_values(
 							plotdata != undefined ? plotdata : db_data,
 						),
-						y: get_performance(calculated_value[0].map((col, i) => calculated_value.map(row => row[i])), index),
+						y: get_performance(calculated_value, index),
 						name: trace_name,
 					};
 					console.log("result=", result);

@@ -127,7 +127,8 @@
                 x: get_sweep_values(
                         plotdata != undefined ? plotdata : db_data, probes.split(',').length - 1
                     ),
-                y: get_performance(calculated_value[0].map((col, i) => calculated_value.map(row => row[i])), index),
+                // y: get_performance(calculated_value[0].map((col, i) => calculated_value.map(row => row[i])), index),
+                y: get_performance(calculated_value, index), /* tanspose above abolished */
                 });
             });
         }
@@ -333,7 +334,10 @@
     proj.results_data[0] = {};
 
     async function calculate_equation(probes) {
-        proj.results_data = [];
+        if (performances == undefined) {
+            alert("Performance name(s) for equation(s) not defined");
+            return;
+        }        proj.results_data = [];
         proj.results_data[0] = {};
         calculated_value = await submit_equation(
             port,
@@ -353,10 +357,6 @@
             $state.snapshot(calculated_value),
         );
         const equation_array = equation.split(",");
-        if (performances == undefined) {
-            alert("Performance name(s) for equation(s) not defined");
-            return;
-        }
         console.log("performances =", $state.snapshot(performances));
         performances.forEach(function (perf, index) {
             //console.log("perf, index=", [perf, index]);
@@ -856,7 +856,7 @@
                 </tr>
                 {/each}
             {:else}
-               {#each calculated_value[0].map((col, i) => calculated_value.map(row => row[i])) as vals, i}
+               {#each calculated_value as vals, i}
                 <tr>
                     {#each vals as val}
                         <td>{val}</td>
