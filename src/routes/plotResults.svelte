@@ -282,7 +282,6 @@
             proj.file,
             probes,
             equation,
-            calculated_value,
             plotdata,
             db_data,
             ph_data,
@@ -306,6 +305,7 @@
                   });
             });
         }
+        result;
     }
 
     step_precision = 3;
@@ -337,6 +337,10 @@
             alert("Performance name(s) for equation(s) not defined");
             return;
         }        proj.results_data = [];
+        if (equation == undefined || equation.trim().length == 0) {
+            alert("Error: equation is not defined");
+            return;
+        }
         proj.results_data[0] = {};
         calculated_value = await submit_equation(
             port,
