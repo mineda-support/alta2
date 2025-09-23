@@ -67,7 +67,6 @@
         file,
         probes,
         equation,
-        calculated_value,
         plotdata,
         db_data,
         ph_data,
@@ -107,7 +106,6 @@
         }
         console.log("probes=", probes);
         if (probes != undefined && probes.trim().length > 0) {
-            step_precision = 3; // step_precision = '' is weird!
             [plotdata, db_data, ph_data, sweep_name] = set_trace_names(
                 // ignore weird probes change
                 res2,
@@ -116,21 +114,11 @@
                 step_precision,
             );
         }
+        let calculated_value;
         if (res2.keys != undefined && res2.keys != '') {
           let performances = res2.keys;
           performance_names = performances.join(',');
           calculated_value = res2.calculated_value;
-
-          performances.forEach(function (perf, index) {
-            proj.results_data[0][perf] = [];
-            proj.results_data[0][perf].push({
-                x: get_sweep_values(
-                        plotdata != undefined ? plotdata : db_data, probes.split(',').length - 1
-                    ),
-                // y: get_performance(calculated_value[0].map((col, i) => calculated_value.map(row => row[i])), index),
-                y: get_performance(calculated_value, index), /* tanspose above abolished */
-                });
-            });
         }
         return [plotdata, db_data, ph_data, sweep_name, probes, performance_names, calculated_value];
     }
@@ -306,6 +294,17 @@
         if (result != undefined) {
             [plotdata, db_data, ph_data, sweep_name, probes, performance_names, calculated_value] = result;
             plot_showhide = false;
+            let performances = performance_names.split(',').map((a) => a.trim());
+            performances.forEach(function (perf, index) {
+              proj.results_data[0][perf] = [];
+              proj.results_data[0][perf].push({
+                  x: get_sweep_values(
+                          plotdata != undefined ? plotdata : db_data, probes.split(',').length - 1
+                      ),
+                  // y: get_performance(calculated_value[0].map((col, i) => calculated_value.map(row => row[i])), index),
+                  y: get_performance(calculated_value, index), /* tanspose above abolished */
+                  });
+            });
         }
     }
 

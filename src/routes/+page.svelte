@@ -16,34 +16,9 @@
 
 	let { data } = $props();
 
-	export function handleMessage(event) {
-		console.log("handleMessage");
-		alert(event.detail.text);
-		plot_result();
-	}
-
 	let current_plot = $state(0); //  = 0;
 
 	let show_details = $state(false);
-
-	/*
-	function plot_results() {
-		if (variations == {}) {
-			return;
-		}
-		let vals;
-		for (const [ckt_name, elms] of Object.entries(elements)) {
-			for (const [elm, props] of Object.entries(elms)) {
-				if (elm.match(/#$/) && (vals = variations[elm])) {
-					vals.forEach((val) => {
-						current_plot = current_plot + 1;
-					});
-					return;
-				}
-			}
-		}
-	}
-	*/
 
 	function clear_all_plots() {
 		ckt_data = {
@@ -185,7 +160,7 @@
 			}
 		}
 		console.log("ckt_data=", $state.snapshot(ckt_data));
-		console.log("sweep_name", sweep_name);
+		console.log(`sweep_name = ${sweep_name}`);
 	}
 
 	function clear_measurement_group() {

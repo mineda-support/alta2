@@ -9,7 +9,7 @@
 		//console.log('probes in set_trace_names=', probes);
 		if (probes != null && probes.startsWith("frequency")) {
 			sweep_name = set_trace_names2(db_data, elements, step_precision);
-			sweep_name = set_trace_names2(ph_data, elements, step_precision);
+			// sweep_name = set_trace_names2(ph_data, elements, step_precision);
 			if (sweep_name == undefined) {
 				sweep_name = db_data[0].name.replace(/=.*$/, '');
 			}
@@ -100,7 +100,7 @@
 		if (name.toLowerCase().includes('param')) {
 		  name = items[2];
   		  if(items[3] == 'list'){
-		    src_values = items.slice(4).map((v) => `${name}=${v}`)
+		    src_values = items.slice(4).map((v) => `${name}=${eng2f(v).toPrecision(precision)}`)
 		    console.log("src_values in parse_step_command=", src_values);
 		    return [name, src_values];
 	      }
@@ -235,7 +235,7 @@
 		//dispatch("sim_end", { text: "LTspice simulation ended!" });
 		// plotdata = get_results();
 		const calculated_value = await res2.calculated_value;   // calculated_value needs to be transposed as below
-		return [calculated_value, plotdata, db_data, ph_data, sweep_name];
+		return [structuredClone(calculated_value), plotdata, db_data, ph_data, sweep_name];
 	}
 
 	function create_updates(keep, var_name, par_name, value) {
@@ -273,7 +273,7 @@
 				return;
 			}
 			console.log("plus=", plus);
-			console.log(proj.elements);
+			console.log($state.snapshot(proj.elements));
 			updates = updates.concat(
 				create_updates(
 					proj.elements[target][var_name],
@@ -293,9 +293,10 @@
 	);
 
 	async function go_experiments(dir, settings, elements) {
+		let simStartTime = new Date();
 		proj.results_data = [];
         proj.results_data[0] = {};
-		if (ckt == undefined) {
+		if (ckt == undefined || Object.entries(ckt.elements).length == 0) {
 			alert("Please read-in the circuit before experiment");
 		}
 		if (settings.src == undefined || settings.src_values[0] == undefined) {
@@ -319,7 +320,7 @@
 			await update_elms(proj.dir, schema_file(target, proj.schema_editor), updates);
 			// dispatch("sim_start", { text: "LTspice simulation started!" });
 			on_sim_start("LTspice simulation started!");
-			let calculated_value, plotdata, db_data, ph_data;
+			let result, calculated_value, plotdata, db_data, ph_data;
 			[calculated_value, plotdata, db_data, ph_data, sweep_name] =
 				await goLTspice2(ckt);
 			settings.sweep_title[0] = sweep_name;
@@ -328,15 +329,17 @@
 					proj.results_data[0][perf] = [];
 				}
 				if (Array.isArray(calculated_value[0])) {
-					let result = {
+					result = {
 						x: get_sweep_values(
 							plotdata != undefined ? plotdata : db_data,
 						),
 						y: get_performance(calculated_value, index),
 						name: trace_name,
 					};
-					console.log("result=", result);
-					proj.results_data[0][perf].push(result);
+					console.log(`'${perf}'' for ${trace_name}=`, result);
+					console.log('before push', Object.keys(proj.results_data[0][perf]));
+					proj.results_data[0][perf].push(structuredClone(result));
+					console.log('after push', Object.keys(proj.results_data[0][perf]));
 				} else {
 					proj.results_data[0][perf].push(undefined);
 				}
@@ -352,6 +355,9 @@
 		}
 		console.log("proj.results_data=", $state.snapshot(proj.results_data));
 		// console.log("proj.results_data[0]=", $state.snapshot(proj.results_data[0]));
+		let elapseTime = new Date() - simStartTime.getTime();
+		console.log(`sweep_name: ${sweep_name}; elapse = ${elapseTime/1000.0} sec.`);
+		alert(`Experiment completed in ${elapseTime/1000.0} sec.`);
 	}
 	// plot_data = [{x:[1,2,3,4], y:[1,2,4,3]}];
 
