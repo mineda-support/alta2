@@ -293,17 +293,19 @@
         if (result != undefined) {
             [plotdata, db_data, ph_data, sweep_name, probes, performance_names, calculated_value] = result;
             plot_showhide = false;
-            let performances = performance_names.split(',').map((a) => a.trim());
-            performances.forEach(function (perf, index) {
-              proj.results_data[0][perf] = [];
-              proj.results_data[0][perf].push({
-                  x: get_sweep_values(
-                          plotdata != undefined ? plotdata : db_data, probes.split(',').length - 1
+            if (result[5] != undefined) {
+              let performances = performance_names.split(',').map((a) => a.trim());
+              performances.forEach(function (perf, index) {
+                proj.results_data[0][perf] = [];
+                proj.results_data[0][perf].push({
+                    x: get_sweep_values(
+                            plotdata != undefined ? plotdata : db_data, probes.split(',').length - 1
                       ),
                   // y: get_performance(calculated_value[0].map((col, i) => calculated_value.map(row => row[i])), index),
-                  y: get_performance(calculated_value, index), /* tanspose above abolished */
-                  });
-            });
+                    y: get_performance(calculated_value, index), /* tanspose above abolished */
+                    });
+              });
+            }
         }
         result;
     }
