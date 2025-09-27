@@ -194,11 +194,11 @@ module Test
       end
 
       def ckt_is_latest file
+        puts "Check if '#{file}' is latest"
         return nil unless ckt = @@ngspice_ckt[file]
         return nil unless File.exist?(file)
         mtime = File.mtime file
-        return nil if @@ngspice_mtime[file] && (mtime > @@ngspice_mtime[file])
-        @@ngspice_mtime[file] = mtime
+        return nil if @@ngspice_mtime[file].nil? || (mtime > @@ngspice_mtime[file])
         ckt
       end
     end
@@ -208,11 +208,12 @@ module Test
       get :open do
         open{|ckt_name|
         unless ckt = ckt_is_latest(ckt_name)
-          ckt = NgspiceControl.new(File.basename(ckt_name), true, true)
-          puts "ckt.file@:open = #{ckt.file}"
-          @@ngspice_ckt[ckt_name] = ckt
-        end
-        ckt.open(File.basename(ckt_name), true, true) if params[:showup]
+            ckt = NgspiceControl.new(File.basename(ckt_name), true, true)
+            puts "ckt.file@:open = #{ckt.file}"
+            @@ngspice_ckt[ckt_name] = ckt
+            @@ngspice_mtime[ckt_name] = File.mtime(ckt_name)
+          end
+          ckt.open(File.basename(ckt_name), true, true) if params[:showup]
           {"elements" => ckt.elements, "info" => nil, "models" => ckt.models}
         }
       end
