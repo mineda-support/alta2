@@ -82,7 +82,7 @@ module Test
       p
     end
 
-    def self.return_results probes, traces, params, vars, keys, results, elements=nil 
+    def self.return_results probes, traces, params, vars, keys, results, elements=nil, info=nil 
       if probes.start_with? 'frequency'
         db_traces = traces.map{|trace| {name: trace[:name], x: trace[:x], y: trace[:y].map{|a| 20.0*Math.log10(a.abs)}}}
         phase_traces = traces.map{|trace| {name: trace[:name], x: trace[:x], y: trace[:y].map{|a| Utils::shift360(a.phase*(180.0/Math::PI))}}}
@@ -97,9 +97,9 @@ module Test
         equation = params[:equation]
         if equation && equation != ''
           results = eval_equation vars, traces, equation
-          {"vars" => vars, "traces" => traces, "calculated_value" => results, "updates" => elements}
+          {"vars" => vars, "traces" => traces, "calculated_value" => results, "updates" => elements, "info" => info}
         else
-          {"vars" => vars, "traces" => traces, "keys" => keys, "calculated_value" => results, "updates" => elements}
+          {"vars" => vars, "traces" => traces, "keys" => keys, "calculated_value" => results, "updates" => elements, "info" => info}
         end
       end 
     end
@@ -253,14 +253,15 @@ module Test
               error!("#{error}\n\n#{error.backtrace.join("\n")}", 500)
             end
             begin
-              Utils::return_results probes, traces, params, vars, keys, results, ckt.elements
+              $stderr.puts 'ckt.info:', ckt.info()
+              Utils::return_results probes, traces, params, vars, keys, results, ckt.elements, ckt.info()
             rescue => error
               $stderr.puts "Error at 'get :simulate': #{error}"
               $stderr.puts error.backtrace.join("\n")
               error!("#{error}\n\n#{error.backtrace.join("\n")}", 500)
             end 
           else
-            {"log" => ckt.sim_log, "updates" => ckt.elements, "info" => ckt.info}          
+            {"log" => ckt.sim_log, "updates" => ckt.elements, "info" => ckt.info()}
           end
           }
         end
@@ -303,7 +304,7 @@ module Test
           #  @@ngspice_ckt[ckt_name] = ckt
           #end          
           ckt.set updates
-          {"elements" => ckt.elements, "info" => ckt.info}
+          {"elements" => ckt.elements, "info" => ckt.info()}
         }
       end
       desc 'Info'
@@ -311,7 +312,7 @@ module Test
         work_dir, ckt_name = Utils::get_params(params)
         Dir.chdir(work_dir){
           ckt = @@ngspice_ckt[ckt_name]
-          {"info" => ckt.info}
+          {"info" => ckt.info()}
         }
       end   
       desc 'Measurement'

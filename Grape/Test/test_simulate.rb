@@ -10,7 +10,7 @@ class APITest < Minitest::Test
     end
 
     def test_simulate_LTspice
-      puts 'LTspice simulateion!'
+      puts 'LTspice simulation!'
       get '/api/ltspctl/simulate?dir=C%3A%5CUsers%5Cseiji%5CSeafile%5CLSI_devel%5CLR_homework%5CLR_hokari%5CLTspice%2F&file=NOR2.asc&probes=time%2C%20V(out)&variations=%7B%7D&models_update=%7B%7D'
       #get '/api/ltspctl/simulate?dir=C%3A%5CUsers%5Cseiji%5CSeafile%5CLSI_devel%5CLR_homework%5CLR_Furukawa%2F&file=2NAND.asc&probes=time%2C%20V(out)&variations=%7B%7D&models_update=%7B%7D'
       result = JSON.parse(last_response.body) #['keys']
