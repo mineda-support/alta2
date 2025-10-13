@@ -15,6 +15,10 @@
         return target;
     }
 
+    function add_update_elms(elm, value) {
+      return elm + ":'" + value + "',";
+    }
+
     export function update_elements(ckt, elements, schema_editor) {
         for (const [ckt_name, elms] of Object.entries(ckt.elements)) {
             if (ckt_name[0] == ".") {
@@ -23,13 +27,22 @@
             let target = schema_file(ckt_name, schema_editor);
             let update_elms = "";
             for (const [elm, props] of Object.entries(elms)) {
-                if (elements[ckt_name][elm] != get_control(props)) {
-                    update_elms =
-                        update_elms +
-                        elm +
-                        ":'" +
-                        elements[ckt_name][elm] +
-                        "',";
+                if (Array.isArray(props)){
+                    if (Object.entries(props).length == 1) {
+                      if (elements[ckt_name][elm] != props[0].control) {
+                        update_elms = update_elms + add_update_elms(elm, elements[ckt_name][elm]);
+                      }
+                    } else {
+                      Object.values(props).forEach(function (p, index) {
+                        if (elements[ckt_name][elm+String(index+1)] != p.control) {
+                          update_elms = update_elms + add_update_elms(elm+String(index+1), elements[ckt_name][elm+String(index+1)]);
+                        }
+                      })
+                    }
+                } else {
+                  if (elements[ckt_name][elm] != props.value) {
+                      update_elms = update_elms + add_update_elms(elm, elements[ckt_name][elm])
+                  }
                 }
             }
             if (update_elms != "") {

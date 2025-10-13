@@ -13,9 +13,11 @@
 		"@sveltejs/kit": "^2.9.0",
 		"@sveltejs/vite-plugin-svelte": "^5.0.0",
 		"svelte": "^5.15.0",
+		"svelte-markdoc-preprocess": "^3.0.0",
 		"vite": "^6.3.5"
 	},
 	"dependencies": {
+		"@markdoc/markdoc": "^0.5.4",
 		"child_process": "^1.0.2",
 		"get-port": "^7.1.0",
 		"glob": "^11.0.0",

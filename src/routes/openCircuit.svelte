@@ -95,7 +95,17 @@
         proj.elements[ckt_name] = {};
         for (const [elm, props] of Object.entries(elms)) {
           // console.log([elm, props]);
-          proj.elements[ckt_name][elm] = get_control(props);
+          if (Array.isArray(props)) {
+            if (Object.values(props).length == 1) {
+              proj.elements[ckt_name][elm] = props[0].control;
+            } else {
+              Object.values(props).forEach(function (p, index) {
+                proj.elements[ckt_name][elm+String(index+1)] = p.control;
+              })
+            }
+          } else {
+            proj.elements[ckt_name][elm] = props.value;
+          }
         }
       }
       console.log("elements=", $state.snapshot(proj.elements));
