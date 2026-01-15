@@ -154,6 +154,7 @@
 </script>
 
 <script lang="ts">
+	import { showOpenFilePicker, showSaveFilePicker } from 'native-file-system-adapter'
     import BodePlot from "./Utils/bode_plot.svelte";
     import SinglePlot from "./Utils/single_plot.svelte";
     import { set_trace_names } from "./experiment.svelte";
@@ -219,7 +220,7 @@
         tracemode,
     ) {
         if (measfile == undefined || measfile == "") {
-            const [handle] = await window.showOpenFilePicker(options);
+		    const [fileHandle] = await showOpenFilePicker({_preferPolyfill: false, ...options});
         }
         measdata = await measurement_results(
             port,
@@ -490,7 +491,7 @@
         });
         csv_text = csv_text + "\n";
         csv_text = data2csv(csv_text, csv_data);
-        const handle = await window.showSaveFilePicker(saveFileOptions);
+		const handle = await showSaveFilePicker({_preferPolyfill: false, ...saveFileOptions});
         const ws = await handle.createWritable();
         await ws.write(csv_text);
         await ws.close();
@@ -522,7 +523,7 @@
                 ph_data: ph_data,
             },
         ]);
-        const handle = await window.showSaveFilePicker(saveFileOptions);
+		const handle = await showSaveFilePicker({_preferPolyfill: false, ...saveFileOptions});
         const ws = await handle.createWritable();
         await ws.write(blob);
         await ws.close();
@@ -573,7 +574,7 @@
             multiple: false,
         };
         let fileHandle;
-        [fileHandle] = await window.showOpenFilePicker(pickerOpts);
+		[fileHandle] = await showOpenFilePicker({_preferPolyfill: false, ...pickerOpts});
         const file = await fileHandle.getFile();
         filename = file.name;
         let filedata = await file.text();

@@ -15,6 +15,7 @@
   }
 </script>
 <script lang="ts">
+	import { showOpenFilePicker } from 'native-file-system-adapter'
     import { enhance, applyAction } from "$app/forms";
     import { goto } from "$app/navigation";
     import { proj } from "./shared.svelte";
@@ -60,7 +61,7 @@
             multiple: false,
         };
         let fileHandle;
-        [fileHandle] = await window.showOpenFilePicker(pickerOpts);
+        [fileHandle] = await showOpenFilePicker({_preferPolyfill: false, ...pickerOpts});
         const file = await fileHandle.getFile();
         let edifdata = await file.text();
         console.log('File name:', file.name, 'size=', edifdata.length);

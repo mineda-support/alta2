@@ -126,6 +126,7 @@
 </script>
 
 <script lang="ts">
+	import { showOpenFilePicker, showSaveFilePicker } from 'native-file-system-adapter'
 	import Plot from "svelte-plotly.js";
 	import { schema_file, update_elements, update_models } from "./simulate.svelte";
 	import SweepSource from "./Utils/sweep_source.svelte";
@@ -427,7 +428,8 @@
 			],
 		};
 		const blob = JSON.stringify([settings, proj.results_data]);
-		const handle = await window.showSaveFilePicker(saveFileOptions);
+		const handle = await showSaveFilePicker({_preferPolyfill: false, ...saveFileOptions});
+
 		const ws = await handle.createWritable();
 		await ws.write(blob);
 		await ws.close();
@@ -441,7 +443,7 @@
 			multiple: false,
 		};
 		let fileHandle;
-		[fileHandle] = await window.showOpenFilePicker(pickerOpts);
+		[fileHandle] = await showOpenFilePicker({_preferPolyfill: false, ...pickerOpts});
 		const file = await fileHandle.getFile();
 		/* const reader = new FileReader();
 		reader.readAsText(file, 'UTF-8');
