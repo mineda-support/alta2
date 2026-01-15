@@ -5,6 +5,7 @@ import getPort from 'get-port';
 import { exec } from 'node:child_process';
 
 //const { exec } = require('child_process');
+let current_dir = process.cwd();
 
 export async function load({ url }) {
     // const probes = cookies.get('probes')
@@ -68,8 +69,6 @@ export async function load({ url }) {
         }
     }
 }
-
-let current_dir = undefined;
 
 async function startGrape() {
     if (current_dir == undefined) {
