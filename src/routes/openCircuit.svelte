@@ -20,6 +20,8 @@
 </script>
 
 <script lang="ts">
+ 	let md = $state('# Hello world!');
+	import Markdown from 'svelte-exmarkdown';
   import { edif2ltspice } from "./convertSchematic.svelte";
   import { tooltip, msg } from "./Utils/tooltip.svelte";
   import InputWideValue from "./Utils/input_wide_value.svelte";
@@ -284,6 +286,9 @@
     </div>
   {/if}
 {/if}
+<textarea bind:value={md}></textarea>
+<Markdown {md} />
+<hr />
 <div>
   <button
     onclick={() =>
