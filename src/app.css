@@ -51,6 +51,7 @@ label {
   }
   .box-item {
     width: 25%;
+    max-height: 25%;
     background: orange;
     text-align: left;
     padding: 5px 10px;
@@ -58,6 +59,7 @@ label {
   }
   .box-item2 {
     width: 25%;
+    max-height: 25%;
     background: darkorange;
     text-align: left;
     padding: 5px 10px;
@@ -66,6 +68,7 @@ label {
   .box-item3 {
     width: 25%;
     background: silver;
+    max-height: 25%;
     text-align: left;
     padding: 5px 10px;
     border: 5px solid #ddd;

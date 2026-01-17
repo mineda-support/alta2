@@ -17,11 +17,11 @@ export function GET({ url }) {
 export async function POST({ request, cookies }) {
     // console.log(request);
 	const props = await request.json();
-    const wdir = props.wdir;
-    const settings_name = props.settings_name;
-    console.log(wdir);
-    fs.writeFileSync(wdir+`${settings_name}_settings.json`, JSON.stringify(props));
-    console.log(props);
-    const setting_files = globSync(wdir + '*_settings.json');
-	return json(setting_files.map(a => path.basename(a).replace('_settings.json', '')), { status: 201 });
+    const md_data = props.md_data;
+    const md_file = props.md_file;
+    fs.writeFileSync(md_file, md_data
+    );
+    console.log('md_file=', md_file);
+    console.log('md_data=', md_data);
+    return json({status: 'success'}, { status: 201 });
 }

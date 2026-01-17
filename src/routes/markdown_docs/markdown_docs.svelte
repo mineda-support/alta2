@@ -1,32 +1,18 @@
 <script lang="ts">
   import Markdown from 'svelte-exmarkdown';
+ 	import { gfmPlugin } from 'svelte-exmarkdown/gfm';
   import { tooltip, msg } from "../Utils/tooltip.svelte";
-  async function save_markdown(md_file) {
+  async function save_markdown(md_data, md_file) {
     const props = {};
-    props.home = data.props.home;
-    props.wdir = data.props.wdir;
-    props.markdown_name = markdown_name;
-    props.ckt = ckt;
-    props.variations = variations;
-    console.log("markdown=", $state.snapshot(markdown));
-    props.markdown = {};
-    for (const [item, value] of Object.entries(markdown)) {
-      props.markdown[item] = value;
-    }
-    console.log("props=", props);
-    const response = await fetch("markdown", {
+    props.md_data = md_data;
+    props.md_file = md_file;
+    const response = await fetch("markdown_docs", {
       method: "POST",
       body: JSON.stringify(props),
       headers: {
         "Content-Type": "application/json",
       },
     });
-    const setting_names = await response.json();
-    console.log("setting names:", setting_names);
-    if (setting_names.includes(markdown_name)) {
-      alert(`${markdown_name} saved`);
-      data.props.setting_names = setting_names;
-    }
   }
 
   async function load_markdown(md_file, dir) {
@@ -43,15 +29,33 @@
   let { data, dir, md_file } = $props();
   // let md = $state("# Hello world\nThis is sample markdown.");
   let md = $derived(load_markdown(md_file,dir));
+  let show_markdown = $state(false);
 </script>
-
+{#if data.props.markdown_files.length > 0}
+  <button
+    use:tooltip={() => msg("show or hide markdown")}
+    onclick={() => (show_markdown = !show_markdown)}
+    class="button-3"
+    >show/hide markdown</button
+  >
+{/if}
+<div style="border: 2px solid gold;"><Markdown {md} [gfmPlugin()]/></div>
+{#if show_markdown}  
+  <div><textarea bind:value={md}></textarea></div>
+{/if}
 <div>
   <button
-    onclick={() => save_markdown(markdown_name)}
+    onclick={() => save_markdown(md, dir+md_file)}
+    class="button-1"
+    use:tooltip={() => msg("save markdown")}
+  >
+    Save markdown</button
+  >  <button
+    onclick={() => save_markdown(md, dir+md_file)}
     class="button-1"
     use:tooltip={() => msg("save markdown in a working directory")}
   >
-    Save markdown in:</button
+    Save markdown as</button
   >
   <label>
     <input
@@ -59,23 +63,20 @@
       autocomplete="off"
       onkeydown={async (e) => {
         if (e.key == "Enter") {
-          save_markdown(markdown_name);
+          save_markdown(md, dir+md_file);
         }
       }}
       bind:value={markdown_name}
       style="border:darkgray solid 1px;"
     />
   </label>
-  <button
+  <!-- button
     onclick={() => load_markdown(md_file, data.props.wdir)}
     class="button-1"
     use:tooltip={() => msg("load markdown from a file")}
     >Load markdown
-  </button>
-  <hr />
-  <textarea bind:value={md}></textarea>
-  <Markdown {md} />
-</div>
+  </button -->
+  </div>
 
 <style>
 </style>

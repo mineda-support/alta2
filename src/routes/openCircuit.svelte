@@ -232,7 +232,8 @@
   }
   let show_symbol_files = $state(false);
   let show_markdown_files = $state(false);
-  let filter = $state("");
+  let show_readme = $state(true);
+let filter = $state("");
 </script>
 
 <p>
@@ -251,7 +252,21 @@
     class="button-1">Switch Wdir</button
   >
 </p>
-  {#if data.props != undefined} 
+{#if data.props != undefined} 
+  {#if data.props.markdown_files.includes('README.md')}
+    <button
+      use:tooltip={() => msg("show or hide README.md")}
+      onclick={() => (show_readme = !show_readme)}
+      class="button-3"
+      >show/hide README</button
+    >
+    {#if show_readme}
+      <Markdown_docs
+        {data}
+        dir={data.props.wdir}
+        md_file={"README.md"} />
+    {/if}
+  {/if}
   <div class="sample"> 
     {#each ['..'].concat(data.props.sub_directories) as subdir}
       <button
