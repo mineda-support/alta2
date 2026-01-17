@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { showOpenFilePicker } from 'native-file-system-adapter'
 	import Simulate from "./simulate.svelte";
 	import ConvertSchematic from "./convertSchematic.svelte";
 	import Experiment, { set_trace_names } from "./experiment.svelte";
@@ -53,7 +54,7 @@
 			multiple: false,
 		};
 		let fileHandle;
-		[fileHandle] = await window.showOpenFilePicker(pickerOpts);
+		[fileHandle] = await showOpenFilePicker({_preferPolyfill: false, ...pickerOpts});
 		const file = await fileHandle.getFile();
 		const decoder = new TextDecoder("sjis");
 		const filedata = await file.arrayBuffer(); //text()

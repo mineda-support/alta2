@@ -63,6 +63,13 @@ label {
     padding: 5px 10px;
     border: 5px solid #ddd;
   }
+  .box-item3 {
+    width: 25%;
+    background: silver;
+    text-align: left;
+    padding: 5px 10px;
+    border: 5px solid #ddd;
+  }
   .button-item {
     /* width: 25%; */
     background: lightblue;

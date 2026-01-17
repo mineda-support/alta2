@@ -5,12 +5,13 @@ import { json } from '@sveltejs/kit';
 
 export function GET({ url }) {
     console.log('URL=', url);
-    const settings_name = url.searchParams.get('settings_name');
+    const md_file_name = url.searchParams.get('md_file_name');
     const dir = url.searchParams.get('dir');
-    const json_file = dir + settings_name + '_settings.json';
-    console.log(json_file);
-    const settings = JSON.parse(fs.readFileSync(json_file));
-    return json(settings);
+    const json_file = dir + md_file_name;
+    console.log('json_file=', json_file);
+    const md_data = fs.readFileSync(json_file, {encoding: "utf8"});
+    console.log('md_data=', md_data);
+    return json(md_data);
 }
 
 export async function POST({ request, cookies }) {

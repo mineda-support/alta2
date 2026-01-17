@@ -50,6 +50,7 @@ export async function load({ url }) {
                                                   .concat(globSync(wdir + '*.edif'))
                                                   .concat(globSync(wdir + '*.out'));
             const symbol_files = globSync(wdir + '*.asy').concat(globSync(wdir + '*.sym'))
+            const markdown_files  = globSync(wdir + '*.md').concat(globSync(wdir + '*.markdoc'));
             files.forEach(file => {
                 // console.log(file);
             });
@@ -63,7 +64,8 @@ export async function load({ url }) {
                     symbol_files: symbol_files.map(a => path.basename(a)),
                     sub_directories: subdirs.map(a => path.basename(a)),
                     setting_names: setting_files.map(a => path.basename(a).replace('_settings.json', '')),
-                    flow_names: flow_files.map(a => path.basename(a).replace('_flow.json', ''))
+                    flow_names: flow_files.map(a => path.basename(a).replace('_flow.json', '')),
+                    markdown_files: markdown_files.map(a => path.basename(a))  
                 }
             };
         }

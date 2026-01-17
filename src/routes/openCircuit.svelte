@@ -20,8 +20,7 @@
 </script>
 
 <script lang="ts">
- 	let md = $state('# Hello world!');
-	import Markdown from 'svelte-exmarkdown';
+  import Markdown_docs from './markdown_docs/markdown_docs.svelte';
   import { edif2ltspice } from "./convertSchematic.svelte";
   import { tooltip, msg } from "./Utils/tooltip.svelte";
   import InputWideValue from "./Utils/input_wide_value.svelte";
@@ -232,6 +231,7 @@
     console.log("*** dir=", proj.dir);
   }
   let show_symbol_files = $state(false);
+  let show_markdown_files = $state(false);
   let filter = $state("");
 </script>
 
@@ -251,7 +251,7 @@
     class="button-1">Switch Wdir</button
   >
 </p>
-{#if data.props != undefined} 
+  {#if data.props != undefined} 
   <div class="sample"> 
     {#each ['..'].concat(data.props.sub_directories) as subdir}
       <button
@@ -286,8 +286,28 @@
     </div>
   {/if}
 {/if}
-<textarea bind:value={md}></textarea>
-<Markdown {md} />
+  {#if data.props.markdown_files.length > 0}
+    <button
+      use:tooltip={() => msg("show or hide markdown document files")}
+      onclick={() => (show_markdown_files = !show_markdown_files)}
+      class="button-3"
+      >show/hide documents</button
+    >
+  {/if}
+  {#if show_markdown_files}
+    <div class="sample">
+      {#each data.props.markdown_files as file}
+        <label class="box-item3">
+          <input type="radio" name="chosen" value={file} bind:group={chosen} />
+          {file}<br />
+        </label>
+      {/each}
+    </div>
+    <Markdown_docs
+      {data}
+	    dir={data.props.wdir}
+      md_file={chosen} />
+  {/if}
 <hr />
 <div>
   <button
@@ -388,7 +408,7 @@
         <button onclick={() => add_variation_item(src)} class="td-button"
           >+</button
         >
-        <button onclick={() => emove_variation_item(src)} class="td-button"
+        <button onclick={() => remove_variation_item(src)} class="td-button"
           >-</button
         >
         (nvar={nvar})
