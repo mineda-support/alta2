@@ -17,7 +17,7 @@
   }
 
   async function load_markdown(md_file, dir) {
-    console.log('md_file=', md_file, 'dir=', dir);
+    console.log("md_file=", md_file, "dir=", dir);
     const response = await fetch(
       `markdown_docs?dir=${encodeURIComponent(dir)}&md_file_name=${md_file}`,
     );
@@ -30,17 +30,17 @@
   let markdown_name = $state("default");
   let { data, dir, md_file } = $props();
   // let md = $state("# Hello world\nThis is sample markdown.");
-  let md = $derived(load_markdown(md_file, dir))
+  let md = $derived(load_markdown(md_file, dir));
   let show_markdown = $state(false);
 </script>
 
 <div style="border: 2px solid gold;"><Markdown {md} [gfmPlugin()] /></div>
 
-  <button
-    use:tooltip={() => msg("show or hide markdown")}
-    onclick={() => (show_markdown = !show_markdown)}
-    class="button-3">show/hide markdown source</button
-  >
+<button
+  use:tooltip={() => msg("show or hide markdown source")}
+  onclick={() => (show_markdown = !show_markdown)}
+  class="button-3">show/hide markdown source</button
+>
 
 {#if show_markdown}
   <div><textarea bind:value={md}></textarea></div>

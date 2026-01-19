@@ -9,9 +9,17 @@
     import { proj, ckt, settings } from "../shared.svelte.js";
     const details = {
         'switch working directory': '\n回路データのあるワークディレクトリを絶対パスで指定する',
+        'show or hide README.md': '\nワークディレクトリにあるREADME.mdの表示をオン・オフする',
+        'show or hide markdown source': '\nマークダウンのソースの表示をオン・オフする',
+        'save markdown': '\nマークダウンデータをワークディレクトリに保存する',
+        'select directory to switch': '\nこのディレクトリをワークディレクトリにする',
+        'show or hide symbol files' : '\nシンボルファイルのリストの表示をオン・オフする',
+        'show or hide markdown document files' : '\nマークダウンファイルのリストの表示をオン・オフする',
+        'select circuit to open': '\n読み込む回路を選択する',
         'readin circuit checked above': '\選択された回路を読み込む',
         'show up schematic editor': `\nチェックしていれば、${proj.schema_editor}が開きます。alta2の内部状態とは同期しないので注意！`,
         'elements and control': '\n回路に含まれる素子と制御情報です',
+        'SPICE models': '\n回路で使用するSPICEモデルの一覧です',
         'variations on device parameters': '\n素子特性を調べるときに、変化させた素子値で一挙にシミュレーションする',
         'save settings in a working directory': '\n設定情報を、ワークディレクトリに保存する',
         'load settings from a file': '\nワークディレクトリファイルから、設定情報をロードします。',

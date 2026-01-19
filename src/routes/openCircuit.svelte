@@ -276,7 +276,8 @@
       >
     {/each}
     {#each data.props.files as file}
-      <label class="box-item">
+      <label use:tooltip={() => msg("select circuit to open")}
+        class="box-item">
         <input type="radio" name="chosen" value={file} bind:group={chosen} />
         {file}<br />
       </label>
@@ -377,7 +378,8 @@
       {/if}
     </div>
     <input id="TAB-02" type="radio" name="TAB" class="tab-switch" />
-    <label class="tab-label" for="TAB-02">SPICE models</label>
+    <label class="tab-label" for="TAB-02" use:tooltip={() => msg("SPICE models")}
+    >SPICE models</label>
     <EditModels bind:models={proj.models} {filter} />
     <input id="TAB-03" type="radio" name="TAB" class="tab-switch" />
     <label class="tab-label" for="TAB-03">Alter</label>
