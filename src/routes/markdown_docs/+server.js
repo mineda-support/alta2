@@ -9,6 +9,9 @@ export function GET({ url }) {
     const dir = url.searchParams.get('dir');
     const json_file = dir + md_file_name;
     console.log('json_file=', json_file);
+    if (!fs.existsSync(json_file)) {
+        return json('');
+    }
     const md_data = fs.readFileSync(json_file, {encoding: "utf8"});
     console.log('md_data=', md_data);
     return json(md_data);

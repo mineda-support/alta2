@@ -15,17 +15,21 @@
     } */
     console.log("wdir=", wdir);
     //goto("?wdir=" + wdir.replace(/^"/, "").replace(/"$/, ""));
-    window.location = "?show_flow=" + show_flow + "&wdir=" + wdir.replace(/^"/, "").replace(/"$/, "");
+    window.location =
+      "?show_flow=" +
+      show_flow +
+      "&wdir=" +
+      wdir.replace(/^"/, "").replace(/"$/, "");
   }
 </script>
 
 <script lang="ts">
-  import Markdown_docs from './markdown_docs/markdown_docs.svelte';
+  import Markdown_docs from "./markdown_docs/markdown_docs.svelte";
   import { edif2ltspice } from "./convertSchematic.svelte";
   import { tooltip, msg } from "./Utils/tooltip.svelte";
   import InputWideValue from "./Utils/input_wide_value.svelte";
-	import EditModels from "./Utils/edit_models.svelte";
-  import { info_translated } from "./simulate.svelte"
+  import EditModels from "./Utils/edit_models.svelte";
+  import { info_translated } from "./simulate.svelte";
   function set_ctl_type(file) {
     if (file.match(/\.asc/)) {
       console.log(`${file} type is ltspice`);
@@ -74,7 +78,7 @@
     if (res2.error) {
       alert(res2.error);
       return;
-    } 
+    }
     console.log("probes:", probes);
     if (probes != undefined) {
       // goLTspice();
@@ -101,8 +105,8 @@
               proj.elements[ckt_name][elm] = props[0].control;
             } else {
               Object.values(props).forEach(function (p, index) {
-                proj.elements[ckt_name][elm+String(index+1)] = p.control;
-              })
+                proj.elements[ckt_name][elm + String(index + 1)] = p.control;
+              });
             }
           } else {
             proj.elements[ckt_name][elm] = props.value;
@@ -123,7 +127,7 @@
       }
       console.log("models=", $state.snapshot(proj.models));
       if (Object.keys(ckt.models).length == 0) {
-         alert('Warning: SPICE models are not included in the circuit');
+        alert("Warning: SPICE models are not included in the circuit");
       }
     }
     alter = [{}];
@@ -142,7 +146,7 @@
     chosen = $bindable(),
   } = $props();
   import { proj, ckt } from "./shared.svelte";
-    import { disableScrollHandling } from "$app/navigation";
+  import { disableScrollHandling } from "$app/navigation";
   //import { files } from "$service-worker"; ### this caused app.js:16 ReferenceError: ServiceWorkerGlobalScope is not defined
   //import { esbuildVersion } from "vite";
 
@@ -232,8 +236,9 @@
   }
   let show_symbol_files = $state(false);
   let show_markdown_files = $state(false);
-  let show_readme = $state(true);
-let filter = $state("");
+  //t show_readme = $state(false);   let md = $derived(load_markdown(md_file, dir));
+  let show_readme = $derived(data.props.markdown_files.includes("README.md"));
+  let filter = $state("");
 </script>
 
 <p>
@@ -252,29 +257,23 @@ let filter = $state("");
     class="button-1">Switch Wdir</button
   >
 </p>
-{#if data.props != undefined} 
-  {#if data.props.markdown_files.includes('README.md')}
-    <button
-      use:tooltip={() => msg("show or hide README.md")}
-      onclick={() => (show_readme = !show_readme)}
-      class="button-3"
-      >show/hide README</button
-    >
-    {#if show_readme}
-      <Markdown_docs
-        {data}
-        dir={data.props.wdir}
-        md_file={"README.md"} />
-    {/if}
+{#if data.props != undefined}
+  <button
+    use:tooltip={() => msg("show or hide README.md")}
+    onclick={() => (show_readme = !show_readme)}
+    class="button-3">show/hide README</button
+  >
+  {#if show_readme}
+    <Markdown_docs {data} dir={data.props.wdir} md_file={"README.md"} />
   {/if}
-  <div class="sample"> 
-    {#each ['..'].concat(data.props.sub_directories) as subdir}
+
+  <div class="sample">
+    {#each [".."].concat(data.props.sub_directories) as subdir}
       <button
-         use:tooltip={() =>
-            msg("select directory to switch")}
-         onclick={() => switch_wdir(data.props.wdir + subdir, false)}
-         class="box-item2">{subdir}</button
-      > 
+        use:tooltip={() => msg("select directory to switch")}
+        onclick={() => switch_wdir(data.props.wdir + subdir, false)}
+        class="box-item2">{subdir}</button
+      >
     {/each}
     {#each data.props.files as file}
       <label class="box-item">
@@ -282,13 +281,17 @@ let filter = $state("");
         {file}<br />
       </label>
     {/each}
-  </div> 
+  </div>
+  <Markdown_docs
+    {data}
+    dir={data.props.wdir}
+    md_file={"Documents/" + chosen + ".md"}
+  />
   {#if data.props.symbol_files.length > 0}
     <button
       use:tooltip={() => msg("show or hide symbol files")}
       onclick={() => (show_symbol_files = !show_symbol_files)}
-      class="button-3"
-      >show/hide symbols</button
+      class="button-3">show/hide symbols</button
     >
   {/if}
   {#if show_symbol_files}
@@ -301,28 +304,24 @@ let filter = $state("");
     </div>
   {/if}
 {/if}
-  {#if data.props.markdown_files.length > 0}
-    <button
-      use:tooltip={() => msg("show or hide markdown document files")}
-      onclick={() => (show_markdown_files = !show_markdown_files)}
-      class="button-3"
-      >show/hide documents</button
-    >
-  {/if}
-  {#if show_markdown_files}
-    <div class="sample">
-      {#each data.props.markdown_files as file}
-        <label class="box-item3">
-          <input type="radio" name="chosen" value={file} bind:group={chosen} />
-          {file}<br />
-        </label>
-      {/each}
-    </div>
-    <Markdown_docs
-      {data}
-	    dir={data.props.wdir}
-      md_file={chosen} />
-  {/if}
+{#if data.props.markdown_files.length > 0}
+  <button
+    use:tooltip={() => msg("show or hide markdown document files")}
+    onclick={() => (show_markdown_files = !show_markdown_files)}
+    class="button-3">show/hide documents</button
+  >
+{/if}
+{#if show_markdown_files}
+  <div class="sample">
+    {#each data.props.markdown_files as file}
+      <label class="box-item3">
+        <input type="radio" name="chosen" value={file} bind:group={chosen} />
+        {file}<br />
+      </label>
+    {/each}
+  </div>
+  <Markdown_docs {data} dir={data.props.wdir} md_file={chosen} />
+{/if}
 <hr />
 <div>
   <button
@@ -379,7 +378,7 @@ let filter = $state("");
     </div>
     <input id="TAB-02" type="radio" name="TAB" class="tab-switch" />
     <label class="tab-label" for="TAB-02">SPICE models</label>
-    <EditModels bind:models={proj.models} {filter}/> 
+    <EditModels bind:models={proj.models} {filter} />
     <input id="TAB-03" type="radio" name="TAB" class="tab-switch" />
     <label class="tab-label" for="TAB-03">Alter</label>
     <div class="tab-content" style="border:blue solid 2px;">
