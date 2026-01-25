@@ -18,6 +18,7 @@
 
   async function load_markdown(md_file, dir) {
     console.log("md_file=", md_file, "dir=", dir);
+    if (md_file.includes('undefined')) return '';
     const response = await fetch(
       `markdown_docs?dir=${encodeURIComponent(dir)}&md_file_name=${md_file}`,
     );

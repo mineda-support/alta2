@@ -106,3 +106,5 @@ label {
   .tab-switch {
     display: none;
   }
+img[alt=drawing30] {width: 30%}
+img[alt=drawing50] {width: 50%}

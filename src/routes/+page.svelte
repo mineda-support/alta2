@@ -5,7 +5,8 @@
 	import Experiment, { set_trace_names } from "./experiment.svelte";
 	import OpenCircuit, { get_control } from "./openCircuit.svelte";
 	import SetProbes from "./setProbes.svelte";
-	import Bsim3fitting from "./bsim3fitting.svelte";
+	// import Bsim3fitting from "./bsim3fitting.svelte";
+	import AltaFlowg from "./alta_flow.svelte";
 	import Settings from "./settings/settings.svelte";
 	import { tooltip, msg } from "./Utils/tooltip.svelte";
 	import PlotResults, {
@@ -262,7 +263,8 @@
 		class="button-3">show/hide flow control</button
 	>
 	{#if show_flow}
-		<Bsim3fitting
+		<!-- Bsim3fitting -->
+		<AltaFlow
 			port={data.props.port}
 			bind:ckt_data
 			bind:current_plot
