@@ -1,4 +1,5 @@
 <script lang="ts">
+    import Markdown_docs from "./markdown_docs/markdown_docs.svelte";
     import { tooltip, msg } from "./Utils/tooltip.svelte";
     import EditModels from "./Utils/edit_models.svelte";
     import { settings } from "./shared.svelte.js";
@@ -144,6 +145,7 @@
     }
     //console.log("settings=", settings);
     let flow_name = $state("default");
+    let show_readme = $derived(data.props.markdown_files.includes("README.md"));
 </script>
 
 <p>
@@ -161,14 +163,19 @@
     >
 </p>
 {#if data.props != undefined}
+    <button
+        use:tooltip={() => msg("show or hide README.md")}
+        onclick={() => (show_readme = !show_readme)}
+        class="button-3">show/hide README</button
+    >
+    {#if show_readme}
+        <Markdown_docs
+            {data}
+            dir={data.props.wdir}
+            md_file={"FLOW/README.md"}
+        />
+    {/if}
     <div class="sample">
-        {#each [".."].concat(data.props.sub_directories) as subdir}
-            <button
-                use:tooltip={() => msg("select directory to switch")}
-                onclick={() => switch_wdir(data.props.wdir + subdir, false)}
-                class="box-item2">{subdir}</button
-            >
-        {/each}
         {#each data.props.flow_names as file}
             <label class="box-item" style="background:lightblue;">
                 <input
@@ -191,73 +198,15 @@
         Click here to read JSON file</button
     >
 </div -->
-
+<Markdown_docs
+    {data}
+    dir={data.props.wdir}
+    md_file={"FLOW/Documents/" + chosen + ".md"}
+/>
 <label use:tooltip={() => msg("Flow title")}
     >Flow_title:
     <input bind:value={flow_title} style="border:darkgray solid 1px;" />
 </label>
-
-<div>
-    BSIM3 model parameter fitting {#if ckt_data.plotdata[current_plot]}
-        for {ckt_data.plotdata[current_plot].length} traces{/if}
-</div>
-<button
-    use:tooltip={() => msg("Get models from a file")}
-    onclick={() => (bsim3_models = get_models(port, filename))}
-    class="button-1">Get models from file:</button
->
-<input bind:value={filename} style="border:darkgray solid 1px;" />
-<div>
-    <label use:tooltip={() => msg("original model file (read only)")}
-        >model_org
-        <input bind:value={model_org} style="border:darkgray solid 1px;" />
-    </label>
-</div>
-<div class="tab-wrap">
-    <input
-        id="TAB-01"
-        type="radio"
-        name="TAB"
-        class="tab-switch"
-        checked="checked"
-    />
-    <label
-        class="tab-label"
-        for="TAB-01"
-        use:tooltip={() => msg("flow conditions")}
-    >
-        Conditions</label
-    >
-    <div class="tab-content" style="border:red solid 2px;">
-        <table>
-            <thead>
-                <tr>
-                    {#each ["name", "vbs", "vgs", "vds", "vth", "l", "w"] as p}
-                        <th>{p}</th>
-                    {/each}
-                </tr>
-            </thead>
-            <tbody>
-                {#each ckt_data.plotdata[current_plot] as trace}
-                    <tr>
-                        {#each ["name", "vbs", "vgs", "vds", "vth", "l", "w"] as p}
-                            <td
-                                ><input
-                                    style="border:darkgray solid 1px; width: 70%"
-                                    bind:value={trace[p]}
-                                /></td
-                            >
-                        {/each}
-                    </tr>
-                {/each}
-            </tbody>
-        </table>
-    </div>
-    <input id="TAB-02" type="radio" name="TAB" class="tab-switch" />
-    <label class="tab-label" for="TAB-02">SPICE models</label>
-
-    <EditModels bind:models={bsim3_models} {filter} />
-</div>
 
 {#each flow_settings.showhide as _, i}
     <div>

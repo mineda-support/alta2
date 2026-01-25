@@ -6,7 +6,7 @@
 	import OpenCircuit, { get_control } from "./openCircuit.svelte";
 	import SetProbes from "./setProbes.svelte";
 	// import Bsim3fitting from "./bsim3fitting.svelte";
-	import AltaFlowg from "./alta_flow.svelte";
+	import AltaFlow from "./alta_flow.svelte";
 	import Settings from "./settings/settings.svelte";
 	import { tooltip, msg } from "./Utils/tooltip.svelte";
 	import PlotResults, {
