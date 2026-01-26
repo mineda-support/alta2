@@ -1,9 +1,9 @@
 <script lang="ts">
-    import Markdown_docs from "./markdown_docs/markdown_docs.svelte";
-    import { tooltip, msg } from "./Utils/tooltip.svelte";
-    import EditModels from "./Utils/edit_models.svelte";
-    import { settings } from "./shared.svelte.js";
-    import { switch_wdir } from "./openCircuit.svelte";
+    import Markdown_docs from "../markdown_docs/markdown_docs.svelte";
+    import { tooltip, msg } from "../Utils/tooltip.svelte";
+    import EditModels from "../Utils/edit_models.svelte";
+    import { settings } from "../shared.svelte.js";
+    import { switch_wdir } from "../openCircuit.svelte";
     let {
         port,
         ckt_data = $bindable(),
@@ -12,75 +12,6 @@
         show_flow = $bindable(),
         chosen = $bindable(),
     } = $props();
-    async function bsim3_step1() {
-        // console.log("ckt_data.plotdata=", $state.snapshot(ckt_data.plotdata));
-        //alert("bsim3 step1");
-        console.log(`procedure to send: ${procedure}`);
-        console.log(
-            "plotdata:",
-            $state.snapshot(ckt_data.plotdata[current_plot]),
-        );
-        console.log("settings:", $state.snapshot(settings));
-        const res = await fetch(`http://localhost:${port}/api/misc/exec_proc`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                model: filename
-                    .trim()
-                    .replace(/\\/g, "/")
-                    .replace(/^"/, "")
-                    .replace(/"$/, ""),
-                procedure: procedure,
-                settings: settings,
-                jtable: {
-                    measdata: ckt_data.plotdata[current_plot]
-                        ? ckt_data.plotdata[current_plot].concat(
-                              ckt_data.measdata[current_plot],
-                          )
-                        : [],
-                },
-            }),
-        });
-        let result = await res.json();
-        let plot_data = await result.plot_data;
-        return plot_data;
-    }
-    let bsim3_models = $state({});
-    let bsim3_models_org = $state({});
-
-    export async function get_models(port, filename) {
-        if (filename == undefined) {
-            alert("Please set file path");
-            return;
-        }
-        let encoded_params = `file=${encodeURIComponent(filename.trim().replace(/^"/, "").replace(/"$/, ""))}`;
-        let response = await fetch(
-            `http://localhost:${port}/api/misc/get_models?${encoded_params}`,
-            {},
-        );
-        let res2 = await response.json();
-        bsim3_models = {};
-        for (const [model_name, model_params] of Object.entries(res2.models)) {
-            bsim3_models[model_name] = {};
-            for (const [par, value] of Object.entries(model_params[1])) {
-                bsim3_models[model_name][par] = value;
-            }
-        }
-        console.log("bsim3_models=", $state.snapshot(bsim3_models));
-        return bsim3_models; // returned value not used
-    }
-    function handle_switch_wdir() {
-        show_flow = true;
-        switch_wdir(data.props.wdir, true);
-    }
-    let filename;
-    let model_org;
-    let filter = $state("");
-    let procedure = $state(
-        "calculate_vth_vbs_relation\n" + "estimate_vth_k1_k2\n",
-    );
 
     let flow_settings = $state({
         flow_number: 0,
@@ -116,7 +47,7 @@
     }
 
     async function save_flow_settings(flow_name) {
-        const response = await fetch("settingit gs", {
+        const response = await fetch("alta_flow", {
             method: "POST",
             body: JSON.stringify([flow_title, flow_settings]),
             headers: {
@@ -132,7 +63,7 @@
 
     async function load_flow_settings(flow_name, dir) {
         const response = await fetch(
-            `settings?dir=${encodeURIComponent(dir)}&settings_name=${flow_name}`,
+            `alta_flow?dir=${encodeURIComponent(dir)}&flow_name=${flow_name}`,
         );
         // const result = await response.json();
         let props = await response.json();
@@ -234,38 +165,8 @@
     <button
         onclick={() => save_flow_settings(flow_name)}
         class="button-1"
-        use:tooltip={() => msg("save settings in a working directory")}
+        use:tooltip={() => msg("save flow settings in a working directory")}
     >
-        Save settings in:</button
+        Save flow</button
     >
-    <label>
-        <input
-            type="text"
-            autocomplete="off"
-            onkeydown={async (e) => {
-                if (e.key == "Enter") {
-                    save_flow_settings(flow_name);
-                }
-            }}
-            bind:value={flow_name}
-            style="border:darkgray solid 1px;"
-        />
-    </label>
-    <button
-        onclick={() => load_flow_settings(flow_name, data.props.wdir)}
-        class="button-1"
-        use:tooltip={() => msg("load settings from a file")}
-        >Load settings from:
-    </button>
-    <select
-        bind:value={flow_name}
-        style="border:darkgray solid 1px;"
-        onchange={() => load_flow_settings(flow_name, data.props.wdir)}
-    >
-        {#if data.props != undefined}
-            {#each data.props.flow_names as setting}
-                <option value={setting}>{setting}</option>
-            {/each}
-        {/if}
-    </select>
 </div>
