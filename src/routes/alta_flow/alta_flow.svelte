@@ -4,6 +4,7 @@
     import EditModels from "../Utils/edit_models.svelte";
     import { settings } from "../shared.svelte.js";
     import { switch_wdir } from "../openCircuit.svelte";
+    import { process_params } from "express/lib/router";
     let {
         port,
         ckt_data = $bindable(),
@@ -47,14 +48,18 @@
     }
 
     async function save_flow_settings(flow_name) {
+        const props = {};
+        props.wdir = data.props.wdir + 'FLOW/';
+        props.flow_name = flow_name;
+        props.flow_settings = flow_settings;
         const response = await fetch("alta_flow", {
             method: "POST",
-            body: JSON.stringify([flow_title, flow_settings]),
+            body: JSON.stringify(props),
             headers: {
                 "Content-Type": "application/json",
             },
         });
-        const flow_names = await response.json();
+        flow_names = await response.json();
         console.log("flow names:", flow_names);
         if (flow_names.includes(flow_name)) {
             alert(`${flow_name} saved`);
@@ -76,6 +81,7 @@
     }
     //console.log("settings=", settings);
     let flow_name = $state("default");
+    let flow_names = $state(data.props.flow_names);
     let show_readme = $derived(data.props.markdown_files.includes("README.md"));
 </script>
 
@@ -107,7 +113,7 @@
         />
     {/if}
     <div class="sample">
-        {#each data.props.flow_names as file}
+        {#each flow_names as file}
             <label class="box-item" style="background:lightblue;">
                 <input
                     type="radio"
@@ -142,7 +148,7 @@
 {#each flow_settings.showhide as _, i}
     <div>
         <label use:tooltip={() => msg("procedures in Step")}>
-            <button onclick={() => bsim3_step1()}> BSIM3 Step#{i + 1} </button>
+            <button onclick={() => bsim3_step1()}> {flow_title} #{i + 1} </button>
             <textarea
                 bind:value={flow_settings.procedure[i]}
                 style="border:darkgray solid 1px; width: 50%; height: 20px; text-align: bottom"
@@ -163,7 +169,7 @@
 >
 <div>
     <button
-        onclick={() => save_flow_settings(flow_name)}
+        onclick={() => save_flow_settings(flow_title)}
         class="button-1"
         use:tooltip={() => msg("save flow settings in a working directory")}
     >
