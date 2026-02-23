@@ -6,6 +6,7 @@ import { exec } from 'node:child_process';
 
 //const { exec } = require('child_process');
 let current_dir = process.cwd();
+const user = process.env.USER || process.env.USERNAME;
 
 export async function load({ url }) {
     // const probes = cookies.get('probes')
@@ -26,6 +27,18 @@ export async function load({ url }) {
                 // console.log(file);
             });
         });
+        const image_files = globSync(wdir + '*.png');
+        const targetDir = path.join(current_dir, 'static', user);
+        fs.mkdir(targetDir, { recursive: true }, (err) => {
+            if (err) throw err;
+            console.log(`${targetDir} created`);
+        });
+        console.log("targetDir = ", targetDir);
+        console.log("image_files = ", image_files);
+        image_files.forEach(file => {
+            const file_content = fs.readFileSync(file);
+            fs.writeFileSync(path.join(targetDir, path.basename(file)), file_content);
+        });
         const subdirs = globSync('*/');
         const files = globSync(wdir + '*.asc').concat(globSync(wdir + '*.sch'))
             .concat(globSync(wdir + '*.edif'))
@@ -41,7 +54,7 @@ export async function load({ url }) {
         console.log("wdir=", wdir, "flow_files:", flow_files);
         return {
             props: {
-                home: home, port: await startGrape(), origin: url.origin, show_flow: false,
+                username: user, home: home, port: await startGrape(), origin: url.origin, show_flow: false,
                 wdir: wdir, ckt: ckt, files: files.map(a => path.basename(a)), //, probes: probes
                 symbol_files: symbol_files.map(a => path.basename(a)),
                 sub_directories: subdirs.map(a => path.basename(a)),
