@@ -87,6 +87,7 @@ module Test
         db_traces = traces.map{|trace| {name: trace[:name], x: trace[:x], y: trace[:y].map{|a| 20.0*Math.log10(a.abs)}}}
         phase_traces = traces.map{|trace| {name: trace[:name], x: trace[:x], y: trace[:y].map{|a| Utils::shift360(a.phase*(180.0/Math::PI))}}}
         if (equation = params[:equation]) != ''
+          equation = "[#{equation}]" unless equation.start_with? '['          
           results = eval_db_ph_equation db_traces, phase_traces, equation
           {"vars" => vars, "db" => db_traces, "phase" => phase_traces, "calculated_value" => results, "updates" => elements}
         else
@@ -96,6 +97,7 @@ module Test
         # $stderr.puts "params[:equation]=#{params[:equation].inspect}"
         equation = params[:equation]
         if equation && equation != ''
+          equation = "[#{equation}]" unless equation.start_with? '['          
           results = eval_equation vars, traces, equation
           {"vars" => vars, "traces" => traces, "calculated_value" => results, "updates" => elements, "info" => info}
         else
@@ -501,7 +503,7 @@ module Test
           if params[:plotdata] && params[:plotdata].size > 0
             vars = params[:probes].split(',')[1..-1].map{|a| a.strip}
             begin
-              results = eval_equation vars, params[:plotdata], params[:equation]
+              results = eval_equation vars, params[:plotdata], equation # params[:equation]
             rescue => error
               $stderr.puts "Error at measure: #{error}"
               $stderr.puts error.backtrace.join("\n")
