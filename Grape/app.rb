@@ -86,8 +86,8 @@ module Test
       if probes.start_with? 'frequency'
         db_traces = traces.map{|trace| {name: trace[:name], x: trace[:x], y: trace[:y].map{|a| 20.0*Math.log10(a.abs)}}}
         phase_traces = traces.map{|trace| {name: trace[:name], x: trace[:x], y: trace[:y].map{|a| Utils::shift360(a.phase*(180.0/Math::PI))}}}
-        if (equation = params[:equation]) != ''
-          equation = "[#{equation}]" unless equation.start_with? '['          
+        if (equation = params[:equation]) && equation != ''
+          equation = "[#{equation}]" unless equation.start_with? '['
           results = eval_db_ph_equation db_traces, phase_traces, equation
           {"vars" => vars, "db" => db_traces, "phase" => phase_traces, "calculated_value" => results, "updates" => elements}
         else
