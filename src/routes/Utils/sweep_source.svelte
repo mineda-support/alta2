@@ -77,6 +77,10 @@
         console.log("src_plus=", $state.snapshot(src_plus));
     }
     let value_list = $state([]);
+    function get_param_names(elements, src) {
+        let [ckt_name, elm_name] = src.split(":");
+        return elements[ckt_name][elm_name].match(/\S+ *= *\S+/g).map((a) => a.replace(/ *=.*/, ''));
+    }
 </script>
 
 <div>
@@ -97,6 +101,13 @@
             <select bind:value={par_name} style="border:darkgray solid 1px;">
                 <option value="l">l</option>
                 <option value="w">w</option>
+            </select>
+        {/if}
+        {#if src != undefined && src.match(/:param/)}
+            <select bind:value={par_name} style="border:darkgray solid 1px;">
+            {#each Object.values(get_param_names(elements, src)) as parm}
+                <option value={parm}>{parm}</option>
+            {/each} 
             </select>
         {/if}
         <label>
