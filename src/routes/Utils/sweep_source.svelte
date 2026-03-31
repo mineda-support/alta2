@@ -79,6 +79,10 @@
     let value_list = $state([]);
     function get_param_names(elements, src) {
         let [ckt_name, elm_name] = src.split(":");
+        if (elements[ckt_name] == undefined) {
+            alert(`'${ckt_name}' is not available`);
+            return [];
+        }
         return elements[ckt_name][elm_name].match(/\S+ *= *\S+/g).map((a) => a.replace(/ *=.*/, ''));
     }
 </script>
