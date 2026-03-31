@@ -309,8 +309,9 @@
 				settings.par_name[0],
 				settings.src_plus[0],
 			);
-			const trace_name =
+			let trace_name =
 				settings.src[0].replace(/^.*:/, "") + ":" + value2;
+			trace_name = trace_name.replace('param', settings.par_name[0]);
 			//plot_trace.name = trace_name;
 			//result_trace.name = trace_name;
 			//console.log("updates=", updates, `on ${dir}${target}.asc`);
