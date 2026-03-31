@@ -240,14 +240,10 @@
 	}
 
 	function create_updates(keep, var_name, par_name, value) {
-		if (var_name.match(/^par/)) {
+		if (var_name.match(/^par|^M/)) {
+			const rex = new RegExp(`${par_name} *= *\\S+`)
 			return [
-				`${var_name}: '${keep.replace(/(\.par\S+ *\S+ *= *)(\S+)/, "$1" + value)}'`,
-			];
-		} else if (var_name.match(/^M/)) {
-			let rex = new RegExp(`${par_name} *= *(\\S+)`);
-			return [
-				`${var_name}: ` + keep.replace(rex, `${par_name}=${value}`),
+				`${var_name}: '${keep.replace(rex, `${par_name}=${value}`)}'`,
 			];
 		} else {
 			return [`${var_name}: ${value}`];
