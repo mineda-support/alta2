@@ -8,7 +8,10 @@ import { exec } from 'node:child_process';
 let current_dir = process.cwd();
 const user = process.env.USER || process.env.USERNAME;
 
-export async function load({ url }) {
+export async function load({ url, setHeaders }) {
+    setHeaders({
+        'cache-control': 'public, max-age=3600' 
+    });
     // const probes = cookies.get('probes')
     const home = process.env.HOME.replaceAll('\\', '/');
     let wdir = url.searchParams.get('wdir');
