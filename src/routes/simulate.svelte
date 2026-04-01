@@ -112,14 +112,14 @@
             alert("Please read-in the circuit before simulation");
             return;
         }
-        console.log(`openCircuit dir='${proj.dir}' file='${proj.file}'`);
+        console.log(`simulate dir='${proj.dir}' file='${proj.gap+proj.file}'`);
         //dispatch("elm_update", { text: "Update elements" });
         //update_elements(port, proj.dir, ckt, proj.elements, probes, proj.schema_editor);
 
         console.log("variations", $state.snapshot(variations));
         let encoded_params = `dir=${encodeURIComponent(
             proj.dir,
-        )}&file=${encodeURIComponent(proj.file)}&probes=${encodeURIComponent(
+        )}&file=${encodeURIComponent(proj.gap+proj.file)}&probes=${encodeURIComponent(
             probes,
         )}&variations=${encodeURIComponent(JSON.stringify(variations))}`;
         //let elements_update = undefined;

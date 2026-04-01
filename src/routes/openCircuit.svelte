@@ -30,6 +30,7 @@
   import InputWideValue from "./Utils/input_wide_value.svelte";
   import EditModels from "./Utils/edit_models.svelte";
   import { info_translated } from "./simulate.svelte";
+
   function set_ctl_type(file) {
     if (file.match(/\.asc/)) {
       console.log(`${file} type is ltspice`);
@@ -56,17 +57,21 @@
     }
     proj.file = file;
     set_ctl_type(file);
-    proj.dir = dir;
-    console.log(`openCircuit port=${port} dir='${dir}' file='${file}'`);
+    // proj.dir = dir;
+    proj.gap = '';
+    if (dir != proj.dir) {
+      gap = dir.replace(proj.dir, '').replace(/\//g, '').replace(/\\/g, '') + '/';
+    }
+    console.log(`openCircuit port=${port} dir='${proj.dir}' file='${proj.gap}${file}}'`);
     let encoded_params;
     if (showup) {
       encoded_params = `dir=${encodeURIComponent(
-        dir,
-      )}&file=${encodeURIComponent(file)}&showup=true`;
+        proj.dir,
+      )}&file=${encodeURIComponent(`${proj.gap}${file}`)}&showup=true`;
     } else {
       encoded_params = `dir=${encodeURIComponent(
-        dir,
-      )}&file=${encodeURIComponent(file)}`;
+        proj.dir,
+      )}&file=${encodeURIComponent(`${proj.gap}${file}`)}`;
     }
     console.log(encoded_params);
     let response = await fetch(
@@ -245,7 +250,7 @@
   Work directory:
   {#if data != undefined && data.props != undefined && data.props.wdir != undefined}
     <input
-      bind:value={data.props.wdir}
+      bind:value={proj.dir}
       style="border:darkgray solid 1px;width: 50%;"
     />
   {/if}
@@ -253,7 +258,7 @@
 
   <button
     use:tooltip={() => msg("switch working directory")}
-    onclick={() => switch_wdir(data.props.wdir, false)}
+    onclick={() => switch_wdir(proj.dir, false)}
     class="button-1">Switch Wdir</button
   >
 </p>

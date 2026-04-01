@@ -186,7 +186,7 @@ module Test
 
         Dir.chdir(work_dir){
           begin
-            yield ckt_name
+            yield ckt_name, work_dir
           rescue => error
             $stderr.puts "Error at open: #{error}"
             $stderr.puts error.backtrace.join("\n")
@@ -208,14 +208,14 @@ module Test
     resource :ngspctl do
       desc 'Open Xschem'
       get :open do
-        open{|ckt_name|
+        open{|ckt_name, wdir|
         unless ckt = ckt_is_latest(ckt_name)
-            ckt = NgspiceControl.new(File.basename(ckt_name), true, true)
+            ckt = NgspiceControl.new([ckt_name, wdir], true, true)
             puts "ckt.file@:open = #{ckt.file}"
             @@ngspice_ckt[ckt_name] = ckt
             @@ngspice_mtime[ckt_name] = File.mtime(ckt_name)
           end
-          ckt.open(File.basename(ckt_name), true, true) if params[:showup]
+          ckt.open([ckt_name, wdir], true, true) if params[:showup]
           {"elements" => ckt.elements, "info" => nil, "models" => ckt.models}
         }
       end
@@ -225,7 +225,7 @@ module Test
         probes = params[:probes] 
         Dir.chdir(work_dir){
           unless ckt = @@ngspice_ckt[ckt_name]
-            ckt = NgspiceControl.new(File.basename(ckt_name), true, true)
+            ckt = NgspiceControl.new([ckt_name, work_dir], true, true)
             @@ngspice_ckt[ckt_name] = ckt
           end
           puts "ckt.file@:simulate = #{ckt.file}"
@@ -363,7 +363,7 @@ module Test
     resource :ltspctl do      
       desc 'Open LTspice'
       get :open do
-        open{|ckt_name|
+        open{|ckt_name, wdir|
           ckt = LTspiceControl.new(File.basename(ckt_name), true)
           ckt.open(File.basename(ckt_name), true) if params[:showup]
           puts ckt.elements
