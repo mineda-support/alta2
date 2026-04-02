@@ -9,7 +9,7 @@
 		//console.log('probes in set_trace_names=', probes);
 		if (probes != null && probes.startsWith("frequency")) {
 			sweep_name = set_trace_names2(db_data, elements, step_precision);
-			// sweep_name = set_trace_names2(ph_data, elements, step_precision);
+			sweep_name = set_trace_names2(ph_data, elements, step_precision);
 			if (sweep_name == undefined) {
 				sweep_name = db_data[0].name.replace(/=.*$/, '');
 			}
@@ -51,7 +51,11 @@
                             if (plotdata[index] != undefined) {
 		  					    plotdata[index].probe = plotdata[index].name;
                                 plotdata[index].step = src_values[i];
-							    plotdata[index].name = `${plotdata[index].name}@${src_values[i]}`;
+								if (plotdata[index].name.match(sweep_name.toLowerCase())) {
+									plotdata[index].name = src_values[i];
+								} else {
+   									plotdata[index].name = `${plotdata[index].name}@${src_values[i]}`;
+								}
                             }
                         }
 					}
