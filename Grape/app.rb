@@ -276,7 +276,7 @@ module Test
         # debugger
         Dir.chdir(work_dir){
           unless ckt = @@ngspice_ckt[ckt_name]
-            ckt = NgspiceControl.new(File.basename(ckt_name), true, true)
+            ckt = NgspiceControl.new([ckt_name, work_dir], true, true)
             @@ngspice_ckt[ckt_name] = ckt
           end
           puts "ckt.file@:results = #{ckt.file}"
