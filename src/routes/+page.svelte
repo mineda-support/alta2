@@ -137,7 +137,7 @@
 			let result = plot_result(
 				data.props.port,
 				proj.dir,
-				proj.file,
+				proj.gap + proj.file,
 				settings.probes[i],
 				settings.equation[i],
 				ckt_data.plotdata[i],

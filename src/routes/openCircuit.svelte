@@ -60,7 +60,8 @@
     // proj.dir = dir;
     proj.gap = '';
     if (dir != proj.dir) {
-      proj.gap = dir.replace(proj.dir, '').replace(/\//g, '').replace(/\\/g, '') + '/';
+      // proj.gap = dir.replace(proj.dir, '').replace(/\//g, '').replace(/\\/g, '') + '/';
+      proj.gap = dir.replace(proj.dir, '') + '/';      
     }
     console.log(`openCircuit port=${port} dir='${proj.dir}' file='${proj.gap}${file}}'`);
     let encoded_params;
