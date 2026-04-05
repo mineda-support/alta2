@@ -14,10 +14,18 @@ export async function load({ url, setHeaders }) {
     });
     // const probes = cookies.get('probes')
     const home = process.env.HOME.replaceAll('\\', '/');
+    let command = url.searchParams.get('command');
     let wdir = url.searchParams.get('wdir');
     fs.existsSync(wdir) || (wdir = home);
     let ckt = url.searchParams.get('ckt');
-    console.log(`wdir: ${wdir}`);
+    let gap = '';
+    if (ckt) {
+      gap = path.dirname(ckt);
+      if (gap == '.') gap = '';
+      ckt = path.basename(ckt);
+      wdir = path.join(wdir, gap);
+      console.log(`wdir: ${wdir} gap: ${gap} ckt: ${ckt}`);
+    };
     console.log('home=', home);
     console.log('href = ', url.href);
     console.log('origin = ', url.origin);
@@ -56,7 +64,7 @@ export async function load({ url, setHeaders }) {
         const flow_files = globSync(wdir + 'FLOW/*.json');
         console.log("wdir=", wdir, "flow_files:", flow_files);
         return {
-            props: {
+            props: { command: command, gap: gap,
                 username: user, home: home, port: await startGrape(), origin: url.origin, show_flow: false,
                 wdir: wdir, ckt: ckt, files: files.map(a => path.basename(a)), //, probes: probes
                 symbol_files: symbol_files.map(a => path.basename(a)),
