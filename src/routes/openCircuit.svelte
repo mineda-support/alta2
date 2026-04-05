@@ -21,30 +21,7 @@
       "&wdir=" +
       wdir.replace(/^"/, "").replace(/"$/, "");
   }
-</script>
-
-<script lang="ts">
-  import Markdown_docs from "./markdown_docs/markdown_docs.svelte";
-  import { edif2ltspice } from "./convertSchematic.svelte";
-  import { tooltip, msg } from "./Utils/tooltip.svelte";
-  import InputWideValue from "./Utils/input_wide_value.svelte";
-  import EditModels from "./Utils/edit_models.svelte";
-  import { info_translated } from "./simulate.svelte";
-
-  function set_ctl_type(file) {
-    if (file.match(/\.asc/)) {
-      console.log(`${file} type is ltspice`);
-      proj.ctl_type = "ltspctl";
-      proj.simulator = "LTspice";
-      proj.schema_editor = "LTspice";
-    } else if (file.match(/\.sch/)) {
-      console.log(`${file} type is ngspice`);
-      proj.ctl_type = "ngspctl";
-      proj.simulator = "Ngspice";
-      proj.schema_editor = "Xschem";
-    }
-  }
-  async function openCircuit(port, dir, file, showup) {
+  export async function openCircuit(port, dir, file, showup) {
     if (file == undefined) {
       alert("Please choose the circuit to open");
       return;
@@ -85,12 +62,7 @@
       alert(res2.error);
       return;
     }
-    console.log("probes:", probes);
-    if (probes != undefined) {
-      // goLTspice();
-      // plot_result();
-      // dispatch("open_end", { text: "fake simulation ended!" });
-    }
+
     ckt.elements = res2.elements;
     ckt.models = res2.models;
     ckt.info = info_translated(res2.info, proj);
@@ -115,7 +87,7 @@
               });
             }
           } else {
-            proj.elements[ckt_name][elm] = props.value;
+            proj.elements[ckt_name][elm] = props.value || props.type;
           }
         }
       }
@@ -142,6 +114,29 @@
     current_plot = 0;
     return res2;
   }
+
+  function set_ctl_type(file) {
+    if (file.match(/\.asc/)) {
+      console.log(`${file} type is ltspice`);
+      proj.ctl_type = "ltspctl";
+      proj.simulator = "LTspice";
+      proj.schema_editor = "LTspice";
+    } else if (file.match(/\.sch/)) {
+      console.log(`${file} type is ngspice`);
+      proj.ctl_type = "ngspctl";
+      proj.simulator = "Ngspice";
+      proj.schema_editor = "Xschem";
+    }
+  }
+</script>
+
+<script lang="ts">
+  import Markdown_docs from "./markdown_docs/markdown_docs.svelte";
+  import { edif2ltspice } from "./convertSchematic.svelte";
+  import { tooltip, msg } from "./Utils/tooltip.svelte";
+  import InputWideValue from "./Utils/input_wide_value.svelte";
+  import EditModels from "./Utils/edit_models.svelte";
+  import { info_translated } from "./simulate.svelte";
 
   let {
     data = $bindable(),
@@ -236,10 +231,10 @@
   let src = $state();
   // let nvar = 0;
   let remove_index = $state(0);
-  if (data != undefined && data.props != undefined) {
-    proj.dir = data.props.wdir;
-    console.log("*** dir=", proj.dir);
-  }
+  // if (data != undefined && data.props != undefined) {
+  //   proj.dir = data.props.wdir;
+  //  console.log("*** dir=", proj.dir);
+  // }
   let show_symbol_files = $state(false);
   let show_markdown_files = $state(false);
   //t show_readme = $state(false);   let md = $derived(load_markdown(md_file, dir));

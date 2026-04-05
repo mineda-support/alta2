@@ -3,7 +3,7 @@
 	import Simulate from "./simulate.svelte";
 	import ConvertSchematic from "./convertSchematic.svelte";
 	import Experiment, { set_trace_names } from "./experiment.svelte";
-	import OpenCircuit, { get_control } from "./openCircuit.svelte";
+	import OpenCircuit, { openCircuit } from "./openCircuit.svelte";
 	import SetProbes from "./setProbes.svelte";
 	// import Bsim3fitting from "./bsim3fitting.svelte";
 	import AltaFlow from "./alta_flow/alta_flow.svelte";
@@ -245,7 +245,14 @@
 	console.log("settings=", $state.snapshot(settings));
 	let show_flow = $state(data.props.show_flow);
 	let show_circuit = $state(!data.props.show_flow);
+	if (data.props.gap != '.') {
+		proj.dir = data.props.wdir.replace(data.props.gap, '');
+	}
 	let chosen = $state();
+	chosen = data.props.ckt;
+	if (data.props.command == 'open') {
+		openCircuit(data.props.port, data.props.wdir, chosen, false);
+	}
 </script>
 
 <main>
