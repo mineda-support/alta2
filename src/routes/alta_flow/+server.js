@@ -19,6 +19,7 @@ export async function POST({ request, cookies }) {
     const wdir = props.wdir;
     const flow_name = props.flow_name;
     console.log(wdir);
+    fs.mkdirSync(wdir, { recursive: true });
     fs.writeFileSync(wdir+`${flow_name}.json`, JSON.stringify(props));
     console.log(props);
     const flow_files = globSync(wdir + '*.json');
