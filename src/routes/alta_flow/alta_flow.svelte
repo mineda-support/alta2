@@ -2,9 +2,10 @@
     import Markdown_docs from "../markdown_docs/markdown_docs.svelte";
     import { tooltip, msg } from "../Utils/tooltip.svelte";
     import EditModels from "../Utils/edit_models.svelte";
-    import { settings } from "../shared.svelte.js";
+    import { proj, settings } from "../shared.svelte.js";
     import { switch_wdir } from "../openCircuit.svelte";
     // import { process_params } from "express/lib/router";
+    import yaml from "js-yaml";
     let {
         port,
         ckt_data = $bindable(),
@@ -36,6 +37,22 @@
             "current_flow_step=",
             $state.snapshot(current_flow_step),
         );
+        return current_flow_step;
+    }
+
+    function create_flow_step(dir) {
+        const current_flow_step = add_flow_step();
+        proj.gap = '';
+        if (dir != proj.dir) {
+          proj.gap = dir.replace(proj.dir.replace(/\/$/, ''), '');  
+        }
+
+        let flow_step = {};
+        flow_step.jobs = {};
+        flow_step.jobs['transim'] = {};
+        flow_step.jobs['transim']['steps'] = 
+          [{ command: 'open', wdir: proj.dir, ckt: proj.gap + proj.file}]; 
+        flow_settings.procedure[current_flow_step] = yaml.dump(flow_step);
     }
 
     function delete_flow_step() {
@@ -47,9 +64,19 @@
         }
     }
 
+    function clear_flow() {
+        flow_settings = {
+            flow_number: 0,
+            showhide: [],
+            title: [],
+            procedure: [],
+        };
+        current_flow_step = 0;
+    }
+
     async function save_flow_settings(flow_name) {
         const props = {};
-        props.wdir = data.props.wdir + 'FLOW/';
+        props.wdir = data.props.wdir + "FLOW/";
         props.flow_name = flow_name;
         props.flow_settings = flow_settings;
         const response = await fetch("alta_flow", {
@@ -83,6 +110,46 @@
     let flow_name = $state("default");
     let flow_names = $state(data.props.flow_names);
     let show_readme = $derived(data.props.markdown_files.includes("README.md"));
+
+    function run_command(steps) {
+        let encoded_params = "";
+        for (const [name, value] of Object.entries(steps)) {
+            encoded_params += `&${name}=${encodeURIComponent(value)}`;
+            //console.log(`    ${name}: ${value}`);
+        }
+        console.log(`  encoded_params: ${encoded_params}`);
+        window.location = "?show_flow=false" + encoded_params;
+    }
+
+    function execute_flow(flow_name) {
+        // alert(`execute flow ${flow_name} with settings ${JSON.stringify(flow_settings)}`);
+        flow_settings.procedure.forEach(function (p, i) {
+            if (flow_settings.showhide[i]) {
+                console.log(
+                    `execute step ${i} with procedure ${flow_settings.procedure[i]}`,
+                );
+                let proc = yaml.load(p);
+                console.log(proc);
+                //Object.entries(proc.jobs).forEach(([job_name, job_config]) => {
+                if (proc.jobs) {
+                    for (const [job_name, job_config] of Object.entries(
+                        proc.jobs,
+                    )) {
+                        console.log(
+                            `execute job '${job_name}' with config ${JSON.stringify(job_config)}`,
+                        );
+                        job_config.steps.forEach((steps, i) => {
+                            console.log(`  ${i}: ${steps}`);
+                            if (steps.command) {
+                                run_command(steps);
+                            }
+                        });
+                        // Here you would add the logic to execute the job based on its configuration}}
+                    }
+                }
+            }
+        });
+    }
 </script>
 
 <p>
@@ -148,7 +215,9 @@
 {#each flow_settings.showhide as _, i}
     <div>
         <label use:tooltip={() => msg("procedures in Step")}>
-            <button onclick={() => bsim3_step1()}> {flow_title} #{i + 1} </button>
+            <button onclick={() => bsim3_step1()}>
+                {flow_title} #{i + 1}
+            </button>
             <textarea
                 bind:value={flow_settings.procedure[i]}
                 style="border:darkgray solid 1px; width: 50%; height: 20px; text-align: bottom"
@@ -169,10 +238,38 @@
 >
 <div>
     <button
+        onclick={() => load_flow_settings(chosen, data.props.wdir + "FLOW/")}
+        class="button-1"
+        use:tooltip={() => msg("load flow settings from a working directory")}
+    >
+        Load flow</button
+    >
+    <button
         onclick={() => save_flow_settings(flow_title)}
         class="button-1"
         use:tooltip={() => msg("save flow settings in a working directory")}
     >
         Save flow</button
+    >
+    <button
+        onclick={() => clear_flow(flow_title)}
+        class="button-1"
+        use:tooltip={() => msg("clear flow")}
+    >
+        Clear flow</button
+    >
+    <button
+        onclick={() => execute_flow(flow_title)}
+        class="button-1"
+        use:tooltip={() => msg("execute flow settings in a working directory")}
+    >
+        Execute flow</button
+    >
+    <button
+        onclick={() => create_flow_step(data.props.wdir)}
+        class="button-1"
+        use:tooltip={() => msg("create a new flow step from the current circuit settings")}
+    >
+        Create flow step</button
     >
 </div>
