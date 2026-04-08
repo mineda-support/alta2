@@ -22,7 +22,7 @@
         procedure: [],
     });
     let current_flow_step = $state(0);
-    let flow_title = $state("Bsim3 fitting");
+    let flow_title = $derived(chosen); // $state("Bsim3 fitting");
     function add_flow_step() {
         flow_settings.showhide.push(true);
         console.log(
@@ -93,6 +93,19 @@
         }
     }
 
+    async function delete_flow(flow_name) {
+        const dir = data.props.wdir + "FLOW/";
+        const response = await fetch(
+            `alta_flow?dir=${encodeURIComponent(dir)}&flow_name=${flow_name}`,
+            {
+                method: "DELETE",
+            }
+        );
+        const result = await response.json();
+        flow_names = flow_names.filter(name => name !== flow_name);
+        alert(result.message);
+    } 
+
     async function load_flow_settings(flow_name, dir) {
         const response = await fetch(
             `alta_flow?dir=${encodeURIComponent(dir)}&flow_name=${flow_name}`,
@@ -100,7 +113,7 @@
         // const result = await response.json();
         let props = await response.json();
         //[flow_title, flow_settings] = props;
-        flow_title = props.flow_title;
+        //flow_title = props.flow_title;
         flow_settings = props.flow_settings;
 
         // probes_name.set(probes);
@@ -111,17 +124,27 @@
     let flow_names = $state(data.props.flow_names);
     let show_readme = $derived(data.props.markdown_files.includes("README.md"));
 
-    function run_command(steps) {
+    function run_command(steps, event) {
         let encoded_params = "";
         for (const [name, value] of Object.entries(steps)) {
             encoded_params += `&${name}=${encodeURIComponent(value)}`;
             //console.log(`    ${name}: ${value}`);
         }
         console.log(`  encoded_params: ${encoded_params}`);
-        window.location = "?show_flow=false" + encoded_params;
+        if (event.shiftKey) {
+            const width = window.outerWidth;
+            const height = window.outerHeight;
+            window.open(
+                "?show_flow=false" + encoded_params, 
+                "newWindow",
+                `width=${width},height=${height},resizable=yes,scrollbars=yes`
+            );
+        } else {
+            window.location = "?show_flow=true" + encoded_params;
+        }
     }
 
-    function execute_flow(flow_name) {
+    function execute_flow(event) {
         // alert(`execute flow ${flow_name} with settings ${JSON.stringify(flow_settings)}`);
         flow_settings.procedure.forEach(function (p, i) {
             if (flow_settings.showhide[i]) {
@@ -141,7 +164,7 @@
                         job_config.steps.forEach((steps, i) => {
                             console.log(`  ${i}: ${steps}`);
                             if (steps.command) {
-                                run_command(steps);
+                                run_command(steps, event);
                             }
                         });
                         // Here you would add the logic to execute the job based on its configuration}}
@@ -257,9 +280,16 @@
         use:tooltip={() => msg("clear flow")}
     >
         Clear flow</button
+    > 
+    <button
+        onclick={() => delete_flow(chosen)}
+        class="button-1"
+        use:tooltip={() => msg("delete flow")}
+    >
+        Delete flow</button
     >
     <button
-        onclick={() => execute_flow(flow_title)}
+        onclick={execute_flow}
         class="button-1"
         use:tooltip={() => msg("execute flow settings in a working directory")}
     >
