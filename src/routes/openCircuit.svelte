@@ -8,18 +8,29 @@
     }
   }
 
-  export function switch_wdir(wdir, show_flow) {
+  export function switch_wdir(event, wdir, show_flow) {
     /* if (wdir == undefined) {
       const handle = await window.showDirectoryPicker();
       wdir = handle.name; //USELESS because does not return PATH
     } */
     console.log("wdir=", wdir);
     //goto("?wdir=" + wdir.replace(/^"/, "").replace(/"$/, ""));
-    window.location =
-      "?show_flow=" +
-      show_flow +
-      "&wdir=" +
-      wdir.replace(/^"/, "").replace(/"$/, "");
+
+    if (event.shiftKey) {
+      const width = window.outerWidth;
+      const height = window.outerHeight;
+      window.open(
+        "?show_flow=" + show_flow + "&wdir=" + wdir.replace(/^"/, "").replace(/"$/, ""),
+        "newWindow",
+        `width=${width},height=${height},resizable=yes,scrollbars=yes`,
+      );
+    } else {
+      window.location =
+        "?show_flow=" +
+        show_flow +
+        "&wdir=" +
+        wdir.replace(/^"/, "").replace(/"$/, "");
+    }
   }
   export async function openCircuit(port, dir, file, showup) {
     if (file == undefined) {
@@ -35,12 +46,14 @@
     proj.file = file;
     set_ctl_type(file);
     // proj.dir = dir;
-    proj.gap = '';
+    proj.gap = "";
     if (dir != proj.dir) {
       // proj.gap = dir.replace(proj.dir, '').replace(/\//g, '').replace(/\\/g, '') + '/';
-      proj.gap = dir.replace(proj.dir, '') + '/';      
+      proj.gap = dir.replace(proj.dir, "") + "/";
     }
-    console.log(`openCircuit port=${port} dir='${proj.dir}' file='${proj.gap}${file}}'`);
+    console.log(
+      `openCircuit port=${port} dir='${proj.dir}' file='${proj.gap}${file}}'`,
+    );
     let encoded_params;
     if (showup) {
       encoded_params = `dir=${encodeURIComponent(
@@ -254,7 +267,7 @@
 
   <button
     use:tooltip={() => msg("switch working directory")}
-    onclick={() => switch_wdir(proj.dir, false)}
+    onclick={(e) => switch_wdir(e, proj.dir, false)}
     class="button-1">Switch Wdir</button
   >
 </p>
@@ -272,13 +285,12 @@
     {#each [".."].concat(data.props.sub_directories) as subdir}
       <button
         use:tooltip={() => msg("select directory to switch")}
-        onclick={() => switch_wdir(data.props.wdir + subdir, false)}
+        onclick={(e) => switch_wdir(e,data.props.wdir + subdir, false)}
         class="box-item2">{subdir}</button
       >
     {/each}
     {#each data.props.files as file}
-      <label use:tooltip={() => msg("select circuit to open")}
-        class="box-item">
+      <label use:tooltip={() => msg("select circuit to open")} class="box-item">
         <input type="radio" name="chosen" value={file} bind:group={chosen} />
         {file}<br />
       </label>
@@ -379,8 +391,11 @@
       {/if}
     </div>
     <input id="TAB-02" type="radio" name="TAB" class="tab-switch" />
-    <label class="tab-label" for="TAB-02" use:tooltip={() => msg("SPICE models")}
-    >SPICE models</label>
+    <label
+      class="tab-label"
+      for="TAB-02"
+      use:tooltip={() => msg("SPICE models")}>SPICE models</label
+    >
     <EditModels bind:models={proj.models} {filter} />
     <input id="TAB-03" type="radio" name="TAB" class="tab-switch" />
     <label class="tab-label" for="TAB-03">Alter</label>
