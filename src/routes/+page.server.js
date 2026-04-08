@@ -61,7 +61,7 @@ export async function load({ url, setHeaders }) {
         });
         const setting_files = globSync(wdir + '*_settings.json');
         console.log(setting_files);
-        const flow_files = globSync(wdir + 'FLOW/*.json');
+        const flow_files = globSync(wdir + 'FLOW/*.yaml');
         console.log("wdir=", wdir, "flow_files:", flow_files);
         return {
             props: { command: command, gap: gap,
@@ -70,7 +70,7 @@ export async function load({ url, setHeaders }) {
                 symbol_files: symbol_files.map(a => path.basename(a)),
                 sub_directories: subdirs.map(a => path.basename(a)),
                 setting_names: setting_files.map(a => path.basename(a).replace('_settings.json', '')),
-                flow_names: flow_files.map(a => path.basename(a).replace('.json', '')),
+                flow_names: flow_files.map(a => path.basename(a).replace('.yaml', '')),
                 markdown_files: markdown_files.map(a => path.basename(a))
             }
         };
