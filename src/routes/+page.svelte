@@ -3,7 +3,7 @@
 	import Simulate from "./simulate.svelte";
 	import ConvertSchematic from "./convertSchematic.svelte";
 	import Experiment, { set_trace_names } from "./experiment.svelte";
-	import OpenCircuit, { openCircuit } from "./openCircuit.svelte";
+	import OpenCircuit from "./openCircuit.svelte";
 	import SetProbes from "./setProbes.svelte";
 	// import Bsim3fitting from "./bsim3fitting.svelte";
 	import AltaFlow from "./alta_flow/alta_flow.svelte";
@@ -250,9 +250,6 @@
 	}
 	let chosen = $state();
 	chosen = data.props.ckt;
-	if (data.props.command == 'open') {
-		openCircuit(data.props.port, data.props.wdir, chosen, false);
-	}
 </script>
 
 <main>
@@ -302,7 +299,7 @@
 			bind:chosen
 		/>
 		<!--	plot_on:open_end={plot_results} -->
-		<Settings {data} {ckt} bind:variations />
+		<Settings bind:data {ckt} bind:variations />
 		<div>
 			<Simulate
 				port={data.props.port}

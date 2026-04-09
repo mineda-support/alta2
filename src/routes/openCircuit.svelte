@@ -20,7 +20,10 @@
       const width = window.outerWidth;
       const height = window.outerHeight;
       window.open(
-        "?show_flow=" + show_flow + "&wdir=" + wdir.replace(/^"/, "").replace(/"$/, ""),
+        "?show_flow=" +
+          show_flow +
+          "&wdir=" +
+          wdir.replace(/^"/, "").replace(/"$/, ""),
         "newWindow",
         `width=${width},height=${height},resizable=yes,scrollbars=yes`,
       );
@@ -32,7 +35,30 @@
         wdir.replace(/^"/, "").replace(/"$/, "");
     }
   }
-  export async function openCircuit(port, dir, file, showup) {
+</script>
+
+<script lang="ts">
+  import Markdown_docs from "./markdown_docs/markdown_docs.svelte";
+  import { edif2ltspice } from "./convertSchematic.svelte";
+  import { tooltip, msg } from "./Utils/tooltip.svelte";
+  import InputWideValue from "./Utils/input_wide_value.svelte";
+  import EditModels from "./Utils/edit_models.svelte";
+  import { info_translated } from "./simulate.svelte";
+  function set_ctl_type(file) {
+    if (file.match(/\.asc/)) {
+      console.log(`${file} type is ltspice`);
+      proj.ctl_type = "ltspctl";
+      proj.simulator = "LTspice";
+      proj.schema_editor = "LTspice";
+    } else if (file.match(/\.sch/)) {
+      console.log(`${file} type is ngspice`);
+      proj.ctl_type = "ngspctl";
+      proj.simulator = "Ngspice";
+      proj.schema_editor = "Xschem";
+    }
+  }
+
+  async function openCircuit(port, dir, file, showup) {
     if (file == undefined) {
       alert("Please choose the circuit to open");
       return;
@@ -100,7 +126,12 @@
               });
             }
           } else {
-            proj.elements[ckt_name][elm] = props.value || props.type;
+            if (props.value == undefined) {
+              proj.elements[ckt_name][elm] = ckt.elements[ckt_name][elm].value =
+                props.type;
+            } else {
+              proj.elements[ckt_name][elm] = props.value;
+            }
           }
         }
       }
@@ -127,29 +158,6 @@
     current_plot = 0;
     return res2;
   }
-
-  function set_ctl_type(file) {
-    if (file.match(/\.asc/)) {
-      console.log(`${file} type is ltspice`);
-      proj.ctl_type = "ltspctl";
-      proj.simulator = "LTspice";
-      proj.schema_editor = "LTspice";
-    } else if (file.match(/\.sch/)) {
-      console.log(`${file} type is ngspice`);
-      proj.ctl_type = "ngspctl";
-      proj.simulator = "Ngspice";
-      proj.schema_editor = "Xschem";
-    }
-  }
-</script>
-
-<script lang="ts">
-  import Markdown_docs from "./markdown_docs/markdown_docs.svelte";
-  import { edif2ltspice } from "./convertSchematic.svelte";
-  import { tooltip, msg } from "./Utils/tooltip.svelte";
-  import InputWideValue from "./Utils/input_wide_value.svelte";
-  import EditModels from "./Utils/edit_models.svelte";
-  import { info_translated } from "./simulate.svelte";
 
   let {
     data = $bindable(),
@@ -285,7 +293,7 @@
     {#each [".."].concat(data.props.sub_directories) as subdir}
       <button
         use:tooltip={() => msg("select directory to switch")}
-        onclick={(e) => switch_wdir(e,data.props.wdir + subdir, false)}
+        onclick={(e) => switch_wdir(e, data.props.wdir + subdir, false)}
         class="box-item2">{subdir}</button
       >
     {/each}
