@@ -49,9 +49,14 @@
 
         let flow_step = {};
         flow_step.jobs = {};
-        flow_step.jobs['transim'] = {};
-        flow_step.jobs['transim']['steps'] = 
-          [{ command: 'open', wdir: proj.dir, ckt: proj.gap + proj.file}]; 
+        flow_step.jobs['alta2'] = {};
+        flow_step.jobs['alta2']['steps'] = 
+          [{ 
+            command: 'open', 
+            wdir: proj.dir, 
+            ckt: proj.gap + proj.file,
+            settings_name: proj.settings_name
+        }]; 
         flow_settings.procedure[current_flow_step] = yaml.dump(flow_step);
     }
 

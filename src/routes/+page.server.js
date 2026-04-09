@@ -18,6 +18,7 @@ export async function load({ url, setHeaders }) {
     let wdir = url.searchParams.get('wdir');
     fs.existsSync(wdir) || (wdir = home);
     let ckt = url.searchParams.get('ckt');
+    let settings_name = url.searchParams.get('settings_name');
     let gap = '';
     if (ckt) {
       gap = path.dirname(ckt);
@@ -64,7 +65,7 @@ export async function load({ url, setHeaders }) {
         const flow_files = globSync(wdir + 'FLOW/*.yaml');
         console.log("wdir=", wdir, "flow_files:", flow_files);
         return {
-            props: { command: command, gap: gap,
+            props: { command: command, gap: gap, settings_name: settings_name,
                 username: user, home: home, port: await startGrape(), origin: url.origin, show_flow: false,
                 wdir: wdir, ckt: ckt, files: files.map(a => path.basename(a)), //, probes: probes
                 symbol_files: symbol_files.map(a => path.basename(a)),

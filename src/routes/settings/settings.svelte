@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { settings } from "../shared.svelte.js";
+  import { proj, settings } from "../shared.svelte.js";
   import { tooltip, msg } from "../Utils/tooltip.svelte";
   async function save_settings(settings_name) {
     const props = {};
@@ -45,8 +45,12 @@
     variations = props.variations;
   }
   //console.log("settings=", settings);
-  let settings_name = $state("default");
+  proj.settings_name = "default";
   let { data, ckt, variations = $bindable() } = $props();
+  if (data.props.settings_name != undefined) {
+    proj.settings_name = data.props.settings_name;
+    load_settings(proj.settings_name, data.props.wdir);
+  }
 </script>
 
 <div>
@@ -63,10 +67,10 @@
       autocomplete="off"
       onkeydown={async (e) => {
         if (e.key == "Enter") {
-          save_settings(settings_name);
+          save_settings(proj.settings_name);
         }
       }}
-      bind:value={settings_name}
+      bind:value={proj.settings_name}
       style="border:darkgray solid 1px;"
     />
   </label>
@@ -77,7 +81,7 @@
     >Load settings from:
   </button>
   <select
-    bind:value={settings_name}
+    bind:value={proj.settings_name}
     style="border:darkgray solid 1px;"
     onchange={() => load_settings(settings_name, data.props.wdir)}
   >
