@@ -8,11 +8,16 @@
     }
   }
 
-  export function switch_wdir(event, wdir, show_flow) {
+  export function switch_wdir(event, wdir, sub_dir, show_flow) {
     /* if (wdir == undefined) {
       const handle = await window.showDirectoryPicker();
       wdir = handle.name; //USELESS because does not return PATH
     } */
+    if (sub_dir == '..') {
+      wdir = wdir.replace(/[\/\\][^\/\\]+$/, '');
+    } else if (sub_dir != '') {
+      wdir = wdir + '/' + sub_dir;
+    }
     console.log("wdir=", wdir);
     //goto("?wdir=" + wdir.replace(/^"/, "").replace(/"$/, ""));
 
@@ -275,7 +280,7 @@
 
   <button
     use:tooltip={() => msg("switch working directory")}
-    onclick={(e) => switch_wdir(e, proj.dir, false)}
+    onclick={(e) => switch_wdir(e, proj.dir, '', false)}
     class="button-1">Switch Wdir</button
   >
 </p>
@@ -293,7 +298,7 @@
     {#each [".."].concat(data.props.sub_directories) as subdir}
       <button
         use:tooltip={() => msg("select directory to switch")}
-        onclick={(e) => switch_wdir(e, data.props.wdir + subdir, false)}
+        onclick={(e) => switch_wdir(e, data.props.wdir, subdir, false)}
         class="box-item2">{subdir}</button
       >
     {/each}

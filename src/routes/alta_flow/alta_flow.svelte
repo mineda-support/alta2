@@ -44,7 +44,7 @@
         const current_flow_step = add_flow_step();
         proj.gap = '';
         if (dir != proj.dir) {
-          proj.gap = dir.replace(proj.dir.replace(/\/$/, ''), '');  
+          proj.gap = dir.replace(proj.dir, '') + '/';  
         }
 
         let flow_step = {};
@@ -53,8 +53,8 @@
         flow_step.jobs['alta2']['steps'] = 
           [{ 
             command: 'open', 
-            wdir: proj.dir, 
-            ckt: proj.gap + proj.file,
+            wdir: (proj.gap == '') ? '' : '..',
+            ckt: proj.gap+proj.file,
             settings_name: proj.settings_name
         }]; 
         flow_settings.procedure[current_flow_step] = yaml.dump(flow_step);
@@ -81,7 +81,7 @@
 
     async function save_flow_settings(flow_name) {
         const props = {};
-        props.wdir = data.props.wdir + "FLOW/";
+        props.wdir = data.props.wdir + "/FLOW/";
         props.flow_name = flow_name;
         props.flow_settings = flow_settings;
         const response = await fetch("alta_flow", {
@@ -99,7 +99,7 @@
     }
 
     async function delete_flow(flow_name) {
-        const dir = data.props.wdir + "FLOW/";
+        const dir = data.props.wdir + "/FLOW/";
         const response = await fetch(
             `alta_flow?dir=${encodeURIComponent(dir)}&flow_name=${flow_name}`,
             {
@@ -131,7 +131,14 @@
 
     function run_command(steps, event) {
         let encoded_params = "";
-        for (const [name, value] of Object.entries(steps)) {
+        for (let [name, value] of Object.entries(steps)) {
+            if (name == 'wdir') {
+                if (value == '..') {
+                    value = data.props.wdir.replace(/[\/\\][^\/\\]+$/, '');
+                } else if (value != '..') {
+                    value = data.props.wdir + '/' + value;;
+                }
+            }
             encoded_params += `&${name}=${encodeURIComponent(value)}`;
             //console.log(`    ${name}: ${value}`);
         }
@@ -266,7 +273,7 @@
 >
 <div>
     <button
-        onclick={() => load_flow_settings(chosen, data.props.wdir + "FLOW/")}
+        onclick={() => load_flow_settings(chosen, data.props.wdir + "/FLOW/")}
         class="button-1"
         use:tooltip={() => msg("load flow settings from a working directory")}
     >
