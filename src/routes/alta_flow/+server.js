@@ -8,7 +8,7 @@ export function GET({ url }) {
     console.log('URL=', url);
     const flow_name = url.searchParams.get('flow_name');
     const dir = url.searchParams.get('dir');
-    const yaml_file = dir + flow_name + '.yaml';
+    const yaml_file = path.join(dir, flow_name) + '.yaml';
     console.log(yaml_file);
     const flow_settings = yaml.load(fs.readFileSync(yaml_file, 'utf8'));
     return json(flow_settings);

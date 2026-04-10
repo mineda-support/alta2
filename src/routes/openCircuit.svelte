@@ -76,24 +76,24 @@
     }
     proj.file = file;
     set_ctl_type(file);
-    // proj.dir = dir;
+    /*
     proj.gap = "";
     if (dir != proj.dir) {
-      // proj.gap = dir.replace(proj.dir, '').replace(/\//g, '').replace(/\\/g, '') + '/';
       proj.gap = dir.replace(proj.dir, "") + "/";
     }
+    */
     console.log(
-      `openCircuit port=${port} dir='${proj.dir}' file='${proj.gap}${file}}'`,
+      `openCircuit port=${port} dir='${proj.dir}' file='${dir}/${file}}'`,
     );
     let encoded_params;
     if (showup) {
       encoded_params = `dir=${encodeURIComponent(
         proj.dir,
-      )}&file=${encodeURIComponent(`${proj.gap}${file}`)}&showup=true`;
+      )}&file=${encodeURIComponent(`${dir}/${file}`)}&showup=true`;
     } else {
       encoded_params = `dir=${encodeURIComponent(
         proj.dir,
-      )}&file=${encodeURIComponent(`${proj.gap}${file}`)}`;
+      )}&file=${encodeURIComponent(`${dir}/${file}`)}`;
     }
     console.log(encoded_params);
     let response = await fetch(
@@ -131,7 +131,7 @@
               });
             }
           } else {
-            if (props.value == undefined) {
+            if (props.value == undefined || props.value == '') {
               proj.elements[ckt_name][elm] = ckt.elements[ckt_name][elm].value =
                 props.type;
             } else {

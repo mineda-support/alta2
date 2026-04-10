@@ -32,14 +32,14 @@ export async function load({ url, setHeaders }) {
     console.log('origin = ', url.origin);
     process.chdir(wdir);
     wdir = process.cwd();
-    if (!wdir.endsWith('/')) wdir = wdir + '/';
+    //if (!wdir.endsWith('/')) wdir = wdir + '/';
     if (fs.existsSync(wdir)) {
         fs.readdir(wdir, (err, files) => {
             files.forEach(file => {
                 // console.log(file);
             });
         });
-        const image_files = globSync(wdir + '*.png');
+        const image_files = globSync(wdir + '/*.png');
         const targetDir = path.join(current_dir, 'static', user);
         fs.mkdir(targetDir, { recursive: true }, (err) => {
             if (err) throw err;
@@ -52,17 +52,17 @@ export async function load({ url, setHeaders }) {
             fs.writeFileSync(path.join(targetDir, path.basename(file)), file_content);
         });
         const subdirs = globSync('*/');
-        const files = globSync(wdir + '*.asc').concat(globSync(wdir + '*.sch'))
-            .concat(globSync(wdir + '*.edif'))
-            .concat(globSync(wdir + '*.out'));
-        const symbol_files = globSync(wdir + '*.asy').concat(globSync(wdir + '*.sym'))
-        const markdown_files = globSync(wdir + '*.md').concat(globSync(wdir + '*.markdoc'));
+        const files = globSync(wdir + '/*.asc').concat(globSync(wdir + '/*.sch'))
+            .concat(globSync(wdir + '/*.edif'))
+            .concat(globSync(wdir + '/*.out'));
+        const symbol_files = globSync(wdir + '/*.asy').concat(globSync(wdir + '/*.sym'))
+        const markdown_files = globSync(wdir + '/*.md').concat(globSync(wdir + '/*.markdoc'));
         files.forEach(file => {
             // console.log(file);
         });
         const setting_files = globSync(wdir + '*_settings.json');
         console.log(setting_files);
-        const flow_files = globSync(wdir + 'FLOW/*.yaml');
+        const flow_files = globSync(wdir + '/FLOW/*.yaml');
         console.log("wdir=", wdir, "flow_files:", flow_files);
         return {
             props: { command: command, gap: gap, settings_name: settings_name,

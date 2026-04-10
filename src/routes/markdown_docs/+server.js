@@ -7,7 +7,7 @@ export function GET({ url }) {
     console.log('URL=', url);
     const md_file_name = url.searchParams.get('md_file_name');
     const dir = url.searchParams.get('dir');
-    const json_file = dir + md_file_name;
+    const json_file = path.join(dir, md_file_name);
     console.log('json_file=', json_file);
     if (!fs.existsSync(json_file)) {
         return json('');
