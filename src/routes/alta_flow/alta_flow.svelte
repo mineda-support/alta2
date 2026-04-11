@@ -53,7 +53,7 @@
         flow_step.jobs['alta2']['steps'] = 
           [{ 
             command: 'open', 
-            wdir: (proj.gap == '') ? '' : '..',
+            wdir: (proj.gap == '') ? '' : proj.gap.split(/[\/\\]/).filter((v) => {return v!=''}).map((a)=>'..').join('/'),
             ckt: proj.gap+proj.file,
             settings_name: proj.settings_name
         }]; 

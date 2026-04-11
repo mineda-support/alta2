@@ -117,7 +117,7 @@
       for (const [ckt_name, elms] of Object.entries(ckt.elements)) {
         //console.log(ckt_name, "=", elms);
         if (ckt_name[0] == ".") {
-          console.log("skip:", ckt_name);
+          // console.log("skip:", ckt_name);
           continue;
         }
         if (Object.entries(elms).length == 0) {
