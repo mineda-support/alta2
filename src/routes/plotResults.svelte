@@ -280,7 +280,7 @@
         let result = await plot_result(
             port,
             proj.dir,
-            proj.gap+proj.file,
+            proj.file_path,
             probes,
             equation,
             plotdata,

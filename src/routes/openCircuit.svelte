@@ -82,18 +82,19 @@
       proj.gap = dir.replace(proj.dir, "") + "/";
     }
     */
+    proj.file_path = dir + '/' + file;
     console.log(
-      `openCircuit port=${port} dir='${proj.dir}' file='${dir}/${file}}'`,
+      `openCircuit port=${port} dir='${proj.dir}' file='${proj.file_path}}'`,
     );
     let encoded_params;
     if (showup) {
       encoded_params = `dir=${encodeURIComponent(
         proj.dir,
-      )}&file=${encodeURIComponent(`${dir}/${file}`)}&showup=true`;
+      )}&file=${encodeURIComponent(`${proj.file_path}`)}&showup=true`;
     } else {
       encoded_params = `dir=${encodeURIComponent(
         proj.dir,
-      )}&file=${encodeURIComponent(`${dir}/${file}`)}`;
+      )}&file=${encodeURIComponent(`${proj.file_path}`)}`;
     }
     console.log(encoded_params);
     let response = await fetch(
@@ -118,6 +119,10 @@
         if (ckt_name[0] == ".") {
           console.log("skip:", ckt_name);
           continue;
+        }
+        if (Object.entries(elms).length == 0) {
+          alert(`${proj.dir} might not be a wright place to invoke Xschem and read-in ${ckt_name}`);
+          return;
         }
         proj.elements[ckt_name] = {};
         for (const [elm, props] of Object.entries(elms)) {
