@@ -110,6 +110,7 @@ module Test
   class API < Grape::API
     @@ngspice_ckt = {}
     @@ngspice_mtime = {}
+    @@ngspice_wdir = {}
     format :json
     prefix :api
     resource :misc do
@@ -196,8 +197,9 @@ module Test
         }              
       end
 
-      def ckt_is_latest file
+      def ckt_is_latest file, wdir
         puts "Check if '#{file}' is latest"
+        return nil unless @@ngspice_wdir[file] == wdir
         return nil unless ckt = @@ngspice_ckt[file]
         return nil unless File.exist?(file)
         mtime = File.mtime file
@@ -210,12 +212,13 @@ module Test
       desc 'Open Xschem'
       get :open do
         open{|ckt_name, wdir|
-        unless ckt = ckt_is_latest(ckt_name)
+        unless ckt = ckt_is_latest(ckt_name, wdir)
             ckt = NgspiceControl.new([ckt_name, wdir], true, true)
             puts "ckt.file@:open = #{ckt.file}"
             @@ngspice_ckt[ckt_name] = ckt
             @@ngspice_mtime[ckt_name] = File.mtime(ckt_name)
-          end
+            @@ngspice_wdir[ckt_name] = wdir
+        end
           ckt.open([ckt_name, wdir], true, true) if params[:showup]
           {"elements" => ckt.elements, "info" => nil, "models" => ckt.models}
         }
