@@ -243,8 +243,9 @@
 	let nvar = $state(0);
 	let show_meas_group = $state(true);
 	console.log("settings=", $state.snapshot(settings));
-	let show_flow = $state(data.props.show_flow);
-	let show_circuit = $state(!data.props.show_flow);
+	let show_flow = $derived(data.props.show == 'flow');
+	//let show_circuit = $derived(!data.props.show_flow);
+	let show_circuit = $derived(!show_flow);
 	if (data.props.gap != '.') {
 		proj.dir = data.props.wdir.replace(data.props.gap, '');
 	}

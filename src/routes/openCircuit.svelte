@@ -25,8 +25,8 @@
       const width = window.outerWidth;
       const height = window.outerHeight;
       window.open(
-        "?show_flow=" +
-          show_flow +
+        "?show=" +
+          (show_flow ? 'flow' : 'circuit') +
           "&wdir=" +
           wdir.replace(/^"/, "").replace(/"$/, ""),
         "newWindow",
@@ -34,8 +34,8 @@
       );
     } else {
       window.location =
-        "?show_flow=" +
-        show_flow +
+        "?show=" +
+          (show_flow ? 'flow' : 'circuit') +
         "&wdir=" +
         wdir.replace(/^"/, "").replace(/"$/, "");
     }

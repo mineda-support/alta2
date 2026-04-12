@@ -147,12 +147,12 @@
             const width = window.outerWidth;
             const height = window.outerHeight;
             window.open(
-                "?show_flow=false" + encoded_params, 
+                "?show=circuit" + encoded_params, 
                 "newWindow",
                 `width=${width},height=${height},resizable=yes,scrollbars=yes`
             );
         } else {
-            window.location = "?show_flow=true" + encoded_params;
+            window.location = "?show=circuit" + encoded_params;
         }
     }
 
