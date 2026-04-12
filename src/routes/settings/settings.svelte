@@ -49,7 +49,7 @@
   let { data, ckt, variations = $bindable() } = $props();
   if (data.props.settings_name != undefined) {
     proj.settings_name = data.props.settings_name;
-    load_settings(proj.settings_name, data.props.wdir);
+    if (proj.settings_name != 'default') load_settings(proj.settings_name, data.props.wdir);
   }
 </script>
 
