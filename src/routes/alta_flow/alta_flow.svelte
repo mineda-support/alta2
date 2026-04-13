@@ -133,7 +133,8 @@
         let encoded_params = "";
         for (let [name, value] of Object.entries(steps)) {
             if (name == 'wdir') {
-                if (value == '..') {
+                if (value == '.') value = data.props.wdir;
+                else if (value == '..') {
                     value = data.props.wdir.replace(/[\/\\][^\/\\]+$/, '');
                 } else if (value != '..') {
                     value = data.props.wdir + '/' + value;;
