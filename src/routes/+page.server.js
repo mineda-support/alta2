@@ -61,7 +61,7 @@ export async function load({ url, setHeaders }) {
         files.forEach(file => {
             // console.log(file);
         });
-        const setting_files = globSync(wdir + '*_settings.json');
+        const setting_files = globSync(wdir + '/*_settings.json');
         console.log(setting_files);
         const flow_files = globSync(wdir + '/FLOW/*.yaml');
         console.log("wdir=", wdir, "flow_files:", flow_files);
