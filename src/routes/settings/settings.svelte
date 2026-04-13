@@ -55,7 +55,7 @@
 
 <div>
   <button
-    onclick={() => save_settings(settings_name)}
+    onclick={() => save_settings(proj.settings_name)}
     class="button-1"
     use:tooltip={() => msg("save settings in a working directory")}
   >
@@ -75,7 +75,7 @@
     />
   </label>
   <button
-    onclick={() => load_settings(settings_name, data.props.wdir)}
+    onclick={() => load_settings(proj.settings_name, data.props.wdir)}
     class="button-1"
     use:tooltip={() => msg("load settings from a file")}
     >Load settings from:
@@ -83,7 +83,7 @@
   <select
     bind:value={proj.settings_name}
     style="border:darkgray solid 1px;"
-    onchange={() => load_settings(settings_name, data.props.wdir)}
+    onchange={() => load_settings(proj.settings_name, data.props.wdir)}
   >
     {#if data.props != undefined}
       {#each data.props.setting_names as setting}

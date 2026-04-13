@@ -84,7 +84,7 @@
     */
     proj.file_path = dir + '/' + file;
     console.log(
-      `openCircuit port=${port} dir='${proj.dir}' file='${proj.file_path}}'`,
+      `openCircuit port=${port} dir='${proj.dir}' file='${proj.file_path}'`,
     );
     let encoded_params;
     if (showup) {
