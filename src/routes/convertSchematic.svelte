@@ -1,21 +1,24 @@
 <script module>
-  import { switch_wdir } from "./openCircuit.svelte";
-  export async function edif2ltspice(port, dir, chosen){
-    console.log(`convert_edif port=${port} dir='${dir}' chosen='${chosen}'`);
-    let encoded_params = `dir=${encodeURIComponent(
-        dir,
-      )}&file=${encodeURIComponent(chosen)}`
-    let response = await fetch(
-      `http://localhost:${port}/api/ltspctl/convert_edif?${encoded_params}`,
-      {},
-    );
-    let res2 = await response.json();
-    console.log(res2);
-    switch_wdir(dir, false);
-  }
+    import { switch_wdir } from "./openCircuit.svelte";
+    export async function edif2ltspice(port, dir, chosen) {
+        console.log(
+            `convert_edif port=${port} dir='${dir}' chosen='${chosen}'`,
+        );
+        let encoded_params = `dir=${encodeURIComponent(
+            dir,
+        )}&file=${encodeURIComponent(chosen)}`;
+        let response = await fetch(
+            `http://localhost:${port}/api/ltspctl/convert_edif?${encoded_params}`,
+            {},
+        );
+        let res2 = await response.json();
+        console.log(res2);
+        switch_wdir(dir, "", false);
+    }
 </script>
+
 <script lang="ts">
-	import { showOpenFilePicker } from 'native-file-system-adapter'
+    import { showOpenFilePicker } from "native-file-system-adapter";
     import { enhance, applyAction } from "$app/forms";
     import { goto } from "$app/navigation";
     import { proj } from "./shared.svelte";
@@ -28,20 +31,29 @@
     let selected = $state();
     let to_program = $derived.by(() => {
         console.log`selected = ${selected}`;
-                switch (selected) {
-                    case "Xschem":
-                        return `
+        switch (selected) {
+            case "Xschem":
+                return `
                 create_cdraw();
                 dir = Dir.pwd;
                 cdraw2target 'xschem', File.join(dir,'cdraw'), File.join(dir, '${selected}')
                 `;
-                        break;
-                    case "LTspice":
-                        return `
+                break;
+            case "EEschema":
+                return `
+                create_cdraw();
+                dir = Dir.pwd;
+                cdraw2target 'EESchema', File.join(dir,'cdraw'), File.join(dir, '${selected}')
+                `;
+                break;
+            case "Qucs":
+                return
+                break;
+            case "LTspice":
+                return `
                 dir = Dir.pwd;
                 xschem2cdraw dir, File.join(dir, '${selected}')
                 `;
-                        break;
         }
     });
     function encoded_params(dir, program) {
@@ -50,21 +62,27 @@
         return `dir=${encodeURIComponent(dir)}&program=${program}`;
     }
     async function convert_edif(chosen) {
-        if (chosen != undefined ) {
+        if (chosen != undefined) {
             edif2ltspice(port, dir, chosen); // I don't know where 'dir' comes from
             return;
         }
         const pickerOpts = {
             types: [
-                { description: "EDIF(.edif/out)", accept: { "edif/*": [".edif", ".out"] } },
+                {
+                    description: "EDIF(.edif/out)",
+                    accept: { "edif/*": [".edif", ".out"] },
+                },
             ],
             multiple: false,
         };
         let fileHandle;
-        [fileHandle] = await showOpenFilePicker({_preferPolyfill: false, ...pickerOpts});
+        [fileHandle] = await showOpenFilePicker({
+            _preferPolyfill: false,
+            ...pickerOpts,
+        });
         const file = await fileHandle.getFile();
         let edifdata = await file.text();
-        console.log('File name:', file.name, 'size=', edifdata.length);
+        console.log("File name:", file.name, "size=", edifdata.length);
         const props = {};
         props.wdir = dir;
         props.edifdata = edifdata;
@@ -73,7 +91,7 @@
             method: "POST",
             body: JSON.stringify(props),
             headers: {
-            "Content-Type": "application/json",
+                "Content-Type": "application/json",
             },
         });
         edif2ltspice(port, dir, file.name);
@@ -93,18 +111,20 @@
                 alert(`${selected} folder created under ${dir}`);
             }
             window.location =
-                "?wdir=" + dir.replace(/^"/, "").replace(/"$/, "") + selected;
+                "?wdir=" +
+                dir.replace(/^"/, "").replace(/"$/, "") +
+                "/" +
+                selected;
             editor = selected;
         };
     }}
     class="button-2"
-        action={`http://localhost:${port}/api/misc/convert_circuit_data?${encoded_params(
+    action={`http://localhost:${port}/api/misc/convert_circuit_data?${encoded_params(
         dir,
         to_program,
     )}`}
 >
-    <button>Convert circuit data</button
-    >
+    <button>Convert circuit data</button>
     to
     <!--input name={selected} / -->
     <input name="to_program" value={to_program} type="hidden" />
@@ -125,12 +145,13 @@
         <option value="Edif">Edif</option>
     </select>
 </form>
-{#if proj.schema_editor == 'LTspice'}
-<button
-    use:tooltip={() => msg("Convert from Edif file")}
-    onclick={() => convert_edif(chosen)}
-    class="button-2">Convert from Edif file</button
->
+{#if proj.schema_editor == "LTspice"}
+    <button
+        use:tooltip={() => msg("Convert from Edif file")}
+        onclick={() => convert_edif(chosen)}
+        class="button-2">Convert from Edif file</button
+    >
 {/if}
+
 <style>
 </style>
