@@ -11,7 +11,7 @@ class APITest < Minitest::Test
 
     def test_simulate_ngspice
       puts 'simulate_ngspice!'
-      get '/api/ngspctl/simulate?dir=C%3A%5CUsers%5Cseiji%5CSeafile%5CLSI_devel%5CLR_homework%5CLR_hokari%2F&file=NOR2.sch&probes=time%2C%20V(in1)%2C%20V(out)&variations=%7B%7D&models_update=%7B%7D'
+      get '/api/xschmctl/simulate?dir=C%3A%5CUsers%5Cseiji%5CSeafile%5CLSI_devel%5CLR_homework%5CLR_hokari%2F&file=NOR2.sch&probes=time%2C%20V(in1)%2C%20V(out)&variations=%7B%7D&models_update=%7B%7D'
       assert_equal [], JSON.parse(last_response.body)
     end
 

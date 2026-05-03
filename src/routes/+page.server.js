@@ -54,9 +54,10 @@ export async function load({ url, setHeaders }) {
         });
         const subdirs = globSync('*/');
         const files = globSync(wdir + '/*.asc').concat(globSync(wdir + '/*.sch'))
-            .concat(globSync(wdir + '/*.edif'))
+            .concat(globSync(wdir + '/*.edif')).concat(globSync(wdir + '/*.kicad_sch'))
             .concat(globSync(wdir + '/*.out'));
         const symbol_files = globSync(wdir + '/*.asy').concat(globSync(wdir + '/*.sym'))
+            .concat(globSync(wdir + '/*.kicad_sym'))
         const markdown_files = globSync(wdir + '/*.md').concat(globSync(wdir + '/*.markdoc'));
         files.forEach(file => {
             // console.log(file);

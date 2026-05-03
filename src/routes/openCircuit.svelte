@@ -56,10 +56,15 @@
       proj.simulator = "LTspice";
       proj.schema_editor = "LTspice";
     } else if (file.match(/\.sch/)) {
-      console.log(`${file} type is ngspice`);
-      proj.ctl_type = "ngspctl";
+      console.log(`${file} type is xschem`);
+      proj.ctl_type = "xschmctl";
       proj.simulator = "Ngspice";
       proj.schema_editor = "Xschem";
+    } else if (file.match(/\.kicad_sch/)) {
+      console.log(`${file} type is eeschema`);
+      proj.ctl_type = "eescmctl";
+      proj.simulator = "Ngspice";
+      proj.schema_editor = "EEschema";
     }
   }
 
