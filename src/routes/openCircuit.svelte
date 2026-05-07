@@ -49,17 +49,23 @@
   import InputWideValue from "./Utils/input_wide_value.svelte";
   import EditModels from "./Utils/edit_models.svelte";
   import { info_translated } from "./simulate.svelte";
-  function set_ctl_type(file) {
+  function set_ctl_type(file, dir) {
     if (file.match(/\.asc/)) {
       console.log(`${file} type is ltspice`);
       proj.ctl_type = "ltspctl";
       proj.simulator = "LTspice";
       proj.schema_editor = "LTspice";
     } else if (file.match(/\.sch/)) {
-      console.log(`${file} type is xschem`);
-      proj.ctl_type = "xschmctl";
+      if (dir.match(/cells_prj/)){
+        console.log(`${file} type is QUCS`);
+        proj.ctl_type = "qucsctl";
+        proj.schema_editor = "qucs";
+      } else {
+        console.log(`${file} type is xschem`);
+        proj.ctl_type = "ngspctl";
+        proj.schema_editor = "Xschem";
+      }
       proj.simulator = "Ngspice";
-      proj.schema_editor = "Xschem";
     } else if (file.match(/\.kicad_sch/)) {
       console.log(`${file} type is eeschema`);
       proj.ctl_type = "eescmctl";
@@ -80,7 +86,7 @@
       }
     }
     proj.file = file;
-    set_ctl_type(file);
+    set_ctl_type(file, dir);
     /*
     proj.gap = "";
     if (dir != proj.dir) {

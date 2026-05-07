@@ -365,12 +365,12 @@ module Test
       end
     end
 
-    resource :eeschmctl do
+    resource :eescmctl do
       desc 'Open EEschema'
       get :open do
         open{|ckt_name, wdir|
         unless ckt = ckt_is_latest(ckt_name, wdir)
-            ckt = NgspiceControl.new([ckt_name, wdir], true, true)
+            ckt = EEschemaControl.new([ckt_name, wdir], true, true)
             puts "ckt.file@:open = #{ckt.file}"
             @@ngspice_ckt[ckt_name] = ckt
             @@ngspice_mtime[ckt_name] = File.mtime(ckt_name)
@@ -387,6 +387,158 @@ module Test
         Dir.chdir(work_dir){
           unless ckt = @@ngspice_ckt[ckt_name]
             ckt = NgspiceControl.new([ckt_name, work_dir], true, true)
+            @@ngspice_ckt[ckt_name] = ckt
+          end
+          puts "ckt.file@:simulate = #{ckt.file}"
+          if params[:elements_update]
+            updates = eval params[:elements_update]
+            puts "updates: #{updates}"
+            ckt.set updates
+          end
+          puts "models_update: #{params[:models_update]}"
+          puts "variations: #{params[:variations]}"
+          variations = params[:variations] ? eval(params[:variations].gsub('null', 'nil')) : {}
+          models_update = params[:models_update] ? eval(params[:models_update]) : {}
+          begin
+            keys, results = ckt.simulate models_update: models_update, variations: variations, probes: probes.split(',')
+          rescue => error
+            $stderr.puts "Error at simulate: #{error}"
+            $stderr.puts error.backtrace.join("\n")
+            error!("#{error}\n\n#{error.backtrace.join("\n")}", 500)
+          end
+          puts "probes=#{probes}"
+          if probes && probes.strip != ''
+            begin
+              vars, traces = ckt.get_traces *(probes.split(','))
+            rescue => error
+              $stderr.puts "Error at get_traces: #{error}"
+              $stderr.puts error.backtrace.join("\n")
+              error!("#{error}\n\n#{error.backtrace.join("\n")}", 500)
+            end
+            begin
+              $stderr.puts 'ckt.info:', ckt.info()
+              Utils::return_results probes, traces, params, vars, keys, results, ckt.elements, ckt.info()
+            rescue => error
+              $stderr.puts "Error at 'get :simulate': #{error}"
+              $stderr.puts error.backtrace.join("\n")
+              error!("#{error}\n\n#{error.backtrace.join("\n")}", 500)
+            end 
+          else
+            {"log" => ckt.sim_log, "updates" => ckt.elements, "info" => ckt.info()}
+          end
+          }
+        end
+      desc 'Results'
+      get :results do
+        work_dir, ckt_name = Utils::get_params(params)
+        #probes = params[:probes] ? URI.decode_www_form_component(params[:probes]): nil
+        probes = params[:probes] 
+        # require 'debug'
+        # debugger
+        Dir.chdir(work_dir){
+          unless ckt = @@ngspice_ckt[ckt_name]
+            ckt = NgspiceControl.new([ckt_name, work_dir], true, true)
+            @@ngspice_ckt[ckt_name] = ckt
+          end
+          puts "ckt.file@:results = #{ckt.file}"
+          if probes && probes.strip != ''
+            vars, traces = ckt.get_traces *(probes.split(','))
+            begin
+              Utils::return_results probes, traces, params, vars, ckt.step_results[3], ckt.step_results[2], ckt.elements
+            rescue => error
+              $stderr.puts "Error at 'get :results': #{error}"
+              $stderr.puts error.backtrace.join("\n")
+              error!("#{error}\n\n#{error.backtrace.join("\n")}", 500)
+            end
+          else
+            {"log" => ckt.sim_log}
+          end
+        }
+      end
+      desc 'Updates' # no longer used
+      get :update do
+        work_dir, ckt_name = Utils::get_params(params)
+        updates = eval params[:updates]
+        puts "updates: #{updates}"
+        Dir.chdir(work_dir){
+          ckt = @@ngspice_ckt[ckt_name]
+          #unless ckt = @@ngspice_ckt[ckt_name]
+          #  ckt = NgspiceControl.new(File.basename(ckt_name), true, true)
+          #  @@ngspice_ckt[ckt_name] = ckt
+          #end          
+          ckt.set updates
+          {"elements" => ckt.elements, "info" => ckt.info()}
+        }
+      end
+      desc 'Info'
+      get :info do
+        work_dir, ckt_name = Utils::get_params(params)
+        Dir.chdir(work_dir){
+          ckt = @@ngspice_ckt[ckt_name]
+          {"info" => ckt.info()}
+        }
+      end   
+      desc 'Measurement'
+      post :measure do
+        require 'json'
+        # puts params.keys
+        # puts params
+        work_dir, ckt_name = Utils::get_params(params)
+        results = []
+        Dir.chdir(work_dir){
+          puts "equation for measurement:\n#{params[:equation]}"
+          ckt = @@ngspice_ckt[ckt_name]
+          # '#{params[:plotdata].inspect}', size=#{params[:plotdata].size}"
+          if params[:plotdata] && params[:plotdata].size > 0
+            vars = params[:probes].split(',')[1..-1].map{|a| a.strip}
+            begin
+              results = eval_equation vars, params[:plotdata], params[:equation]
+            rescue => error
+              $stderr.puts "Error at measure: #{error}"
+              $stderr.puts error.backtrace.join("\n")
+              error!("#{error}\n\n#{error.backtrace.join("\n")}", 500)
+            end
+          else # db and phase
+            puts params[:db_data].size
+            if params[:db_data] && params[:db_data].size > 0
+              params[:db_data].each_index{|i|
+                db_data = params[:db_data][i]
+                ph_data = params[:ph_data][i]
+                x = Array_with_interpolation.new db_data[:x]
+                db = Array_with_interpolation.new db_data[:y]
+                ph = Array_with_interpolation.new ph_data[:y]
+                # puts "db=#{db}"
+                begin
+                  results << eval(params[:equation])
+                  #puts "results === #{results}"
+                rescue
+                  results << nil
+                end
+              }
+            end
+          end
+          {"calculated_value" => results}
+        }
+      end
+    end
+  
+    resource :qucsctl do
+      desc 'Open QUCS-S'
+      get :open do
+        open{|ckt_name, wdir|
+          ckt = QucsControl.new(ckt_name, true)
+          ckt.open(File.basename(ckt_name), true) if params[:showup]
+          puts ckt.elements
+          {"elements" => ckt.elements, "info" => nil, "models" => ckt.models}
+        }
+      end
+      desc 'Simulate'
+      get :simulate do
+        work_dir, ckt_name = Utils::get_params(params)
+        probes = params[:probes] 
+        Dir.chdir(work_dir){
+          unless ckt = @@ngspice_ckt[ckt_name]
+            ckt = NgspiceControl.new(ckt_name, true, true)
             @@ngspice_ckt[ckt_name] = ckt
           end
           puts "ckt.file@:simulate = #{ckt.file}"

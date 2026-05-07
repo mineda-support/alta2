@@ -47,7 +47,11 @@
                 `;
                 break;
             case "Qucs":
-                return
+                return `
+                create_cdraw();
+                dir = Dir.pwd;
+                cdraw2target 'qucs', File.join(dir,'cdraw'), File.join(dir, '${selected}')
+                `;
                 break;
             case "LTspice":
                 return `
