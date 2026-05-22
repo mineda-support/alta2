@@ -126,6 +126,7 @@
     if (ckt != undefined) {
       proj.elements = {};
       for (const [ckt_name, elms] of Object.entries(ckt.elements)) {
+        if (elms == null) continue;
         //console.log(ckt_name, "=", elms);
         if (ckt_name[0] == ".") {
           // console.log("skip:", ckt_name);
