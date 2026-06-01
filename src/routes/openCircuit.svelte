@@ -170,7 +170,7 @@
         }
       }
       console.log("models=", $state.snapshot(proj.models));
-      if (Object.keys(ckt.models).length == 0) {
+      if (ckt.models && Object.keys(ckt.models).length == 0) {
         alert("Warning: SPICE models are not included in the circuit");
       }
     }
