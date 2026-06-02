@@ -159,13 +159,15 @@
       }
       console.log("elements=", $state.snapshot(proj.elements));
       proj.models = {};
-      for (const [model_name, model_params] of Object.entries(ckt.models)) {
-        if (model_name.match(/Error/)) {
-          alert(model_name);
-        } else {
-          proj.models[model_name] = {};
-          for (const [par, value] of Object.entries(model_params[1])) {
-            proj.models[model_name][par] = value;
+      if (ckt.models) {
+        for (const [model_name, model_params] of Object.entries(ckt.models)) {
+          if (model_name.match(/Error/)) {
+           alert(model_name);
+          } else {
+            proj.models[model_name] = {};
+            for (const [par, value] of Object.entries(model_params[1])) {
+              proj.models[model_name][par] = value;
+            }
           }
         }
       }
