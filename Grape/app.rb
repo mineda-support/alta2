@@ -369,14 +369,14 @@ module Test
       desc 'Open EEschema'
       get :open do
         open{|ckt_name, wdir|
-        unless ckt = ckt_is_latest(ckt_name, wdir)
-            ckt = EEschemaControl.new([ckt_name, wdir], true, true)
+          unless ckt = ckt_is_latest(ckt_name, wdir)
+            ckt = EEschemaControl.new(ckt_name, true, true)
             puts "ckt.file@:open = #{ckt.file}"
             @@ngspice_ckt[ckt_name] = ckt
             @@ngspice_mtime[ckt_name] = File.mtime(ckt_name)
             @@ngspice_wdir[ckt_name] = wdir
-        end
-          ckt.open([ckt_name, wdir], true, true) if params[:showup]
+          end
+          ckt.open(ckt_name, true, true) if params[:showup]
           {"elements" => ckt.elements, "info" => nil, "models" => ckt.models}
         }
       end
@@ -386,7 +386,7 @@ module Test
         probes = params[:probes] 
         Dir.chdir(work_dir){
           unless ckt = @@ngspice_ckt[ckt_name]
-            ckt = NgspiceControl.new([ckt_name, work_dir], true, true)
+            ckt = NgspiceControl.new(ckt_name, true, true)
             @@ngspice_ckt[ckt_name] = ckt
           end
           puts "ckt.file@:simulate = #{ckt.file}"
@@ -437,7 +437,7 @@ module Test
         # debugger
         Dir.chdir(work_dir){
           unless ckt = @@ngspice_ckt[ckt_name]
-            ckt = NgspiceControl.new([ckt_name, work_dir], true, true)
+            ckt = NgspiceControl.new(ckt_name, true, true)
             @@ngspice_ckt[ckt_name] = ckt
           end
           puts "ckt.file@:results = #{ckt.file}"
