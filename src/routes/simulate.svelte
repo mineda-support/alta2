@@ -5,11 +5,11 @@
             case "LTspice":
                 target = ckt_name + ".asc";
                 break;
-            case "Xschem":
+            case "Xschem", "qucs":
                 target = ckt_name + ".sch";
                 break;
             case "EEschema":
-                target = ckt_name + ".sch";
+                target = ckt_name + ".kicad_sch";
                 break;
         }
         return target;
@@ -19,13 +19,13 @@
       return elm + ":'" + value + "',";
     }
 
-    export function update_elements(ckt, elements, schema_editor) {
+    export function update_elements(ckt, elements) {
+        let update_elms = '';
         for (const [ckt_name, elms] of Object.entries(ckt.elements)) {
             if (ckt_name[0] == ".") {
                 continue;
             }
-            let target = schema_file(ckt_name, schema_editor);
-            let update_elms = "";
+            update_elms = update_elms + ckt_name + ': {';
             for (const [elm, props] of Object.entries(elms)) {
                 if (Array.isArray(props)){
                     if (Object.entries(props).length == 1) {
@@ -45,12 +45,9 @@
                   }
                 }
             }
-            if (update_elms != "") {
-                console.log("let me update ", target, " with:", update_elms);
-                return [update_elms, target];
-            }
+            update_elms = update_elms + '}, ';
         }
-        return ["", null];
+        return update_elms;
     }
 
     export function update_models(ckt, models) {
@@ -124,28 +121,29 @@
         )}&variations=${encodeURIComponent(JSON.stringify(variations))}`;
         //let elements_update = undefined;
         //let target = undefined;
-        const [elements_update, target] = update_elements(
+        const ckt_elements_update = update_elements(
             ckt,
             proj.elements,
             proj.schema_editor,
         );
 
-        if (elements_update != "") {
-            console.log("target=", target);
+        if (ckt_elements_update != "") {
             console.log(
                 "update elements=",
                 $state.snapshot(proj.elements),
-                ` here @ proj.dir= ${proj.dir} file=${target}`,
+                ` here @ proj.dir= ${proj.dir} with=${ckt_elements_update}`,
             );
             encoded_params =
                 encoded_params +
-                `&elements_update=${encodeURIComponent(`{${elements_update}}`)}`;
+                `&elements_update=${encodeURIComponent(`{${ckt_elements_update}}`)}`;
         }
-        const models_update = update_models(ckt, proj.models);
-        if (models_update != {}) {
-            encoded_params =
-                encoded_params +
-                `&models_update=${encodeURIComponent(JSON.stringify(models_update))}`;
+        if (ckt.models) {
+          const models_update = update_models(ckt, proj.models);
+          if (models_update != {}) {
+              encoded_params =
+                  encoded_params +
+                  `&models_update=${encodeURIComponent(JSON.stringify(models_update))}`;
+          }
         }
         // dispatch("sim_start", { text: "LTspice simulation started!" });
         on_sim_start("Simulation started!");
@@ -161,7 +159,7 @@
         if (res2.keys != "") {
             let performances = res2.keys;
         }
-        if (elements_update != "") {
+        if (ckt_elements_update != "") {
             let elements = res2.updates;
             for (const [ckt_name, elms] of Object.entries(ckt.elements)) {
                 if (ckt_name[0] == ".") {
@@ -170,7 +168,7 @@
                 for (const [elm, props] of Object.entries(ckt.elements)) {
                     //if (elements[ckt_name][elm] != get_control(props)) {
                     if (elements[elm] != get_control(props)) {
-                        console.log(
+                        alert(
                             `Update error! ${elm}: ${get_control(props)} vs. ${
                                 //elements[ckt_name][elm]
                                 elements[elm]

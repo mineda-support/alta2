@@ -8,7 +8,7 @@ puts "hello world from ruby"
 puts Dir.pwd
 #puts $:
 require 'j_pack'
-require 'debug'
+#require 'debug'
 require 'csv_read'
 require 'xls_read'
 require 'exec_proc'
@@ -226,22 +226,26 @@ module Test
       desc 'Simulate'
       get :simulate do
         work_dir, ckt_name = Utils::get_params(params)
-        probes = params[:probes] 
         Dir.chdir(work_dir){
+          if params[:elements_update]
+            updates = eval params[:elements_update]
+            puts "updates: #{updates}"
+            updates.each_pair{|c_name, updts|
+              ckt = LTspiceControl.new("#{c_name}.sch")
+              @@ngspice_ckt["#{c_name}.asc"] = nil
+              ckt.set updts
+            }
+          end
           unless ckt = @@ngspice_ckt[ckt_name]
             ckt = NgspiceControl.new([ckt_name, work_dir], true, true)
             @@ngspice_ckt[ckt_name] = ckt
           end
           puts "ckt.file@:simulate = #{ckt.file}"
-          if params[:elements_update]
-            updates = eval params[:elements_update]
-            puts "updates: #{updates}"
-            ckt.set updates
-          end
           puts "models_update: #{params[:models_update]}"
           puts "variations: #{params[:variations]}"
           variations = params[:variations] ? eval(params[:variations].gsub('null', 'nil')) : {}
           models_update = params[:models_update] ? eval(params[:models_update]) : {}
+          probes = params[:probes] 
           begin
             keys, results = ckt.simulate models_update: models_update, variations: variations, probes: probes.split(',')
           rescue => error
@@ -385,16 +389,20 @@ module Test
         work_dir, ckt_name = Utils::get_params(params)
         probes = params[:probes] 
         Dir.chdir(work_dir){
-          unless ckt = @@ngspice_ckt[ckt_name]
-            ckt = NgspiceControl.new(ckt_name, true, true)
-            @@ngspice_ckt[ckt_name] = ckt
-          end
-          puts "ckt.file@:simulate = #{ckt.file}"
           if params[:elements_update]
             updates = eval params[:elements_update]
             puts "updates: #{updates}"
-            ckt.set updates
+            updates.each_pair{|c_name, updts|
+              ckt = LTspiceControl.new("#{c_name}.kicad_sch")
+              @@ngspice_ckt["#{c_name}.asc"] = nil
+              ckt.set updts
+            }
           end
+          unless ckt = @@ngspice_ckt[ckt_name]
+            ckt = NgspiceControl.new([ckt_name, work_dir], true, true)
+            @@ngspice_ckt[ckt_name] = ckt
+          end
+          puts "ckt.file@:simulate = #{ckt.file}"
           puts "models_update: #{params[:models_update]}"
           puts "variations: #{params[:variations]}"
           variations = params[:variations] ? eval(params[:variations].gsub('null', 'nil')) : {}
@@ -535,10 +543,18 @@ module Test
       desc 'Simulate'
       get :simulate do
         work_dir, ckt_name = Utils::get_params(params)
-        probes = params[:probes] 
         Dir.chdir(work_dir){
+          if params[:elements_update]
+            updates = eval params[:elements_update]
+            puts "updates: #{updates}"
+            updates.each_pair{|c_name, updts|
+              ckt = LTspiceControl.new("#{c_name}.sch")
+              @@ngspice_ckt["#{c_name}.asc"] = nil
+              ckt.set updts
+            }
+          end
           unless ckt = @@ngspice_ckt[ckt_name]
-            ckt = NgspiceControl.new(ckt_name, true, true)
+            ckt = NgspiceControl.new([ckt_name, work_dir], true, true)
             @@ngspice_ckt[ckt_name] = ckt
           end
           puts "ckt.file@:simulate = #{ckt.file}"
@@ -551,6 +567,7 @@ module Test
           puts "variations: #{params[:variations]}"
           variations = params[:variations] ? eval(params[:variations].gsub('null', 'nil')) : {}
           models_update = params[:models_update] ? eval(params[:models_update]) : {}
+          probes = params[:probes] 
           begin
             keys, results = ckt.simulate models_update: models_update, variations: variations, probes: probes.split(',')
           rescue => error
@@ -704,14 +721,16 @@ module Test
       desc 'Simulate'
       get :simulate do
         work_dir, ckt_name = Utils::get_params(params)
-        probes = params[:probes] 
         Dir.chdir(work_dir){
-          ckt = LTspiceControl.new(File.basename ckt_name)
           if params[:elements_update]
             updates = eval params[:elements_update]
             puts "updates: #{updates}"
-            ckt.set updates
+            updates.each_pair{|c_name, updts|
+              ckt = LTspiceControl.new("#{c_name}.asc")
+              ckt.set updts
+            }
           end
+          ckt = LTspiceControl.new(File.basename ckt_name)
           puts "models_update: #{params[:models_update]}"
           puts "variations: #{params[:variations]}"
           variations = params[:variations] ? eval(params[:variations].gsub('null', 'nil')) : {}
@@ -727,6 +746,7 @@ module Test
                 error!("#{error}\n\n#{error.backtrace.join("\n")}", 500)
               end
           end
+          probes = params[:probes] 
           puts "probes=#{probes}"
           if probes && probes.strip != ''
             begin
