@@ -31,33 +31,49 @@
     let selected = $state();
     let to_program = $derived.by(() => {
         console.log`selected = ${selected}`;
-        switch (selected) {
-            case "Xschem":
-                return `
-                create_cdraw();
-                dir = Dir.pwd;
-                cdraw2target 'xschem', File.join(dir,'cdraw'), File.join(dir, '${selected}')
-                `;
-                break;
-            case "EEschema":
-                return `
-                create_cdraw();
-                dir = Dir.pwd;
-                cdraw2target 'EESchema', File.join(dir,'cdraw'), File.join(dir, '${selected}')
-                `;
-                break;
-            case "Qucs":
-                return `
-                create_cdraw();
-                dir = Dir.pwd;
-                cdraw2target 'qucs', File.join(dir,'cdraw'), File.join(dir, '${selected}')
-                `;
-                break;
+        switch (proj.schema_editor) {
             case "LTspice":
-                return `
+                switch (selected) {
+                    case "Xschem":
+                        return `
+                  create_cdraw();
+                  dir = Dir.pwd;
+                  cdraw2target 'xschem', File.join(dir,'cdraw'), File.join(dir, '${selected}')
+                  `;
+                        break;
+                    case "EEschema":
+                        return `
+                  create_cdraw();
+                  dir = Dir.pwd;
+                  cdraw2target 'EESchema', File.join(dir,'cdraw'), File.join(dir, '${selected}')
+                  `;
+                        break;
+                    case "Qucs":
+                        return `
+                  create_cdraw();
+                  dir = Dir.pwd;
+                  cdraw2target 'qucs', File.join(dir,'cdraw'), File.join(dir, '${selected}')
+                  `;
+                        break;
+                }
+            case "Xschem":
+                switch (selected) {
+                    case "LTspice":
+                        return `
                 dir = Dir.pwd;
                 xschem2cdraw dir, File.join(dir, '${selected}')
                 `;
+                    case "Qucs":
+                        return `
+                dir = Dir.pwd;
+                xschem2qucs dir, File.join(dir, '${selected}')    
+                        `;     
+                    case "EEschema":
+                        return `
+                dir = Dir.pwd;
+                xschem2eeschema dir, File.join(dir, '${selected}')    
+                        `;     
+            }
         }
     });
     function encoded_params(dir, program) {
