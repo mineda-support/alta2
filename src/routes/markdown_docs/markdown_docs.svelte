@@ -69,7 +69,9 @@
 >
 
 {#if show_markdown}
-  <div><textarea bind:value={md}></textarea></div>
+  <div><textarea 
+      use:tooltip={() => msg("edit markdown source")}
+      bind:value={md}></textarea></div>
   <div>
     <button
       onclick={() => save_markdown(md, dir + md_file)}

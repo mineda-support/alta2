@@ -90,7 +90,9 @@
 <div>
     <label
         >{source_title}
-        <select bind:value={src} style="border:darkgray solid 1px;">
+        <select 
+            use:tooltip={() => msg("choose a source to sweep")}
+            bind:value={src} style="border:darkgray solid 1px;">
             {#if elements != undefined}
                 {#each Object.entries(elements) as [ckt_name, elms]}
                     {#each Object.keys(elms) as elm}
@@ -102,13 +104,17 @@
             {/if}
         </select>
         {#if src != undefined && src.match(/:M/)}
-            <select bind:value={par_name} style="border:darkgray solid 1px;">
+            <select 
+                use:tooltip={() => msg("choose a source to sweep")}
+                bind:value={par_name} style="border:darkgray solid 1px;">
                 <option value="l">l</option>
                 <option value="w">w</option>
             </select>
         {/if}
         {#if src != undefined && src.match(/:param/)}
-            <select bind:value={par_name} style="border:darkgray solid 1px;">
+            <select 
+            use:tooltip={() => msg("choose a source to sweep")}
+            bind:value={par_name} style="border:darkgray solid 1px;">
             {#each Object.values(get_param_names(elements, src)) as parm}
                 <option value={parm}>{parm}</option>
             {/each} 

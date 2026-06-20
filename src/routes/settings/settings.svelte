@@ -63,6 +63,7 @@
   >
   <label>
     <input
+      use:tooltip={() => msg("input settings file name")}
       type="text"
       autocomplete="off"
       onkeydown={async (e) => {
@@ -81,6 +82,7 @@
     >Load settings from:
   </button>
   <select
+　  use:tooltip={() => msg("select settings file name")}　
     bind:value={proj.settings_name}
     style="border:darkgray solid 1px;"
     onchange={() => load_settings(proj.settings_name, data.props.wdir)}

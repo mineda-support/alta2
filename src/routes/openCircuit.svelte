@@ -291,6 +291,7 @@
   Work directory:
   {#if data != undefined && data.props != undefined && data.props.wdir != undefined}
     <input
+      use:tooltip={() => msg("set working directory")}
       bind:value={proj.dir}
       style="border:darkgray solid 1px;width: 50%;"
     />

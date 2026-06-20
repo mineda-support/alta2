@@ -144,11 +144,16 @@
         to_program,
     )}`}
 >
-    <button>Convert circuit data</button>
+    <!-- button>Convert circuit data</button -->
+    <button
+        use:tooltip={() => msg("Convert circuit data")}
+    >Convert circuit data</button>
     to
     <!--input name={selected} / -->
     <input name="to_program" value={to_program} type="hidden" />
-    <select bind:value={selected}>
+    <select 
+        use:tooltip={() => msg("Conversion target format")}
+        bind:value={selected}>
         {#if editor != " Xschem"}<option value="Xschem">Xschem</option>{/if}
         {#if editor != " LTspice"}<option value="LTspice">LTspice</option>{/if}
         {#if editor != " EESchema"}<option value="EEschema">EEschema</option
@@ -157,7 +162,9 @@
         {#if editor != " Edif"}<option value="Edif">Edif</option>{/if}
     </select>
     Current:
-    <select bind:value={proj.schema_editor}>
+    <select 
+        use:tooltip={() => msg("Set current format")}
+        bind:value={proj.schema_editor}>
         <option value="Xschem">Xschem</option>
         <option value="LTspice">LTspice</option>
         <option value="EEschema">EEschema</option>

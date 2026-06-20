@@ -2,15 +2,22 @@
     export function tooltip(node, fn) {
         $effect(() => {
             const tooltip = tippy(node, fn());
-
             return tooltip.destroy;
         });
     }
     import { proj, ckt, settings } from "../shared.svelte.js";
     const details = {
-        'switch working directory': '\n回路データのあるワークディレクトリを絶対パスで指定する',
+        'show or hide flow control': '\nフローを表示する',
+        'show or hide circuit': '\n回路ファイルの表示をオン・オフする',
+        'Conversion target format': '\n変換先のフォーマット',
+        'Set current format': '\n現在のフォーマットを指定する',
+        'Convert circuit data': '\n回路データの変換を実行する',
+        'Convert from Edif file': '\nEdifファイルをLTspiceデータに変換する',
+        'set working directory': '\n回路データのあるワークディレクトリを絶対パスで指定する',
+        'switch working directory': '\nワークディレクトリを変更する',
         'show or hide README.md': '\nワークディレクトリにあるREADME.mdの表示をオン・オフする',
         'show or hide markdown source': '\nマークダウンのソースの表示をオン・オフする',
+        'edit markdown source': '\nマークダウンのソースを編集する',
         'save markdown': '\nマークダウンデータをワークディレクトリに保存する',
         'select directory to switch': '\nこのディレクトリをワークディレクトリにする',
         'show or hide symbol files' : '\nシンボルファイルのリストの表示をオン・オフする',
@@ -22,8 +29,10 @@
         'SPICE models': '\n回路で使用するSPICEモデルの一覧です',
         'variations on device parameters': '\n素子特性を調べるときに、変化させた素子値で一挙にシミュレーションする',
         'save settings in a working directory': '\n設定情報を、ワークディレクトリに保存する',
-        'load settings from a file': '\nワークディレクトリファイルから、設定情報をロードします。',
-        'run LTspice simulation': '\nシミュレーションを実行します。表示中のプロットはクリアされ、プローブを設定したプロットを表示する',
+        'input settings file name': '\n設定ファイル名を入力する',
+        'load settings from a file': '\nワークディレクトリファイルから、設定情報をロードする',
+        'select settings file name': '\n設定ファイルを選択する',
+        'run simulation': '\nシミュレーションを実行します。表示中のプロットはクリアされ、プローブを設定したプロットを表示する',
         'load measurement group': '\n測定データファイルと測定条件を測定グループとして、所定の形式のcsvファイルで指定する',
         'setup simulation for measurement group': '\n測定グループのシミュレーション条件を設定する',
         'plot measurement group with simulation': '\n測定グループのシミュレーション結果をプロットする',
@@ -35,7 +44,9 @@
         'save this plot as a CSV file': '\nこのプロットをCSVファイルにセーブする',
         'save this plot as a JSON file': '\nこのプロットをJSONファイルにセーブする',
         'get a measurement data file': '\n測定データファイルを絶対パスで指定する',
+        'input measurement file name': '\n測定データファイル名を入力する',
         'select two or more data columns to display in a graph': '\nグラフに表示するデータの桁番号(２つ以上）を空白で区切って指定する',
+        'get data from JSON file and plot': '\nJSONファイルからデータを取り込みプロット表示する',
         'reverse traces in a graph': '\nグラフのトレースの表示順序を逆順にする',
         'invert X data': ' X軸のデータの符号を反転する',
         'invert Y data': ' Y軸のデータの符号を反転する',
@@ -43,7 +54,8 @@
         'check all curves': '\nグラフのすべてのカーブを表示するようにチェックを入れる',
         'clear all curves': '\nグラフのすべてのカーブを削除する',
         'plot all curves': '\nグラフのすべてのカーブをプロットする',
-        'set probes list (separated by comma) for a current plot': '\nこのプロットに表示するトレースをプローブのリストで指定する',
+        'input probes list (separated by comma)': '\nプローブをカンマで区切って入力する',
+        'set probes list for a current plot': '\nこのプロットに表示するトレースをプローブのリストで指定する',
         'precision for number display for a step analysis': '\nステップ解析で表示する数字の桁数',
         'X axis is log scale if checked': '\nチェックすれば、X軸がlog表示になる',
         'Y axis is log scale if checked': '\nチェックすれば、y軸がlog表示になる',
@@ -55,7 +67,9 @@
         'performance equations in an array format': '\n中カッコで囲んだ、パフォーマンス式のリスト',
         'calculate equations for a current plot': '\nこのプロットに対して、パフォーマンス式を計算する',
         'add a new plot': '\nプロットを追加する',
+        'duplicate current plot': '\nプロットを複製する',
         'delete this plot': '\nこのプロットを削除する',
+        'choose a source to sweep': '\nスイープするソースを選択する',
         'add a source parameter to sweep': '\nスイープ解析のためのソースパラメータを追加する',
         'clear a last added source parameter': '\n最後に追加したソースパラメータを削除する',
         'select sweep for a source parameter': '\nソースパラメータのスイープをLinear, Decadeから選ぶ',

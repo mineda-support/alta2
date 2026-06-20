@@ -653,6 +653,7 @@
             class="button-1">Get measured data:</button
         >
         <input
+            use:tooltip={() => msg("input measurement file name")}
             bind:value={measfile}
             style="border:darkgray solid 1px; width:40%;"
         />
@@ -722,14 +723,17 @@
     {/if}
     <button
         use:tooltip={() =>
-            msg("set probes list (separated by comma) for a current plot")}
+            msg("set probes list for a current plot")}
         onclick={() => plot_result_clicked(step_precision)}
         class="button-1">Plot with probes:</button
     >
-    <input bind:value={probes} style="border:darkgray solid 1px;width:30%" />
+    <input 
+        use:tooltip={() =>
+            msg("input probes list (separated by comma)")}
+        bind:value={probes} style="border:darkgray solid 1px;width:30%" />
     <label
         use:tooltip={() =>
-            msg("set probes list (separated by comma) for a current plot")}
+            msg("set probes list for a current plot")}
         >step precision:
         <input bind:value={step_precision} style="width:5%" />
     </label>
