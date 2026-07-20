@@ -21,14 +21,13 @@ export async function POST({ request, cookies }) {
     // console.log(request);
 	const props = await request.json();
     const md_data = props.md_data;
-    const md_file = props.md_file;
+    const md_file = path.join(props.md_dir, props.md_file);
     const dir = path.dirname(md_file);
+    console.log('md_file=', md_file, '@', dir );
     if (!fs.existsSync(dir)) {
         fs.mkdirSync(dir, { recursive: true });
     } 
-    fs.writeFileSync(md_file, md_data
-    );
-    console.log('md_file=', md_file);
+    fs.writeFileSync(md_file, md_data);
     console.log('md_data=', md_data);
     return json({status: 'success'}, { status: 201 });
 }

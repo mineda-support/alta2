@@ -2,7 +2,7 @@
   import Markdown from "svelte-exmarkdown";
   import { gfmPlugin } from "svelte-exmarkdown/gfm";
   import { tooltip, msg } from "../Utils/tooltip.svelte";
-  async function save_markdown(md, md_file) {
+  async function save_markdown(md, dir, md_file) {
     const props = {};
 
     const lines = md.split("\n");
@@ -18,6 +18,7 @@
     md = lines.join("\n");
 
     props.md_data = md;
+    props.md_dir = dir;
     props.md_file = md_file;
     const response = await fetch("markdown_docs", {
       method: "POST",
@@ -74,7 +75,7 @@
       bind:value={md}></textarea></div>
   <div>
     <button
-      onclick={() => save_markdown(md, dir + md_file)}
+      onclick={() => save_markdown(md, dir, md_file)}
       class="button-1"
       use:tooltip={() => msg("save markdown")}
     >
