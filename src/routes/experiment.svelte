@@ -196,18 +196,19 @@
 			probes,
 		)}&equation=${encodeURIComponent(equation)}`;
 
-	    const [elements_update, target] = update_elements(ckt, proj.elements, proj.schema_editor);
-		console.log("elements_update:", elements_update);
-        if (elements_update != '') {
-            console.log('target=', target)
+	    // const [elements_update, target] = update_elements(ckt, proj.elements, proj.schema_editor);
+        const ckt_elements_update = update_elements(ckt, proj.elements);
+		console.log("ckt_elements_update:", ckt_elements_update);
+        if (ckt_elements_update != '') {
+            // console.log('target=', target)
             console.log(
                 "update elements=",
                 $state.snapshot(proj.elements),
-                ` here @ proj.dir= ${proj.dir} file=${target}`,
+                ` here @ proj.dir= ${proj.dir}`,
             );
             encoded_params =
                 encoded_params +
-                `&elements_update=${encodeURIComponent(`{${elements_update}}`)}`;
+                `&elements_update=${encodeURIComponent(`{${ckt_elements_update}}`)}`;
         } 
 		const models_update = update_models(ckt, proj.models);
 		console.log("models_update: ", models_update);
