@@ -124,7 +124,6 @@
         const ckt_elements_update = update_elements(
             ckt,
             proj.elements,
-            proj.schema_editor,
         );
 
         if (ckt_elements_update != "") {

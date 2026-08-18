@@ -393,7 +393,7 @@ module Test
             updates = eval params[:elements_update]
             puts "updates: #{updates}"
             updates.each_pair{|c_name, updts|
-              ckt = LTspiceControl.new("#{c_name}.kicad_sch")
+              ckt = EEschemaControl.new("#{c_name}.kicad_sch")
               @@ngspice_ckt["#{c_name}.asc"] = nil
               ckt.set updts
             }
