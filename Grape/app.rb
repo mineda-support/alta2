@@ -394,12 +394,12 @@ module Test
             puts "updates: #{updates}"
             updates.each_pair{|c_name, updts|
               ckt = EEschemaControl.new("#{c_name}.kicad_sch")
-              @@ngspice_ckt["#{c_name}.asc"] = nil
+              @@ngspice_ckt["#{c_name}.kicad_sch"] = nil
               ckt.set updts
             }
           end
           unless ckt = @@ngspice_ckt[ckt_name]
-            ckt = NgspiceControl.new([ckt_name, work_dir], true, true)
+            ckt = EEschemaControl.new(ckt_name, true, true)
             @@ngspice_ckt[ckt_name] = ckt
           end
           puts "ckt.file@:simulate = #{ckt.file}"
@@ -445,7 +445,7 @@ module Test
         # debugger
         Dir.chdir(work_dir){
           unless ckt = @@ngspice_ckt[ckt_name]
-            ckt = NgspiceControl.new(ckt_name, true, true)
+            ckt = EEschemaControl.new(ckt_name, true, true)
             @@ngspice_ckt[ckt_name] = ckt
           end
           puts "ckt.file@:results = #{ckt.file}"
