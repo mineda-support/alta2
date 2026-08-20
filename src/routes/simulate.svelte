@@ -74,7 +74,7 @@
 
     export function info_translated(info, proj) {
         if (info == null) return null;
-        if (proj.ctl_type == "ngspctl") {
+        if (proj.ctl_type == "ngspctl" || proj.ctl_type == "eescmctl") {
             //return .map(a => {
             return [info[0]].concat(info.slice(1).map((a) => translate(a)));
         } else {
@@ -159,18 +159,16 @@
             let performances = res2.keys;
         }
         if (ckt_elements_update != "") {
-            let elements = res2.updates;
+            let ckt_elements = res2.updates;
             for (const [ckt_name, elms] of Object.entries(ckt.elements)) {
                 if (ckt_name[0] == ".") {
                     continue;
                 }
                 for (const [elm, props] of Object.entries(ckt.elements)) {
-                    //if (elements[ckt_name][elm] != get_control(props)) {
-                    if (elements[elm] != get_control(props)) {
+                    if (ckt_elements[ckt_name][elm] != get_control(props)) {
                         alert(
                             `Update error! ${elm}: ${get_control(props)} vs. ${
-                                //elements[ckt_name][elm]
-                                elements[elm]
+                                ckt_elements[ckt_name][elm]
                             }`,
                         );
                     }

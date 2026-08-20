@@ -231,8 +231,8 @@ module Test
             updates = eval params[:elements_update]
             puts "updates: #{updates}"
             updates.each_pair{|c_name, updts|
-              ckt = LTspiceControl.new("#{c_name}.sch")
-              @@ngspice_ckt["#{c_name}.asc"] = nil
+              ckt = NgspiceControl.new(["#{c_name}.sch", work_dir])
+              @@ngspice_ckt["#{c_name}.sch"] = nil
               ckt.set updts
             }
           end
@@ -730,7 +730,7 @@ module Test
               ckt.set updts
             }
           end
-          ckt = LTspiceControl.new(File.basename ckt_name)
+          ckt = LTspiceControl.new(File.basename(ckt_name), true)
           puts "models_update: #{params[:models_update]}"
           puts "variations: #{params[:variations]}"
           variations = params[:variations] ? eval(params[:variations].gsub('null', 'nil')) : {}
