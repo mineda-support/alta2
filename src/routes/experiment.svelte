@@ -248,10 +248,10 @@
 		if (var_name.match(/^par|^M/)) {
 			const rex = new RegExp(`${par_name} *= *\\S+`)
 			return [
-				`${var_name}: '${keep.replace(rex, `${par_name}=${value}`)}'`,
+				`'${var_name}'=>'${keep.replace(rex, `${par_name}=${value}`)}'`,
 			];
 		} else {
-			return [`${var_name}: ${value}`];
+			return [`'${var_name}'=>${value}`];
 		}
 	}
 
@@ -465,7 +465,8 @@
 
 	async function update_elms(dir, target, update_elms) {
 		console.log("let me update ", target, " with:", update_elms);
-		update_elms = encodeURIComponent(`{${update_elms}}`);
+		const ckt_update = `'${target}'=>{${update_elms.join()}}`
+		update_elms = encodeURIComponent(`{${ckt_update}}`);
 		let encoded_params = `dir=${encodeURIComponent(
 			dir,
 		)}&file=${encodeURIComponent(target)}`;

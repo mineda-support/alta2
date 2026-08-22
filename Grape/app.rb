@@ -302,17 +302,17 @@ module Test
           end
         }
       end
-      desc 'Updates' # no longer used
+      desc 'Updates' 
       get :update do
         work_dir, ckt_name = Utils::get_params(params)
+        puts params[:updates]
         updates = eval params[:updates]
         puts "updates: #{updates}"
         Dir.chdir(work_dir){
-          ckt = @@ngspice_ckt[ckt_name]
-          #unless ckt = @@ngspice_ckt[ckt_name]
-          #  ckt = NgspiceControl.new(File.basename(ckt_name), true, true)
-          #  @@ngspice_ckt[ckt_name] = ckt
-          #end          
+          unless ckt = @@ngspice_ckt[ckt_name]
+            ckt = NgspiceControl.new([File.basename(ckt_name), work_dir], true, true)
+            @@ngspice_ckt[ckt_name] = ckt
+          end
           ckt.set updates
           {"elements" => ckt.elements, "info" => ckt.info()}
         }
@@ -407,6 +407,7 @@ module Test
           puts "variations: #{params[:variations]}"
           variations = params[:variations] ? eval(params[:variations].gsub('null', 'nil')) : {}
           models_update = params[:models_update] ? eval(params[:models_update]) : {}
+          probes = params[:probes] 
           begin
             keys, results = ckt.simulate models_update: models_update, variations: variations, probes: probes.split(',')
           rescue => error
@@ -470,10 +471,10 @@ module Test
         puts "updates: #{updates}"
         Dir.chdir(work_dir){
           ckt = @@ngspice_ckt[ckt_name]
-          #unless ckt = @@ngspice_ckt[ckt_name]
-          #  ckt = NgspiceControl.new(File.basename(ckt_name), true, true)
-          #  @@ngspice_ckt[ckt_name] = ckt
-          #end          
+          unless ckt = @@ngspice_ckt[ckt_name]
+            ckt = EEschemaControl.new(File.basename(ckt_name), true, true)
+            @@ngspice_ckt[ckt_name] = ckt
+          end         
           ckt.set updates
           {"elements" => ckt.elements, "info" => ckt.info()}
         }
@@ -796,7 +797,7 @@ module Test
         updates = eval params[:updates]
         puts "updates: #{updates}"
         Dir.chdir(work_dir){
-          ckt = LTspiceControl.new(File.basename ckt_name)
+          ckt = LTspiceControl.new(File.basename(ckt_name), true)
           ckt.set updates
           {"elements" => ckt.elements, "info" => ckt.info}
         }

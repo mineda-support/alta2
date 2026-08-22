@@ -5,7 +5,8 @@
             case "LTspice":
                 target = ckt_name + ".asc";
                 break;
-            case "Xschem", "qucs":
+            case "Xschem":
+            case "qucs":
                 target = ckt_name + ".sch";
                 break;
             case "EEschema":
@@ -51,6 +52,7 @@
     }
 
     export function update_models(ckt, models) {
+        /// return {}; /* temporarily bypass update_models */
         let update_mdls = {};
         for (const [model_name, model_params] of Object.entries(ckt.models)) {
             for (const [par, value] of Object.entries(model_params[1])) {
